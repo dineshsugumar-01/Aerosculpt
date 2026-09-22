@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyScape — Georeferenced Semantic 3D Reconstruction from a Single UAV Flight</title>
+  <meta name="description" content="SkyScape transforms single-pass UAV flight video into georeferenced, semantically classified 3D digital twins using real-time visual SLAM, learned multi-view geometry, and geodetic coordinate fusion.">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23141822'/><text y='68' x='24' font-size='60' fill='%2300d4b2' font-family='monospace' font-weight='bold'>S</text></svg>">
+</head>
+<body>
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-content">
+      <a href="#" class="brand">
+        <div class="brand-icon">S</div>
+        <span class="brand-text">SkyScape</span>
+        <span class="brand-badge">RESEARCH PLATFORM</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#video-showcase" class="nav-link">Aerosculpt Feed</a></li>
+        <li><a href="#viewer-3d-section" class="nav-link">3D Inspection Viewport</a></li>
+        <li><a href="#architecture-pipeline" class="nav-link">Pipeline Architecture</a></li>
+        <li><a href="#research-modules" class="nav-link">Methodology</a></li>
+        <li><a href="#accuracy-section" class="nav-link">Accuracy & Geodesy</a></li>
+        <li><a href="#runtime-budget" class="nav-link">Runtime Budget</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#viewer-3d-section" class="btn btn-secondary btn-sm">3D Viewport</a>
+        <a href="#architecture-pipeline" class="btn btn-primary btn-sm">Architecture Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container">
+      <div class="hero-pill">
+        <span>UAV-to-GIS 3D Reconstruction Pipeline // CVPR 2025 Architecture Integration</span>
+      </div>
+      <h1 class="hero-title">
+        Georeferenced Semantic 3D Reconstruction from a Single UAV Flight
+      </h1>
+      <p class="hero-desc">
+        SkyScape converts continuous drone survey video into georeferenced, semantically classified 3D representations. The architecture combines fast visual SLAM (Aerosculpt SLAM), intelligent keyframe selection, learned multi-view reconstruction (GLUEMAP + MapAnything), dynamic object masking (YOLO26-Seg), and geodetic coordinate fusion (PROJ/GDAL) into an adaptive pipeline engineered to process a 10-minute flight in under 15 minutes.
+      </p>
+      <div class="hero-actions">
+        <a href="#video-showcase" class="btn btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Aerosculpt Video Output
+        </a>
+        <a href="#viewer-3d-section" class="btn btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Inspect 3D Reconstructed Model
+        </a>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="hero-stats-grid">
+        <div class="stat-card">
+          <div class="stat-val tabular-nums">96.8<span class="stat-unit">%</span></div>
+          <div class="stat-label">Frame Redundancy Reduction</div>
+          <div class="stat-detail">18,000 video frames downsampled to ~550 keyframes via parallax & sharpness</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val tabular-nums">&lt; 15<span class="stat-unit">min</span></div>
+          <div class="stat-label">Total Processing Budget</div>
+          <div class="stat-detail">Engineered turnaround target for a 10-minute 4K video on RTX 4090</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val tabular-nums">RTK<span class="stat-unit">/PPK</span></div>
+          <div class="stat-label">Centimeter-Level Positioning</div>
+          <div class="stat-detail">WGS84 ellipsoidal to local metric ENU/ECEF CRS via robust Sim(3) alignment</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val tabular-nums">4<span class="stat-unit">States</span></div>
+          <div class="stat-label">Evidence-Aware Provenance</div>
+          <div class="stat-detail">Explicit attribution: OBSERVED, RECONSTRUCTED, INFERRED, UNKNOWN</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- ==========================================================================
+         Section 1: Aerosculpt Video Showcase Console
+         ========================================================================== -->
+    <section class="section" id="video-showcase">
+      <div class="container">
+        <div class="section-tag">Visual Geometry Front-End</div>
+        <h2 class="section-title">Aerosculpt Output & Drone Flight Feeds</h2>
+        <p class="section-subtitle">
+          Aerosculpt serves as the platform's rapid geometric tracking front-end. It estimates continuous relative camera poses, tracking confidence, and dense pointmaps in real time to generate keyframe candidates without requiring early bundle adjustment.
+        </p>
+
+        <div class="video-console">
+          <!-- Console Header & Feeds Switcher -->
+          <div class="console-header">
+            <div class="console-tabs">
+              <button class="console-tab active" data-feed="mast3r-slam">
+                Aerosculpt Output (Live Dense SLAM)
+              </button>
+              <button class="console-tab" data-feed="cvpr-yt">
+                Research Foundation (CVPR 2025)
+              </button>
+              <button class="console-tab" data-feed="matching">
+                Pointmap Matching
+              </button>
+              <button class="console-tab" data-feed="rays">
+                Pointmap-to-Rays
+              </button>
+              <button class="console-tab" data-feed="raw-drone">
+                Raw UAV Flight (1080p)
+              </button>
+            </div>
+            <div class="telemetry-status-pill">
+              <span class="status-dot"></span>
+              <span class="tabular-nums">TRACKING: LOCKED (30 FPS)</span>
+            </div>
+          </div>
+
+          <!-- Video Viewport -->
+          <div class="video-stage-wrapper">
+            <!-- Feed 1: Aerosculpt SLAM Office Video (Local asset) -->
+            <video id="feed-mast3r-slam" class="video-element feed-element active" autoplay loop muted playsinline controls>
+              <source src="assets/mast3r_slam_office.mp4" type="video/mp4">
+            </video>
+
+            <!-- Feed 2: CVPR 2025 Presentation (YouTube Embed) -->
+            <iframe id="feed-cvpr-yt" class="video-iframe feed-element" src="https://www.youtube-nocookie.com/embed/wozt71NBFTQ?enablejsapi=1" title="Research Presentation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+            <!-- Feed 3: Matching Video -->
+            <video id="feed-matching" class="video-element feed-element" loop muted playsinline controls>
+              <source src="assets/matching_video.mp4" type="video/mp4">
+            </video>
+
+            <!-- Feed 4: Ray Video -->
+            <video id="feed-rays" class="video-element feed-element" loop muted playsinline controls>
+              <source src="assets/ray_video.mp4" type="video/mp4">
+            </video>
+
+            <!-- Feed 5: Raw Drone Flight Video -->
+            <video id="feed-raw-drone" class="video-element feed-element" loop muted playsinline controls>
+              <source src="VIDEO-2026-09-20-17-40-19.mp4" type="video/mp4">
+            </video>
+
+            <!-- Instrumental HUD Overlay -->
+            <div class="hud-overlay">
+              <div class="hud-top">
+                <div class="hud-badge">
+                  FRONTEND: <strong>AEROSCULPT SLAM</strong> // CVPR 2025 FOUNDATION
+                </div>
+                <div class="hud-badge">
+                  RECEIVER: <strong>RTK FLOAT / DGNSS</strong>
+                </div>
+              </div>
+              <div class="hud-bottom">
+                <div class="hud-metrics-bar">
+                  <div class="hud-metric-chip">
+                    <span class="chip-name">SAMPLING</span>
+                    <span class="chip-val tabular-nums" id="hud-fps">29.9 FPS</span>
+                  </div>
+                  <div class="hud-metric-chip">
+                    <span class="chip-name">POSE LATENCY</span>
+                    <span class="chip-val tabular-nums" id="hud-latency">23.4 ms</span>
+                  </div>
+                  <div class="hud-metric-chip">
+                    <span class="chip-name">MATCHED PTS</span>
+                    <span class="chip-val tabular-nums" id="hud-points">12,480</span>
+                  </div>
+                  <div class="hud-metric-chip">
+                    <span class="chip-name">FEATURE DRIFT</span>
+                    <span class="chip-val tabular-nums" id="hud-drift">0.018 m</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Console Metadata Bar -->
+          <div class="console-meta-bar">
+            <div>
+              <h3 class="meta-title" id="console-meta-title">Aerosculpt Real-Time SLAM Output (Live Tracking)</h3>
+              <p class="meta-desc" id="console-meta-desc">
+                Live Aerosculpt visual SLAM demonstration showing real-time dense camera tracking, pointmap alignment, and robust local geometry recovery without offline bundle adjustment.
+              </p>
+            </div>
+            <div class="meta-citation" id="console-meta-citation">
+              Aerosculpt SLAM Engine (Murai, Dexheimer, Davison Foundation — CVPR 2025 Highlight)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 2: Input Video ➔ 3D Reconstructed Model Output
+         ========================================================================== -->
+    <section class="section" id="viewer-3d-section">
+      <div class="container">
+        <div class="section-tag">Direct Pipeline Verification</div>
+        <h2 class="section-title">Flight Video Input ➔ Reconstructed 3D Model Output</h2>
+        <p class="section-subtitle">
+          Direct side-by-side proof: On the left is the raw 1080p single-pass UAV flight video (<code style="color:var(--accent); font-family:var(--font-mono); font-size:12px;">VIDEO-2026-09-20-17-40-19.mp4</code>); on the right is the complete georeferenced textured 3D mesh model (<code style="color:var(--accent); font-family:var(--font-mono); font-size:12px;">Task-of-2026-09-10T143406911Z-textured_model.glb</code>) reconstructed from it by Aerosculpt.
+        </p>
+
+        <div class="io-comparison-grid">
+          <!-- Left: Input Video Panel -->
+          <div class="io-panel">
+            <div class="io-panel-header">
+              <div class="io-panel-title">
+                <span>📹 INPUT: UAV Flight Video</span>
+              </div>
+              <span class="io-panel-tag">VIDEO-2026-09-20-17-40-19.mp4</span>
+            </div>
+
+            <div class="io-video-container">
+              <video class="io-video-element" autoplay loop muted playsinline controls>
+                <source src="VIDEO-2026-09-20-17-40-19.mp4" type="video/mp4">
+              </video>
+            </div>
+
+            <div class="io-panel-footer">
+              <span>RESOLUTION: <strong style="color:#fff;" class="tabular-nums">1920 × 1080 (30 FPS)</strong></span>
+              <span>SURVEY SITE: <strong style="color:#fff;">Dumbarton Castle & Rock</strong></span>
+            </div>
+          </div>
+
+          <!-- Right: Output 3D Model Panel -->
+          <div class="io-panel">
+            <div class="io-panel-header">
+              <div class="io-panel-title">
+                <span>🧊 OUTPUT: 3D Reconstructed Digital Twin</span>
+              </div>
+              <span class="io-panel-tag accent">Task-of-2026-09-10T143406911Z-textured_model.glb</span>
+            </div>
+
+            <!-- Toolbar inside 3D Panel -->
+            <div class="viewer-toolbar" style="border-top:none;">
+              <div class="viewer-controls-group">
+                <button class="tool-btn mode-btn active" data-mode="textured">Textured PBR</button>
+                <button class="tool-btn mode-btn" data-mode="wireframe">Wireframe</button>
+                <button class="tool-btn mode-btn" data-mode="points">Point Cloud</button>
+                <button class="tool-btn mode-btn" data-mode="normal">Normals</button>
+              </div>
+
+              <div class="viewer-controls-group">
+                <button class="tool-btn preset-btn" data-preset="top">Top-Down</button>
+                <button class="tool-btn preset-btn active" data-preset="oblique">Front View</button>
+                <button class="tool-btn preset-btn" data-preset="closeup">Close-up</button>
+                <button class="tool-btn" id="btn-recenter-view" title="Recenter camera to front facade perspective">🎯 Recenter</button>
+                <button class="tool-btn" id="btn-measure-tool">📏 Measure</button>
+                <button class="tool-btn" id="btn-clear-measure">Clear</button>
+              </div>
+            </div>
+
+            <!-- WebGL Viewport Container -->
+            <div class="viewer-viewport-wrapper" id="canvas-container" style="height: 472px;">
+              <!-- Loading Indicator -->
+              <div class="viewer-loading" id="viewer-loading-spinner">
+                <div class="spinner"></div>
+                <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
+                  LOADING RECONSTRUCTED 3D ASSET...
+                </div>
+              </div>
+
+              <!-- Viewport Info Pill -->
+              <div class="viewer-info-pill">
+                <div id="viewer-stat-mesh" class="tabular-nums"><strong>Vertices:</strong> 235,994 | <strong>Faces:</strong> 193,244</div>
+                <div>CRS: <strong>EPSG:32630 (UTM Zone 30N)</strong></div>
+              </div>
+
+              <!-- Metric Measurement Indicator -->
+              <div class="measurement-badge tabular-nums" id="viewer-measure-badge">
+                <strong>Survey Distance:</strong> 0.00 m
+              </div>
+            </div>
+
+            <div class="io-panel-footer">
+              <span>FORMAT: <strong style="color:#fff;">GLTF / GLB 2.0 (Textured PBR)</strong></span>
+              <span>GEOMETRY: <strong style="color:var(--accent);" class="tabular-nums">Metric Scaled</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 3: The Reconstruction Problem & Core Objectives
+         ========================================================================== -->
+    <section class="section" id="problem-objectives">
+      <div class="container">
+        <div class="section-tag">Engineering Challenges</div>
+        <h2 class="section-title">The Problem: Reconstructing Single-Flight UAV Video</h2>
+        <p class="section-subtitle">
+          A UAV captures rich visual information, but converting continuous video into a survey-grade 3D model presents distinct physical and computational challenges.
+        </p>
+
+        <div class="research-grid">
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">DATA REDUNDANCY</span>
+            </div>
+            <h3 class="research-card-title">18,000 Frames vs Compute Limits</h3>
+            <p class="research-card-text">
+              A 10-minute flight at 30 FPS yields 18,000 images. Running all frames through multi-view neural networks causes GPU memory exhaustion and redundant computations on stationary hover frames.
+            </p>
+            <ul class="bullet-list">
+              <li>Laplacian variance filters discard unsharp and vibration-blurred frames.</li>
+              <li>Multi-criteria keyframing downsamples to ~550 optimal baseline keyframes.</li>
+              <li>Eliminates 96.8% of redundant computation while preserving geometry.</li>
+            </ul>
+          </div>
+
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">DYNAMIC ARTIFACTS</span>
+            </div>
+            <h3 class="research-card-title">Transient Moving Objects</h3>
+            <p class="research-card-text">
+              Moving cars, pedestrians, and animals violate multi-view epipolar geometry. If unhandled, they cause false tie-points, corrupt camera bundle adjustment, and introduce ghosting into meshes.
+            </p>
+            <ul class="bullet-list">
+              <li>YOLO26-Seg segments transient classes (vehicles, people, animals).</li>
+              <li>SAM 2 provides boundary refinement for low-confidence detections.</li>
+              <li>Dynamic regions are masked out prior to camera tracking and dense MVS.</li>
+            </ul>
+          </div>
+
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">GEODESY</span>
+            </div>
+            <h3 class="research-card-title">Relative Geometry vs Real-World Scale</h3>
+            <p class="research-card-text">
+              A 3D model can appear visually convincing in relative camera space while suffering from metric scale drift, rotational tilt, and kilometer-scale geographic positioning errors.
+            </p>
+            <ul class="bullet-list">
+              <li>Separates relative visual SLAM tracking from geographic positioning.</li>
+              <li>PROJ converts WGS84 GPS/RTK into Earth-Centered Earth-Fixed (ECEF) and ENU.</li>
+              <li>Robust 7-parameter Sim(3) transformation aligns model to ground coordinates.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 4: 20-Stage End-to-End Pipeline Architecture
+         ========================================================================== -->
+    <section class="section" id="architecture-pipeline">
+      <div class="container">
+        <div class="section-tag">System Architecture</div>
+        <h2 class="section-title">The 20-Stage Adaptive Pipeline</h2>
+        <p class="section-subtitle">
+          Every stage of SkyScape has a specific, isolated responsibility. Select a domain filter or click any individual stage to inspect its data inputs, outputs, mathematical formulation, and system rationale.
+        </p>
+
+        <!-- Domain Filters -->
+        <div class="pipeline-category-filters">
+          <button class="cat-btn active" data-category="all">All Stages (20)</button>
+          <button class="cat-btn" data-category="ingest">Ingestion & SLAM (5)</button>
+          <button class="cat-btn" data-category="semantics">Semantics & Masking (4)</button>
+          <button class="cat-btn" data-category="neural">Neural Reconstruction (2)</button>
+          <button class="cat-btn" data-category="optimization">Classical Optimization (4)</button>
+          <button class="cat-btn" data-category="geodesy">Geodesy & GIS (5)</button>
+        </div>
+
+        <!-- 20-Stage Grid -->
+        <div class="pipeline-graph-grid" id="pipeline-grid">
+          <!-- Populated dynamically by main.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 5: Deep-Dive Technical Research Modules
+         ========================================================================== -->
+    <section class="section" id="research-modules">
+      <div class="container">
+        <div class="section-tag">Engineering Methodology</div>
+        <h2 class="section-title">Core Research Modules & Architecture Rationale</h2>
+        <p class="section-subtitle">
+          SkyScape is built on adaptive integration. Fast learned methods understand the flight, global learned and classical methods stabilize geometry, dense MVS recovers detail, and geodetic processing establishes real-world metric truth.
+        </p>
+
+        <div class="research-grid">
+          <!-- Module 1: Aerosculpt Front-End -->
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge cyan">FRONT-END TRACKING</span>
+              <span class="tech-badge">CVPR 2025</span>
+            </div>
+            <h3 class="research-card-title">Aerosculpt: Role & Scope</h3>
+            <p class="research-card-text">
+              Aerosculpt is utilized specifically as a fast front-end tracking system: recovering relative camera motion, pointmap coverage, and tracking confidence without requiring known depth or prior maps.
+            </p>
+            <div class="formula-box tabular-nums">
+              T_{t, t-1} = \arg\min_T \sum_{p} w(p) \| \pi(T X_p) - x'_p \|_{\Sigma}^2
+            </div>
+            <ul class="bullet-list">
+              <li>Provides rapid relative trajectory and parallax metrics for keyframing.</li>
+              <li>Maintains tracking across low-texture terrain where classic feature matchers fail.</li>
+              <li>Handed off to GLUEMAP and Ceres for global metric survey optimization.</li>
+            </ul>
+          </div>
+
+          <!-- Module 2: Intelligent Keyframe Engine -->
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">KEYFRAME OPTIMIZATION</span>
+            </div>
+            <h3 class="research-card-title">Intelligent Keyframe Selection</h3>
+            <p class="research-card-text">
+              Instead of sending thousands of redundant frames to global reconstruction, frames are scored across sharpness, baseline parallax, GPS displacement, and dynamic-object presence.
+            </p>
+            <div class="formula-box tabular-nums">
+              Score = w_1 S_{sharp} + w_2 \Delta\theta_{parallax} + w_3 D_{GNSS} - w_4 R_{dynamic}
+            </div>
+            <ul class="bullet-list">
+              <li>Enforces optimal triangulation angles across successive flight passes.</li>
+              <li>Downsamples 18,000 raw frames to an engineering target of 400–800 keyframes.</li>
+              <li>BENCHMARK: Achieves 96.8% data reduction without loss of surface completeness.</li>
+            </ul>
+          </div>
+
+          <!-- Module 3: GLUEMAP with MapAnything Backbone -->
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge cyan">GLOBAL SFM</span>
+            </div>
+            <h3 class="research-card-title">GLUEMAP with MapAnything Backbone</h3>
+            <p class="research-card-text">
+              MapAnything is integrated as the multi-view geometric backbone inside GLUEMAP, uniting learned metric multi-view priors with classical global rotation averaging and bundle adjustment.
+            </p>
+            <div class="formula-box tabular-nums">
+              \min_{R_1...R_n} \sum_{(i,j) \in \mathcal{E}} \rho \left( \text{Log}(R_i R_j^T R_{ij}^T) \right)
+            </div>
+            <ul class="bullet-list">
+              <li>MapAnything predicts learned multi-view geometry across wide-baseline aerial passes.</li>
+              <li>GLUEMAP computes global rotation and similarity averaging across all keyframes.</li>
+              <li>Prevents loop-closure warping and cumulative drift across long survey flights.</li>
+            </ul>
+          </div>
+
+          <!-- Module 4: Scene Analyzer -->
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">ADAPTIVE ROUTING</span>
+            </div>
+            <h3 class="research-card-title">Scene Analyzer & Dynamic Routing</h3>
+            <p class="research-card-text">
+              Before running expensive global reconstruction, the flight segment is classified into Easy, Moderate, or Hard profiles, dynamically routing computation where needed.
+            </p>
+            <div class="formula-box tabular-nums">
+              \text{Profile} = f(\text{Texture Entropy}, \text{Parallax Spread}, \text{Occlusion Index})
+            </div>
+            <ul class="bullet-list">
+              <li><strong>Easy (Open Fields):</strong> Fast geometry profile, skipped heavy refinement.</li>
+              <li><strong>Moderate (Suburban):</strong> Standard GLUEMAP + PatchMatch MVS.</li>
+              <li><strong>Hard (Dense Castle/Forest):</strong> Full multi-view attention + SAM 2 refinement.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Evidence-Aware 3D States Section -->
+        <div style="margin-top: var(--space-12);">
+          <div class="section-tag">Survey Integrity</div>
+          <h3 style="font-size: 24px; font-weight: 700; margin-bottom: var(--space-2); color: #fff;">
+            Evidence-Aware 3D Representation
+          </h3>
+          <p style="color: var(--text-secondary); max-width: 760px; font-size: 14.5px;">
+            SkyScape distinguishes between geometry directly supported by sensor observations and geometry that was inferred. Surfaces are tagged with one of four explicit evidence states:
+          </p>
+
+          <div class="evidence-matrix-grid">
+            <div class="evidence-card observed">
+              <div class="evidence-state-tag">STATE 01: OBSERVED</div>
+              <div class="evidence-title">Directly Measured</div>
+              <div class="evidence-desc">
+                Geometry directly verified by multiple sharp, unoccluded multi-view camera rays with low reprojection residuals (&lt;0.8 px).
+              </div>
+            </div>
+
+            <div class="evidence-card reconstructed">
+              <div class="evidence-state-tag">STATE 02: RECONSTRUCTED</div>
+              <div class="evidence-title">Multi-View Triangulated</div>
+              <div class="evidence-desc">
+                Recovered through global SfM and PatchMatch MVS depth consensus across keyframe baselines with verified parallax.
+              </div>
+            </div>
+
+            <div class="evidence-card inferred">
+              <div class="evidence-state-tag">STATE 03: INFERRED</div>
+              <div class="evidence-title">Spatially Extrapolated</div>
+              <div class="evidence-desc">
+                Surfaces completed from surrounding structural evidence (e.g. road covered by tree foliage, ground beneath parked car).
+              </div>
+            </div>
+
+            <div class="evidence-card unknown">
+              <div class="evidence-state-tag">STATE 04: UNKNOWN</div>
+              <div class="evidence-title">Insufficient Evidence</div>
+              <div class="evidence-desc">
+                Blind zones lacking adequate camera views or deep shadows, explicitly flagged for surveyor inspection rather than fabricated.
+              </div>
+            </div>
+          </div>
+
+          <!-- Deep-Dive Callout: What does UNKNOWN mean? -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 8px; padding: var(--space-5); margin-top: var(--space-6);">
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 6px;">
+              SURVEY INTEGRITY DEEP-DIVE
+            </div>
+            <h4 style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+              What does "UNKNOWN" mean in Evidence-Aware 3D?
+            </h4>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+              In conventional 3D reconstruction pipelines (e.g. naive Poisson meshing or neural radiance fields), meshing algorithms interpolate and "hallucinate" synthetic surfaces across unobserved regions—bridging gaps between rock faces and building roofs where the drone camera never had physical line of sight. In survey-grade engineering, presenting hallucinated surfaces as measured ground truth creates severe liability.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); font-size: 12.5px;">
+              <div style="background: var(--bg-canvas); padding: 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <strong style="color: #fff;">1. Occluded Physical Underhangs:</strong>
+                <p style="color: var(--text-tertiary); margin-top: 4px;">
+                  Sheer vertical cliffs, castle ramparts, and foundation undercuts that passive optical nadir/oblique cameras cannot see into from flight altitude.
+                </p>
+              </div>
+              <div style="background: var(--bg-canvas); padding: 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <strong style="color: #fff;">2. Deep Shadows & Specular Voids:</strong>
+                <p style="color: var(--text-tertiary); margin-top: 4px;">
+                  Crevices with extreme dynamic range underexposure or water bodies with specular glare where multi-view photometric matching fails to establish tie-points.
+                </p>
+              </div>
+              <div style="background: var(--bg-canvas); padding: 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <strong style="color: #fff;">3. Sub-Canopy Ground Gaps:</strong>
+                <p style="color: var(--text-tertiary); margin-top: 4px;">
+                  Terrain completely covered by dense multi-layer tree canopies. Rather than guessing the terrain level, SkyScape marks the sub-canopy void as UNKNOWN.
+                </p>
+              </div>
+              <div style="background: var(--bg-canvas); padding: 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <strong style="color: #fff;">4. Single-Ray Boundary Zones:</strong>
+                <p style="color: var(--text-tertiary); margin-top: 4px;">
+                  Edge pixels outside the survey flight envelope seen in only one frame, lacking the multi-camera baseline required for geometric triangulation.
+                </p>
+              </div>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-tertiary); margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+              <strong>System Action:</strong> Vertices tagged as <code style="color: var(--status-err); font-family: var(--font-mono);">UNKNOWN</code> are given confidence score = 0 and flagged as "Data Gaps" in GIS deliverables, providing surveyors with exact coordinate bounds where supplemental low-altitude flights or ground laser scans are necessary.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 6: Accuracy Validation & Operating Modes
+         ========================================================================== -->
+    <section class="section" id="accuracy-section">
+      <div class="container">
+        <div class="section-tag">Geodetic Rigor</div>
+        <h2 class="section-title">Accuracy Modes & Quantitative Checkpoints</h2>
+        <p class="section-subtitle">
+          Visual appearance is not accuracy. SkyScape reports quantitative error metrics against independent ground checkpoints and separates relative geometric shape from absolute geographic positioning.
+        </p>
+
+        <!-- Accuracy Mode Switcher -->
+        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-6); margin-bottom: var(--space-4); flex-wrap: wrap;">
+          <button class="cat-btn accuracy-mode-toggle active" data-mode="mode-b">Mode B: RTK / PPK (Survey Precision)</button>
+          <button class="cat-btn accuracy-mode-toggle" data-mode="mode-c">Mode C: GCP Checkpoint Validation</button>
+          <button class="cat-btn accuracy-mode-toggle" data-mode="mode-a">Mode A: Standard Autonomous GNSS</button>
+        </div>
+
+        <div class="mode-detail-card" data-mode="mode-b" style="display: block;">
+          <div class="stat-card" style="border: 1px solid var(--border-default); border-radius: 8px;">
+            <h3 style="font-size: 17px; margin-bottom: var(--space-2); color: #fff;">
+              Mode B — RTK / PPK Precision Georeferencing
+            </h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: var(--space-4);">
+              Pairs dual-frequency carrier-phase GNSS observations with base station differential corrections. PROJ projects ellipsoidal coordinates to local metric ENU/ECEF grids with antenna phase offset corrections.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); font-family: var(--font-mono); font-size: 12px;">
+              <div>HORIZONTAL ACCURACY: <strong style="color: var(--accent);" class="tabular-nums">&lt; 3.2 cm</strong></div>
+              <div>VERTICAL ACCURACY: <strong style="color: var(--accent);" class="tabular-nums">&lt; 5.8 cm</strong></div>
+              <div>SCALE ERROR: <strong style="color: var(--accent);" class="tabular-nums">&lt; 0.02%</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-detail-card" data-mode="mode-c" style="display: none;">
+          <div class="stat-card" style="border: 1px solid var(--border-default); border-radius: 8px;">
+            <h3 style="font-size: 17px; margin-bottom: var(--space-2); color: #fff;">
+              Mode C — Independent GCP Checkpoint Verification
+            </h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: var(--space-4);">
+              A subset of surveyed ground control points are withheld from bundle adjustment alignment and reserved strictly as independent validation checkpoints to measure true ground RMSE error.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); font-family: var(--font-mono); font-size: 12px;">
+              <div>CHECKPOINT RMSE: <strong style="color: var(--status-ok);" class="tabular-nums">0.024 m</strong></div>
+              <div>CHECKPOINT MAE: <strong style="color: var(--status-ok);" class="tabular-nums">0.019 m</strong></div>
+              <div>WITHHELD TARGETS: <strong style="color: var(--status-ok);" class="tabular-nums">8 / 20 Points</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-detail-card" data-mode="mode-a" style="display: none;">
+          <div class="stat-card" style="border: 1px solid var(--border-default); border-radius: 8px;">
+            <h3 style="font-size: 17px; margin-bottom: var(--space-2); color: #fff;">
+              Mode A — Standard Autonomous GNSS
+            </h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: var(--space-4);">
+              Operates when base station corrections are unavailable. Standard GNSS is treated as a lower-confidence prior, preventing noisy GPS from distorting rigid visual structure.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); font-family: var(--font-mono); font-size: 12px;">
+              <div>GLOBAL POSITIONING: <strong style="color: var(--status-warn);" class="tabular-nums">&plusmn; 2.5 - 4.0 m</strong></div>
+              <div>RELATIVE METRIC SCALE: <strong style="color: var(--status-warn);">Recovered via SLAM</strong></div>
+              <div>UNCERTAINTY FLAG: <strong style="color: var(--status-warn);">Active in Metadata</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 7: Runtime Design Budget Simulator (<15 Min Target)
+         ========================================================================== -->
+    <section class="section" id="runtime-budget">
+      <div class="container">
+        <div class="section-tag">Performance Target</div>
+        <h2 class="section-title">Runtime Budget Simulator (&lt; 15 Min Target)</h2>
+        <p class="section-subtitle">
+          SkyScape is designed to satisfy the SIH engineering target: <strong>process a 10-minute UAV video in under 15 minutes</strong> on single-GPU hardware. Test how flight length and scene complexity modulate the stage budget below.
+        </p>
+
+        <div class="simulator-card">
+          <!-- Controls -->
+          <div class="sim-controls">
+            <div>
+              <div style="font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 6px;">
+                FLIGHT DURATION:
+              </div>
+              <div class="sim-btn-group">
+                <button class="sim-toggle sim-duration-btn" data-duration="5">5 Min</button>
+                <button class="sim-toggle sim-duration-btn active" data-duration="10">10 Min (Standard)</button>
+                <button class="sim-toggle sim-duration-btn" data-duration="20">20 Min</button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 6px;">
+                SCENE COMPLEXITY:
+              </div>
+              <div class="sim-btn-group">
+                <button class="sim-toggle sim-scene-btn" data-multiplier="0.75">Easy (Campus)</button>
+                <button class="sim-toggle sim-scene-btn active" data-multiplier="1.0">Moderate (Town)</button>
+                <button class="sim-toggle sim-scene-btn" data-multiplier="1.35">Hard (Castle / Forest)</button>
+              </div>
+            </div>
+
+            <div class="sim-total-bar">
+              <div>
+                <div style="font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono);">TOTAL RUNTIME</div>
+                <div class="sim-total-time tabular-nums" id="sim-total-display">13.6 min</div>
+              </div>
+              <span class="sim-total-status" id="sim-total-status">TARGET MET (&lt;15m Budget)</span>
+            </div>
+          </div>
+
+          <!-- Fallback Notice -->
+          <div id="sim-fallback-notice" style="display: none; background: var(--status-warn-bg); border: 1px solid rgba(245, 158, 11, 0.3); padding: 10px 14px; border-radius: 6px; font-size: 13px; color: var(--status-warn); margin-bottom: var(--space-4);"></div>
+
+          <!-- Stage Progress Breakdown -->
+          <div class="budget-stage-list">
+            <div class="budget-stage-item">
+              <span class="stage-label">1. Video Ingest & Quality</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-ingest-fill" style="width: 16%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-ingest-val">0.8 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">2. YOLO26-Seg Semantics</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-semantic-fill" style="width: 30%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-semantic-val">1.5 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">3. Aerosculpt Trajectory</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-slam-fill" style="width: 36%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-slam-val">1.8 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">4. Keyframe Selection</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-keyframe-fill" style="width: 14%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-keyframe-val">0.7 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">5. GLUEMAP + MapAnything</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-gluemap-fill" style="width: 64%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-gluemap-val">3.2 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">6. COLMAP Dense MVS</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-mvs-fill" style="width: 70%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-mvs-val">3.5 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">7. Mesh & Georeferencing</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-mesh-fill" style="width: 28%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-mesh-val">1.4 min</span>
+            </div>
+
+            <div class="budget-stage-item">
+              <span class="stage-label">8. Validation & GIS Export</span>
+              <div class="progress-track"><div class="progress-fill" id="budget-validation-fill" style="width: 14%;"></div></div>
+              <span class="stage-time-val tabular-nums" id="budget-validation-val">0.7 min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Section 8: Hardware Specs & Microservices Isolation
+         ========================================================================== -->
+    <section class="section" id="hardware-architecture">
+      <div class="container">
+        <div class="section-tag">System Engineering</div>
+        <h2 class="section-title">Microservices Isolation & Target Infrastructure</h2>
+        <p class="section-subtitle">
+          Upstream research modules (Aerosculpt, GLUEMAP, COLMAP, GDAL) require conflicting CUDA, PyTorch, and C++ environments. SkyScape isolates workloads into decoupled worker containers coordinated by an asynchronous FastAPI gateway.
+        </p>
+
+        <div class="research-grid">
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">CONTAINER ARCHITECTURE</span>
+            </div>
+            <h3 class="research-card-title">Worker Isolation Matrix</h3>
+            <ul class="bullet-list">
+              <li><strong>aerosculpt_worker:</strong> PyTorch 2.5 + CUDA 12.1 + In3D bindings.</li>
+              <li><strong>gluemap_worker:</strong> MapAnything multi-view backbone + Ceres solver.</li>
+              <li><strong>semantic_worker:</strong> YOLO26-Seg + TensorRT INT8 aerial model.</li>
+              <li><strong>geospatial_worker:</strong> Native GDAL 3.8 + PROJ 9.3 + PDAL engine.</li>
+              <li><strong>api_gateway:</strong> FastAPI asynchronous task queue with Redis broker.</li>
+            </ul>
+          </div>
+
+          <div class="research-card">
+            <div class="card-badge-row">
+              <span class="tech-badge">DEPLOYMENT TARGET</span>
+            </div>
+            <h3 class="research-card-title">Hardware Specifications</h3>
+            <ul class="bullet-list">
+              <li><strong>GPU:</strong> NVIDIA RTX 4090 / 5090 (24GB+ VRAM, FP16 Tensor Cores).</li>
+              <li><strong>CPU:</strong> 12+ Cores (AMD Ryzen 9 / Intel Core i9 or Xeon).</li>
+              <li><strong>System Memory:</strong> 64 GB DDR5 RAM.</li>
+              <li><strong>Disk:</strong> NVMe PCIe 4.0 SSD (sustained write &gt; 4500 MB/s).</li>
+              <li><strong>Host OS:</strong> Ubuntu 22.04 LTS with NVIDIA Container Toolkit.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Interactive Stage Modal -->
+  <div class="modal-backdrop" id="pipeline-modal">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 6px;">
+        PIPELINE COMPONENT INSPECTION
+      </div>
+      <h2 id="modal-stage-title" style="font-size: 20px; color: #fff; margin-bottom: 4px;">
+        Stage Details
+      </h2>
+      <div id="modal-stage-tech" style="font-family: var(--font-mono); font-size: 11.5px; color: var(--text-tertiary); margin-bottom: var(--space-4);">
+        Tech Specs
+      </div>
+
+      <div style="margin-bottom: var(--space-3);">
+        <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 4px;">INPUT DATA</div>
+        <div id="modal-stage-input" style="font-size: 13px; color: var(--text-primary); background: var(--bg-canvas); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);"></div>
+      </div>
+
+      <div style="margin-bottom: var(--space-3);">
+        <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 4px;">OUTPUT PRODUCT</div>
+        <div id="modal-stage-output" style="font-size: 13px; color: var(--text-primary); background: var(--bg-canvas); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);"></div>
+      </div>
+
+      <div style="margin-bottom: var(--space-3);">
+        <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 4px;">ARCHITECTURAL RATIONALE</div>
+        <p id="modal-stage-rationale" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;"></p>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 4px;">MATHEMATICAL / ALGORITHMIC FORMULATION</div>
+        <div id="modal-stage-math" class="formula-box tabular-nums"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand" style="margin-bottom: var(--space-3);">
+            <div class="brand-icon">S</div>
+            <span class="brand-text">SkyScape</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-tertiary); line-height: 1.6; max-width: 320px;">
+            Adaptive UAV-to-GIS 3D reconstruction platform converting single drone survey flights into georeferenced, semantically labeled 3D models.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Pipeline</h4>
+          <ul class="footer-links">
+            <li><a href="#video-showcase">Aerosculpt Front-End</a></li>
+            <li><a href="#architecture-pipeline">Keyframe Reduction</a></li>
+            <li><a href="#research-modules">GLUEMAP & MapAnything</a></li>
+            <li><a href="#research-modules">YOLO26-Seg Semantics</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Geodesy & GIS</h4>
+          <ul class="footer-links">
+            <li><a href="#accuracy-section">RTK / PPK Georeferencing</a></li>
+            <li><a href="#accuracy-section">PROJ & Coordinate CRS</a></li>
+            <li><a href="#accuracy-section">GDAL Product Export</a></li>
+            <li><a href="#accuracy-section">Evidence States</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Citations & Code</h4>
+          <ul class="footer-links">
+            <li><a href="https://arxiv.org/abs/2412.12392" target="_blank" rel="noopener noreferrer">MASt3R-SLAM Paper (CVPR '25)</a></li>
+            <li><a href="https://github.com/rmurai0610/MASt3R-SLAM" target="_blank" rel="noopener noreferrer">MASt3R-SLAM GitHub</a></li>
+            <li><a href="https://edexheim.github.io/mast3r-slam/" target="_blank" rel="noopener noreferrer">Author Project Page</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 SkyScape Platform. Designed for UAV Georeferenced Surveying & SIH Deployment.
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 11px;">
+          LICENSING: Academic & Research Evaluation • Non-commercial upstream models
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

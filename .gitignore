@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build artifacts (tracked separately or built in CI)
+dist/
+
+# Scratch test files & screenshots
+scratch/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Root duplicate media (canonical copies live inside public/)
+/Task-of-2026-09-10T143406911Z-textured_model.glb
+/VIDEO-2026-09-20-17-40-19.mp4
