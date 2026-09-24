@@ -584,30 +584,30 @@
                     </div>
 
                     <!-- Clean Quick Metric Highlights -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px;">
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
-                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Survey Area</div>
-                        <div style="font-size: 17px; font-weight: 800; color: var(--text-main);">42,500 m² <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">(4.25 ha)</span></div>
+                    <div class="task-metrics-grid">
+                      <div class="metric-card-box">
+                        <div class="metric-card-lbl">Survey Area</div>
+                        <div class="metric-card-val">42,500 m² <span class="metric-card-sub">(4.25 ha)</span></div>
                       </div>
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
-                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Resolution (GSD)</div>
-                        <div style="font-size: 17px; font-weight: 800; color: var(--nextgen-cyan);">1.42 cm/px <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">at 64.5m AGL</span></div>
+                      <div class="metric-card-box">
+                        <div class="metric-card-lbl">Resolution (GSD)</div>
+                        <div class="metric-card-val" style="color: var(--nextgen-cyan);">1.42 cm/px <span class="metric-card-sub">at 64.5m</span></div>
                       </div>
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
-                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Dense 3D Points</div>
-                        <div style="font-size: 17px; font-weight: 800; color: var(--text-main);">1,428,950 <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">vertices</span></div>
+                      <div class="metric-card-box">
+                        <div class="metric-card-lbl">Dense 3D Points</div>
+                        <div class="metric-card-val">1,428,950 <span class="metric-card-sub">vertices</span></div>
                       </div>
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
-                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Coordinate Datum</div>
-                        <div style="font-size: 15px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">EPSG:32630 <span class="badge-status-locked" style="margin-left: 4px;">RTK Fixed</span></div>
+                      <div class="metric-card-box">
+                        <div class="metric-card-lbl">Coordinate Datum</div>
+                        <div class="metric-card-val" style="font-family: var(--font-mono); font-size: 13px;">EPSG:32630 <span class="badge-status-locked" style="margin-left: 2px;">RTK</span></div>
                       </div>
                     </div>
 
                     <!-- Visual Deliverables Showcase (3D Model + SLAM Hero) -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 10px;">
+                    <div class="task-showcase-grid">
                       <!-- 3D Model Interactive Card -->
-                      <div class="task-thumbnail-wrapper" id="thumb-preview-box" title="Click to launch 3D Model Viewer" style="height: 380px;">
-                        <div class="thumb-canvas-container" style="height: calc(100% - 60px);">
+                      <div class="task-thumbnail-wrapper" id="thumb-preview-box" title="Click to launch 3D Model Viewer">
+                        <div class="thumb-canvas-container">
                           <canvas id="thumb-canvas" width="480" height="320" style="width: 100%; height: 100%;"></canvas>
                           <div class="thumb-overlay-badge">
                             <i class="fa fa-cube"></i> Inspect 3D Model
@@ -621,7 +621,7 @@
                       </div>
 
                       <!-- AeroSculpt SLAM Tracking Card -->
-                      <div class="task-thumbnail-wrapper" id="dash-slam-video-card" title="Click to open Full Video Feed View" style="height: 380px; cursor: pointer;">
+                      <div class="task-thumbnail-wrapper" id="dash-slam-video-card" title="Click to open Full Video Feed View" style="cursor: pointer;">
                         <div class="thumb-canvas-container" style="height: calc(100% - 60px); position: relative; background: #000;">
                           <video id="dash-slam-video" autoplay loop muted playsinline src="assets/aerosculpt_slam_tracking.mp4" style="width: 100%; height: 100%; object-fit: cover;"></video>
                           <div class="slam-feed-corner-tag top-left">

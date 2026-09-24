@@ -5171,3 +5171,335 @@ body.studio-fullscreen-active #page-wrapper {
 @media (max-width: 768px) {
   .slam-feed-hero-video { height: 260px; }
 }
+
+/* ==========================================================================
+   Mobile Responsiveness Suite (iPhone, Android, Tablets, Small Screens)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* 1. Prevent all horizontal page overflow */
+  html, body, #wrapper, .app-container, #page-wrapper {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Top Navigation Bar */
+  #navbar-top {
+    padding: 0 10px !important;
+    height: 52px !important;
+  }
+  .navbar-header {
+    gap: 8px !important;
+  }
+  .brand-name {
+    font-size: 16px !important;
+  }
+  .node-hardware {
+    display: none !important;
+  }
+  .node-label {
+    display: none !important;
+  }
+  .node-status-pill {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    gap: 5px !important;
+  }
+  .navbar-top-links {
+    gap: 8px !important;
+  }
+  .user-btn {
+    padding: 4px 8px !important;
+  }
+
+  /* 3. Page Wrapper & Padding */
+  #page-wrapper {
+    padding: 10px 10px 40px !important;
+    margin: 0 !important;
+  }
+  .content-view {
+    padding: 0 !important;
+  }
+
+  /* 4. NextGen Hero Banner */
+  .nextgen-hero-banner {
+    padding: 20px 16px !important;
+    border-radius: 14px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  .nextgen-hero-header-row {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+  .nextgen-hero-divider {
+    display: none !important;
+  }
+  .nextgen-hero-title {
+    font-size: clamp(20px, 5.8vw, 28px) !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    margin-bottom: 10px !important;
+  }
+  .nextgen-hero-desc {
+    font-size: 12.5px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 16px !important;
+    max-width: 100% !important;
+  }
+  .nextgen-hero-actions-row {
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  .btn-nextgen-pill {
+    padding: 9px 16px !important;
+    font-size: 13px !important;
+  }
+  .hero-single-mission-tag {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+  }
+  .mission-tag-name {
+    font-size: 12px !important;
+    word-break: break-word !important;
+  }
+
+  /* 5. Command Grid (3D Model + 2D Map + Video Feeds) */
+  .nextgen-command-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin-bottom: 16px !important;
+  }
+  .card-3d-model {
+    height: 380px !important;
+  }
+  .command-right-col {
+    height: auto !important;
+    gap: 14px !important;
+  }
+  .card-2d-map, .card-video-feeds {
+    height: 250px !important;
+    min-height: 250px !important;
+  }
+  .command-card-header {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+  .command-ctrl-bar {
+    padding: 8px 10px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .command-ctrl-bar .btn-ctrl, .command-ctrl-bar .btn-group {
+    flex-shrink: 0 !important;
+  }
+
+  /* 6. Section Navigation Bar */
+  .project-scroll-nav {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .project-scroll-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+  .scroll-nav-item {
+    font-size: 11.5px !important;
+    padding: 6px 10px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 7. Scroll Sections */
+  .scroll-section-header {
+    padding: 10px 14px !important;
+    font-size: 11px !important;
+  }
+  .tab-pane-content {
+    padding: 16px 12px !important;
+  }
+  .pane-header {
+    margin-bottom: 14px !important;
+    padding-bottom: 10px !important;
+  }
+  .pane-header h3 {
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+  }
+  .pane-header p {
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 8. Action Buttons Bar in Tasks */
+  .task-action-buttons-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .action-buttons-left {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .action-buttons-left .btn, .action-buttons-left .btn-group {
+    flex: 1 1 calc(50% - 6px) !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  .action-buttons-right {
+    width: 100% !important;
+    margin-left: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  /* 9. Visual Deliverables Showcase (3D Preview + SLAM Feed) */
+  .task-thumbnail-wrapper {
+    height: 280px !important;
+  }
+  .task-thumbnail-wrapper canvas, .task-thumbnail-wrapper video {
+    height: 100% !important;
+  }
+
+  /* 10. Simplified 4-Step Pipeline Flow */
+  #section-architecture .tab-pane-content > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* 11. Grids: Methodology, Telemetry, Geofence, Provenance */
+  .methodology-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .telemetry-specs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .evidence-matrix-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* 12. Demo Workstation Preview Card in Section 7 */
+  #section-studio .card > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  #section-studio .card > div:first-child > div:last-child {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+  #section-studio .card > div:first-child > div:last-child .btn {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+  #btn-launch-studio-from-tab {
+    width: 100% !important;
+    text-align: center !important;
+    margin-top: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-version {
+    display: none !important;
+  }
+  .card-3d-model {
+    height: 310px !important;
+  }
+  .card-2d-map, .card-video-feeds {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+  .nextgen-hero-title {
+    font-size: 21px !important;
+  }
+  .task-thumbnail-wrapper {
+    height: 250px !important;
+  }
+}
+
+/* Task Metrics & Showcase Grid */
+.task-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.metric-card-box {
+  background: var(--bg-surface-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.metric-card-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.metric-card-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+.metric-card-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.task-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.task-showcase-grid .task-thumbnail-wrapper {
+  height: 380px;
+}
+
+@media (max-width: 768px) {
+  .task-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+  }
+  .metric-card-box {
+    padding: 10px 12px !important;
+  }
+  .metric-card-lbl {
+    font-size: 10px !important;
+  }
+  .metric-card-val {
+    font-size: 14px !important;
+  }
+  .task-showcase-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .task-showcase-grid .task-thumbnail-wrapper {
+    height: 270px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-showcase-grid .task-thumbnail-wrapper {
+    height: 240px !important;
+  }
+}
