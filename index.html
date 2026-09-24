@@ -513,268 +513,117 @@
               <!-- ===================== SCROLL SECTIONS ===================== -->
               <div class="project-scroll-sections">
 
+                            <!-- ========================================================== -->
+              <!-- SECTION 1: Tasks & 3D Assets                               -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-tasks">
                 <div class="scroll-section-header"><i class="fa fa-tasks"></i> Tasks &amp; 3D Assets</div>
                 <div class="project-tab-pane active" id="pane-tab-tasks">
-                <!-- Project Tasks Header Bar -->
-                <div class="project-tasks-bar">
-                  <div class="tasks-summary" id="toggle-task-list">
-                    <i class="fa fa-tasks"></i>
-                    <a href="javascript:void(0);" class="task-count-link" title="Toggle Task Row Visibility">
-                      <span>1 Completed Survey Task</span> <i class="fa fa-caret-down" id="task-list-caret"></i>
-                    </a>
-                  </div>
-                  <div class="task-filter-tools">
-                    <span class="filter-item"><i class="fa fa-filter"></i> Filter: Production</span>
-                    <span class="filter-item"><i class="fa fa-arrow-down-short-wide"></i> Sort: Created on (newest)</span>
-                  </div>
-                </div>
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <!-- Pane Header -->
+                    <div class="pane-header" style="margin-bottom: 20px;">
+                      <h3><i class="fa fa-tasks"></i> Reconstructed 3D Assets &amp; Survey Tasks</h3>
+                      <p>AeroSculpt processes continuous drone flight imagery into high-precision textured 3D models, georeferenced orthophotos, and real-time visual odometry feeds.</p>
+                    </div>
 
-                <!-- Tasks List Container -->
-                <div class="task-list" id="task-list-body">
-                  <!-- Task Card (AeroSculpt TaskListItem) -->
-                  <div class="task-list-item" id="task-item-01">
-                    <!-- Collapsed / Top Row -->
-                    <div class="task-row">
-                      <!-- Column 1: Expand icon & Task Name -->
-                      <div class="task-col-name">
-                        <button class="btn-toggle-expand" id="task-expand-btn" title="Expand/Collapse Detailed Photogrammetry Metrics">
-                          <i class="fa fa-square-minus" id="task-expand-icon"></i>
+                    <!-- Meaningful Action Buttons Bar -->
+                    <div class="task-action-buttons-bar" style="margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                      <div class="action-buttons-left" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button type="button" class="btn btn-primary btn-sm btn-action-3d" id="btn-open-3d" title="Launch Interactive 3D Textured Mesh Viewer">
+                          <i class="fa fa-cube"></i>
+                          <span>Inspect 3D Model (GLB)</span>
                         </button>
-                        <a href="javascript:void(0);" class="task-name-link" id="task-name-link" title="Click to view task details and console logs">
-                          Task-of-2026-09-10T143406911Z (3D Model & Orthophoto)
-                        </a>
-                        <span class="tag-badge small-badge">Production</span>
-                      </div>
-
-                      <!-- Column 2: Images count -->
-                      <div class="task-col-images hidden-xs hidden-sm">
-                        <i class="fa-regular fa-image"></i>
-                        <span id="task-dataset-badge">Calibrated UAV Trajectory</span>
-                      </div>
-
-                      <!-- Column 3: Processing Duration -->
-                      <div class="task-col-time hidden-xs hidden-sm">
-                        <i class="fa-regular fa-clock"></i>
-                        <span>00:14:22 elapsed</span>
-                      </div>
-
-                      <!-- Column 4: Status Badge & Action Ellipsis -->
-                      <div class="task-col-status">
-                        <div class="status-label done" title="Task completed successfully in 00:14:22">
-                          <i class="fa fa-circle-check"></i>
-                          <span>Completed</span>
-                        </div>
-
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-open-map" title="Open 2D Orthophoto and Drone Flight Path Map">
+                          <i class="fa fa-globe"></i>
+                          <span>2D Orthomosaic Map</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" id="btn-open-video" title="Inspect Drone Visual Tracking and Flight Video Streams">
+                          <i class="fa fa-video"></i>
+                          <span>Drone Flight Feeds</span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" id="btn-open-report" title="View Detailed Photogrammetric Quality Diagnostics &amp; GCP Residuals">
+                          <i class="fa-regular fa-file-lines"></i>
+                          <span>Quality &amp; GCP Report</span>
+                        </button>
+                        <!-- Download Assets Dropdown -->
                         <div class="btn-group dropdown">
-                          <button class="btn task-actions btn-default btn-xs dropdown-toggle" id="task-actions-btn" type="button" title="Task Management Menu">
-                            <i class="fa fa-ellipsis-vertical"></i>
+                          <button type="button" class="btn btn-default btn-sm dropdown-toggle" id="btn-download-assets" title="Download Reconstructed 3D Meshes, Orthomosaics, and Point Clouds">
+                            <i class="fa fa-download"></i>
+                            <span>Export Assets</span>
+                            <i class="fa fa-caret-down"></i>
                           </button>
-                          <ul class="dropdown-menu dropdown-menu-right" id="task-actions-dropdown">
-                            <li><a href="javascript:void(0);" id="action-view-3d"><i class="fa fa-cube fa-fw"></i> View 3D Model</a></li>
-                            <li><a href="javascript:void(0);" id="action-view-map"><i class="fa fa-globe fa-fw"></i> View 2D Map</a></li>
-                            <li><a href="javascript:void(0);" id="action-view-video"><i class="fa fa-video fa-fw"></i> Drone Video Feeds</a></li>
-                            <li><a href="javascript:void(0);" id="action-view-report"><i class="fa fa-file-waveform fa-fw"></i> Quality Report</a></li>
+                          <ul class="dropdown-menu download-menu" id="download-dropdown-menu">
+                            <li class="dropdown-header">3D Meshes &amp; Geometry</li>
+                            <li><a href="Task-of-2026-09-10T143406911Z-textured_model.glb" download><i class="fa fa-cube fa-fw"></i> Textured Model (.glb) <span class="size-hint">10.1 MB</span></a></li>
+                            <li><a href="javascript:void(0);" id="dl-ply"><i class="fa fa-circle-nodes fa-fw"></i> Dense Point Cloud (.laz / .ply) <span class="size-hint">15.4 MB</span></a></li>
                             <li class="divider"></li>
-                            <li><a href="javascript:void(0);" id="action-restart"><i class="fa fa-rotate-right fa-fw"></i> Re-Run Processing</a></li>
-                            <li><a href="javascript:void(0);" id="action-duplicate"><i class="fa fa-copy fa-fw"></i> Duplicate Task Parameters</a></li>
+                            <li class="dropdown-header">AeroSculpt SLAM &amp; Tracking Feeds</li>
+                            <li><a href="assets/aerosculpt_slam_tracking.mp4" download><i class="fa fa-video fa-fw"></i> AeroSculpt SLAM Visual Tracking (.mp4) <span class="size-hint">5.7 MB</span></a></li>
+                            <li><a href="assets/ray_video.mp4" download><i class="fa fa-bolt fa-fw"></i> Ray-Cast Multi-View Geometry (.mp4) <span class="size-hint">4.6 MB</span></a></li>
+                            <li><a href="assets/matching_video.mp4" download><i class="fa fa-diagram-project fa-fw"></i> Feature Matching Stream (.mp4) <span class="size-hint">346 KB</span></a></li>
                             <li class="divider"></li>
-                            <li><a href="javascript:void(0);" class="text-danger" id="action-delete"><i class="fa fa-trash fa-fw"></i> Delete Task</a></li>
+                            <li class="dropdown-header">2D GIS &amp; Orthomosaics</li>
+                            <li><a href="javascript:void(0);" id="dl-ortho"><i class="fa fa-map fa-fw"></i> Orthophoto GeoTIFF (.tif) <span class="size-hint">38.2 MB</span></a></li>
+                            <li><a href="javascript:void(0);" id="dl-dsm"><i class="fa fa-layer-group fa-fw"></i> Digital Surface Model DSM (.tif) <span class="size-hint">12.5 MB</span></a></li>
+                            <li class="divider"></li>
+                            <li class="dropdown-header">Survey Diagnostics &amp; Footage</li>
+                            <li><a href="javascript:void(0);" id="dl-report"><i class="fa-regular fa-file-pdf fa-fw"></i> Quality Report (.pdf) <span class="size-hint">2.1 MB</span></a></li>
+                            <li><a href="VIDEO-2026-09-20-17-40-19.mp4" download><i class="fa fa-file-video fa-fw"></i> Raw UAV Flight Survey Video (.mp4) <span class="size-hint">11.6 MB</span></a></li>
                           </ul>
                         </div>
                       </div>
+                      <div class="action-buttons-right" style="margin-left: auto;">
+                        <button type="button" class="btn btn-default btn-xs" id="btn-copy-task-id" title="Copy Task ID">
+                          <i class="fa-regular fa-clipboard" id="copy-task-icon"></i>
+                          <span id="task-id-text" style="font-family: var(--font-mono); font-size: 11px;">Task-of-2026-09-10T143406911Z</span>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-xs btn-delete-task" id="btn-delete-task-action" title="Delete Task Data" style="display:none;">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </div>
                     </div>
 
-                    <!-- Expanded Task Details Panel -->
-                    <div class="expanded-panel" id="task-expanded-panel">
-                      <!-- Meaningful Action Buttons Bar -->
-                      <div class="task-action-buttons-bar">
-                        <div class="action-buttons-left">
-                          <!-- 3D Model Button -->
-                          <button type="button" class="btn btn-primary btn-sm btn-action-3d" id="btn-open-3d" title="Launch Interactive 3D Textured Mesh Viewer">
-                            <i class="fa fa-cube"></i>
-                            <span>Inspect 3D Model (GLB)</span>
-                          </button>
+                    <!-- Clean Quick Metric Highlights -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px;">
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Survey Area</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-main);">42,500 m² <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">(4.25 ha)</span></div>
+                      </div>
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Resolution (GSD)</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--nextgen-cyan);">1.42 cm/px <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">at 64.5m AGL</span></div>
+                      </div>
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Dense 3D Points</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-main);">1,428,950 <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">vertices</span></div>
+                      </div>
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 14px 16px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">Coordinate Datum</div>
+                        <div style="font-size: 15px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">EPSG:32630 <span class="badge-status-locked" style="margin-left: 4px;">RTK Fixed</span></div>
+                      </div>
+                    </div>
 
-                          <!-- Map Button -->
-                          <button type="button" class="btn btn-primary btn-sm" id="btn-open-map" title="Open 2D Orthophoto and Drone Flight Path Map">
-                            <i class="fa fa-globe"></i>
-                            <span>2D Orthomosaic Map</span>
-                          </button>
-
-                          <!-- Drone Video Feed Button -->
-                          <button type="button" class="btn btn-default btn-sm" id="btn-open-video" title="Inspect Drone Visual Tracking and Flight Video Streams">
-                            <i class="fa fa-video"></i>
-                            <span>Drone Flight Feeds</span>
-                          </button>
-
-                          <!-- Report Button -->
-                          <button type="button" class="btn btn-default btn-sm" id="btn-open-report" title="View Detailed Photogrammetric Quality Diagnostics & GCP Residuals">
-                            <i class="fa-regular fa-file-lines"></i>
-                            <span>Quality & GCP Report</span>
-                          </button>
-
-                          <!-- Download Assets Dropdown -->
-                          <div class="btn-group dropdown">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" id="btn-download-assets" title="Download Reconstructed 3D Meshes, Orthomosaics, and Point Clouds">
-                              <i class="fa fa-download"></i>
-                              <span>Export Assets</span>
-                              <i class="fa fa-caret-down"></i>
-                            </button>
-                            <ul class="dropdown-menu download-menu" id="download-dropdown-menu">
-                              <li class="dropdown-header">3D Meshes & Geometry</li>
-                              <li><a href="Task-of-2026-09-10T143406911Z-textured_model.glb" download><i class="fa fa-cube fa-fw"></i> Textured Model (.glb) <span class="size-hint">10.1 MB</span></a></li>
-                              <li><a href="javascript:void(0);" id="dl-ply"><i class="fa fa-circle-nodes fa-fw"></i> Dense Point Cloud (.laz / .ply) <span class="size-hint">15.4 MB</span></a></li>
-                              <li class="divider"></li>
-                              <li class="dropdown-header">AeroSculpt SLAM & Tracking Feeds</li>
-                              <li><a href="assets/aerosculpt_slam_tracking.mp4" download><i class="fa fa-video fa-fw"></i> AeroSculpt SLAM Visual Tracking (.mp4) <span class="size-hint">5.7 MB</span></a></li>
-                              <li><a href="assets/ray_video.mp4" download><i class="fa fa-bolt fa-fw"></i> Ray-Cast Multi-View Geometry (.mp4) <span class="size-hint">4.6 MB</span></a></li>
-                              <li><a href="assets/matching_video.mp4" download><i class="fa fa-diagram-project fa-fw"></i> Feature Matching Stream (.mp4) <span class="size-hint">346 KB</span></a></li>
-                              <li class="divider"></li>
-                              <li class="dropdown-header">2D GIS & Orthomosaics</li>
-                              <li><a href="javascript:void(0);" id="dl-ortho"><i class="fa fa-map fa-fw"></i> Orthophoto GeoTIFF (.tif) <span class="size-hint">38.2 MB</span></a></li>
-                              <li><a href="javascript:void(0);" id="dl-dsm"><i class="fa fa-layer-group fa-fw"></i> Digital Surface Model DSM (.tif) <span class="size-hint">12.5 MB</span></a></li>
-                              <li class="divider"></li>
-                              <li class="dropdown-header">Survey Diagnostics & Footage</li>
-                              <li><a href="javascript:void(0);" id="dl-report"><i class="fa-regular fa-file-pdf fa-fw"></i> Quality Report (.pdf) <span class="size-hint">2.1 MB</span></a></li>
-                              <li><a href="VIDEO-2026-09-20-17-40-19.mp4" download><i class="fa fa-file-video fa-fw"></i> Raw UAV Flight Survey Video (.mp4) <span class="size-hint">11.6 MB</span></a></li>
-                            </ul>
+                    <!-- Visual Deliverables Showcase (3D Model + SLAM Hero) -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 10px;">
+                      <!-- 3D Model Interactive Card -->
+                      <div class="task-thumbnail-wrapper" id="thumb-preview-box" title="Click to launch 3D Model Viewer" style="height: 380px;">
+                        <div class="thumb-canvas-container" style="height: calc(100% - 60px);">
+                          <canvas id="thumb-canvas" width="480" height="320" style="width: 100%; height: 100%;"></canvas>
+                          <div class="thumb-overlay-badge">
+                            <i class="fa fa-cube"></i> Inspect 3D Model
                           </div>
+                          <div class="thumb-model-tag">GLB 3D MESH READY</div>
                         </div>
-
-                        <div class="action-buttons-right">
-                          <button type="button" class="btn btn-danger btn-sm btn-delete-task" id="btn-delete-task-action" title="Delete Task Data and Reconstructed Assets">
-                            <i class="fa fa-trash"></i>
-                            <span class="hidden-xs">Delete Task</span>
-                          </button>
+                        <div class="thumb-caption">
+                          <strong>Reconstructed 3D Mesh (GLB)</strong>
+                          <span>Interactive hardware-accelerated 3D model with true metric dimensions</span>
                         </div>
                       </div>
 
-                      <!-- Two-Column Details Area: Info Table + Media Cards -->
-                      <div class="expanded-details-grid">
-                        <!-- Left Column: AeroSculpt Info Table -->
-                        <div class="details-table-col">
-                          <table class="table table-condensed info-table">
-                            <tbody>
-                              <tr>
-                                <td class="info-label">Task ID:</td>
-                                <td class="info-val">
-                                  <a href="javascript:void(0);" class="task-id-link" id="btn-copy-task-id" title="Click to copy Task ID to clipboard">
-                                    <span id="task-id-text">Task-of-2026-09-10T143406911Z</span>
-                                    <i class="fa-regular fa-clipboard" id="copy-task-icon"></i>
-                                  </a>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Created on:</td>
-                                <td class="info-val">September 10, 2026, 14:34:06 UTC</td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Front-End SLAM Engine:</td>
-                                <td class="info-val">
-                                  <span class="node-indicator online"></span>
-                                  <strong>AeroSculpt SLAM Engine</strong> — Continuous Visual Odometry & Dense Pointmap Recovery
-                                </td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Processing Node:</td>
-                                <td class="info-val">
-                                  <span class="node-indicator online"></span>
-                                  AeroSculpt Local Node (GPU accelerated, auto-routed)
-                                </td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Pipeline Configuration:</td>
-                                <td class="info-val options-pill-list">
-                                  <code class="opt-code">input: drone-video-1080p/4K</code>
-                                  <code class="opt-code">gps: mandatory</code>
-                                  <code class="opt-code">flight-metadata: mandatory</code>
-                                  <code class="opt-code">imu: optional</code>
-                                  <code class="opt-code">barometric-alt: optional</code>
-                                  <code class="opt-code">camera-intrinsics: optional</code>
-                                  <code class="opt-code">rtk-ppk: optional</code>
-                                  <code class="opt-code">slam: aerosculpt-vo</code>
-                                  <code class="opt-code">dsm: true</code>
-                                  <code class="opt-code">dtm: true</code>
-                                  <code class="opt-code">geofence: enforced</code>
-                                  <code class="opt-code">mesh-size: 384192</code>
-                                  <code class="opt-code">output: glb+obj+ply+las+geotiff+fbx</code>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Average GSD:</td>
-                                <td class="info-val"><strong class="highlight-val">1.42 cm/px</strong> at 64.5m flight altitude</td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Reconstructed Area:</td>
-                                <td class="info-val">42,500 m² (4.25 ha)</td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Dense 3D Points:</td>
-                                <td class="info-val tabular-nums"><strong>1,428,950 points</strong> (OpenMVS PatchMatch)</td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Georeferencing:</td>
-                                <td class="info-val">
-                                  <span class="badge badge-neutral">GPS / RTK Prior</span>
-                                  <span class="badge badge-neutral">Sim(3) Metric Helmert Datum</span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Coordinate Reference System:</td>
-                                <td class="info-val"><code>EPSG:32630 (WGS 84 / UTM zone 30N)</code></td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Disk Usage:</td>
-                                <td class="info-val">184.2 MB (Models, Orthophotos, Pyramids, Logs)</td>
-                              </tr>
-                              <tr>
-                                <td class="info-label">Task Output (Console Log):</td>
-                                <td class="info-val">
-                                  <div class="btn-group btn-toggle console-toggle-group">
-                                    <button type="button" class="btn btn-xs btn-primary" id="btn-console-on" title="Display execution console">On</button>
-                                    <button type="button" class="btn btn-xs btn-default" id="btn-console-off" title="Hide execution console">Off</button>
-                                  </div>
-                                  <span class="console-toggle-hint">Display live photogrammetry execution terminal</span>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <!-- Right Column: 3D Model Thumbnail -->
-                        <div class="details-thumbnail-col">
-                          <div class="task-thumbnail-wrapper" id="thumb-preview-box" title="Click to launch 3D Model Viewer">
-                            <div class="thumb-canvas-container">
-                              <canvas id="thumb-canvas" width="280" height="190"></canvas>
-                              <div class="thumb-overlay-badge">
-                                <i class="fa fa-cube"></i> Inspect 3D Model
-                              </div>
-                              <div class="thumb-model-tag">GLB 3D MESH READY</div>
-                            </div>
-                            <div class="thumb-caption">
-                              <strong>Dumbarton Rock Fortress 3D</strong>
-                              <span>Front elevation &amp; ramparts reconstruction</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- AeroSculpt SLAM Feed — Full Width Hero -->
-                      <div class="slam-feed-hero-section">
-                        <div class="slam-feed-hero-header">
-                          <div class="slam-feed-hero-title">
-                            <span class="live-dot pulse"></span>
-                            <i class="fa fa-video"></i>
-                            AeroSculpt SLAM Feed
-                          </div>
-                          <div class="slam-feed-hero-meta">
-                            <span class="pill-rtk">LIVE TRACKING</span>
-                            <span>Continuous learned visual odometry</span>
-                          </div>
-                        </div>
-                        <div class="slam-feed-hero-video" id="dash-slam-video-card" title="Click to open Full Video Feed View">
-                          <video id="dash-slam-video" autoplay loop muted playsinline src="assets/aerosculpt_slam_tracking.mp4"></video>
+                      <!-- AeroSculpt SLAM Tracking Card -->
+                      <div class="task-thumbnail-wrapper" id="dash-slam-video-card" title="Click to open Full Video Feed View" style="height: 380px; cursor: pointer;">
+                        <div class="thumb-canvas-container" style="height: calc(100% - 60px); position: relative; background: #000;">
+                          <video id="dash-slam-video" autoplay loop muted playsinline src="assets/aerosculpt_slam_tracking.mp4" style="width: 100%; height: 100%; object-fit: cover;"></video>
                           <div class="slam-feed-corner-tag top-left">
                             <i class="fa fa-crosshairs"></i> Visual Odometry Tracking
                           </div>
@@ -782,577 +631,401 @@
                             EPSG:32630 · RTK Fixed
                           </div>
                         </div>
-                        <div class="slam-feed-hero-caption">
-                          <strong>AeroSculpt SLAM Trajectory</strong>
-                          <span>Dense keypoint matching across sequential drone survey frames</span>
-                        </div>
-                      </div>
-
-                      <!-- AeroSculpt Authentic Console Output Stream -->
-                      <div class="console-stream-wrapper" id="console-stream-box">
-                        <div class="console-header">
-                          <div class="console-header-left">
-                            <span class="terminal-dot red"></span>
-                            <span class="terminal-dot yellow"></span>
-                            <span class="terminal-dot green"></span>
-                            <span class="console-title"><i class="fa fa-terminal"></i> AeroSculpt Engine Execution Console — Task-of-2026-09-10T143406911Z</span>
-                          </div>
-                          <div class="console-header-right">
-                            <button class="btn btn-xs btn-terminal" id="btn-copy-console" title="Copy console log to clipboard"><i class="fa-regular fa-copy"></i> Copy Log</button>
-                            <button class="btn btn-xs btn-terminal" id="btn-clear-console" title="Hide execution console"><i class="fa fa-circle-xmark"></i> Hide</button>
-                          </div>
-                        </div>
-                        <div class="console-body" id="console-output-text">
-                          <div class="log-line"><span class="log-ts">[14:34:06]</span> <span class="log-tag tag-info">[AeroSculpt-Core]</span> Initializing processing task Task-of-2026-09-10T143406911Z on AeroSculpt GPU worker...</div>
-                          <div class="log-line"><span class="log-ts">[14:34:08]</span> <span class="log-tag tag-info">[Ingest]</span> Demuxing continuous UAV high-resolution flight survey imagery...</div>
-                          <div class="log-line"><span class="log-ts">[14:34:11]</span> <span class="log-tag tag-ok">[Camera-Calib]</span> Extracted EXIF focal length = 24.0mm, sensor size = 13.2x8.8mm, rolling shutter compensation enabled.</div>
-                          <div class="log-line"><span class="log-ts">[14:34:35]</span> <span class="log-tag tag-info">[AeroSculpt-SLAM]</span> Running dense visual odometry tracking (avg 8,420 keypoints/view)...</div>
-                          <div class="log-line"><span class="log-ts">[14:35:48]</span> <span class="log-tag tag-ok">[Match]</span> Found 1,248 matching camera pairs across sequential and loop-closure drone passes.</div>
-                          <div class="log-line"><span class="log-ts">[14:37:12]</span> <span class="log-tag tag-info">[Incremental-SfM]</span> Initialized seed baseline with 2 registered views (Images #01, #02).</div>
-                          <div class="log-line"><span class="log-ts">[14:39:40]</span> <span class="log-tag tag-ok">[Incremental-SfM]</span> Successfully registered 100.0% of survey camera stations. Mean reprojection error: 0.42 px.</div>
-                          <div class="log-line"><span class="log-ts">[14:41:15]</span> <span class="log-tag tag-info">[MVS-Dense]</span> Running multi-view stereo depthmaps fusion (PatchMatch). Output dense point cloud: 1,428,950 vertices.</div>
-                          <div class="log-line"><span class="log-ts">[14:44:22]</span> <span class="log-tag tag-info">[Meshing]</span> Generating Screened Poisson surface reconstruction. Octree depth = 11, target polygon budget = 200,000 faces.</div>
-                          <div class="log-line"><span class="log-ts">[14:46:04]</span> <span class="log-tag tag-ok">[Texturing]</span> Global multi-band UV texture blending completed. Atlas resolution: 4096 x 4096 px.</div>
-                          <div class="log-line"><span class="log-ts">[14:47:30]</span> <span class="log-tag tag-info">[Georeferencing]</span> Applied 7-DoF Sim(3) Helmert transformation to EPSG:32630 UTM 30N datum. Residual RMSE = 0.024m.</div>
-                          <div class="log-line"><span class="log-ts">[14:48:16]</span> <span class="log-tag tag-ok">[Export]</span> Saved Textured 3D Model: Task-of-2026-09-10T143406911Z-textured_model.glb (10,090,524 bytes).</div>
-                          <div class="log-line"><span class="log-ts">[14:48:28]</span> <span class="log-tag tag-ok">[Export]</span> Generated Orthophoto GeoTIFF & DSM pyramid tiles.</div>
-                          <div class="log-line highlight-success"><span class="log-ts">[14:48:28]</span> <span class="log-tag tag-success">[SUCCESS]</span> Task-of-2026-09-10T143406911Z finished in 00:14:22. All assets ready for 3D inspection and download.</div>
+                        <div class="thumb-caption">
+                          <strong>AeroSculpt SLAM Tracking Feed</strong>
+                          <span>Continuous feature landmark detection and real-time visual odometry</span>
                         </div>
                       </div>
                     </div>
+
+                    <!-- Hidden/Collapsible Elements for Script Compatibility -->
+                    <div id="task-list-body" style="display:none;"></div>
+                    <div id="task-expanded-panel" style="display:none;"></div>
+                    <button id="task-expand-btn" style="display:none;"></button>
+                    <a id="task-name-link" style="display:none;"></a>
+                    <span id="task-dataset-badge" style="display:none;"></span>
+                    <button id="task-actions-btn" style="display:none;"></button>
+                    <div id="task-actions-dropdown" style="display:none;"></div>
+                    <a id="action-view-3d" style="display:none;"></a>
+                    <a id="action-view-map" style="display:none;"></a>
+                    <a id="action-view-video" style="display:none;"></a>
+                    <a id="action-view-report" style="display:none;"></a>
+                    <a id="action-restart" style="display:none;"></a>
+                    <a id="action-duplicate" style="display:none;"></a>
+                    <a id="action-delete" style="display:none;"></a>
+                    <div id="console-stream-box" style="display:none;">
+                      <button id="btn-copy-console"></button>
+                      <button id="btn-clear-console"></button>
+                      <div id="console-output-text"></div>
+                    </div>
+                    <button id="btn-console-on" style="display:none;"></button>
+                    <button id="btn-console-off" style="display:none;"></button>
                   </div>
                 </div>
-              </div>
-
-              <!-- ========================================================== -->
-              <!-- TAB 2: Pipeline Architecture & Methodology (Deep Details) -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 2: Pipeline Architecture -->
+              <!-- ========================================================== -->
+              <!-- SECTION 2: Pipeline Architecture                           -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-architecture">
                 <div class="scroll-section-header"><i class="fa fa-diagram-project"></i> Pipeline Architecture</div>
-              <div class="project-tab-pane" id="pane-tab-architecture">
-                <div class="tab-pane-content">
-                  <div class="pane-header">
-                    <h3><i class="fa fa-diagram-project"></i> 20-Stage End-to-End Pipeline Architecture</h3>
-                    <p>AeroSculpt combines real-time geometric visual tracking, intelligent parallax optimization, learned multi-view geometry, and geodetic coordinate fusion into an adaptive photogrammetry pipeline engineered to process 10-minute flight videos in under 15 minutes.</p>
-                  </div>
-
-                  <div class="methodology-grid">
-                    <!-- Module 1 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge">STAGE 01–03</div>
-                      <h4>UAV Ingestion & Quality Gate</h4>
-                      <p>Continuous flight video streams are demuxed into discrete timestamped imagery. Laplacian & Tenengrad sharpness operators filter out motion blur, propeller glare, and banking turns.</p>
-                      <div class="m-formula"><span class="eq-var">S</span><sub>sharp</sub> = Var(∇²I) ≥ τ<sub>blur</sub></div>
-                      <ul>
-                        <li>Discards degraded optical captures before expensive geometric matching.</li>
-                        <li>Filters continuous stream to high-sharpness, high-parallax visual geometry.</li>
-                        <li>Extracts EXIF camera focal length and rolling-shutter coefficients.</li>
-                      </ul>
+                <div class="project-tab-pane" id="pane-tab-architecture">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <div class="pane-header" style="margin-bottom: 24px;">
+                      <h3><i class="fa fa-diagram-project"></i> End-to-End UAV Photogrammetry Pipeline</h3>
+                      <p>How AeroSculpt transforms continuous drone video into photorealistic, survey-grade 3D assets in 4 straightforward stages.</p>
                     </div>
 
-                    <!-- Module 2 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge cyan">STAGE 04–05</div>
-                      <h4>AeroSculpt SLAM Trajectory Tracking</h4>
-                      <p>Acts as the rapid geometric tracking front-end: recovering relative camera motion, pointmap coverage, and tracking confidence without requiring prior maps or known depth.</p>
-                      <div class="m-formula"><span class="eq-var">T</span><sub>t,t-1</sub> = argmin<sub>T</sub> Σ<sub>p</sub> w(p) · ‖π(T·X<sub>p</sub>) − x′<sub>p</sub>‖²</div>
-                      <ul>
-                        <li>Recovers continuous camera pose prior across low-texture rock.</li>
-                        <li>Estimates local 3D pointmaps and geometric tracking confidence.</li>
-                        <li>Handed off to global Structure-from-Motion for bundle adjustment.</li>
-                      </ul>
-                    </div>
+                    <div class="methodology-grid">
+                      <!-- Stage 1 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">STAGE 01</div>
+                        <h4>Drone Ingestion &amp; Quality Filtering</h4>
+                        <p>Continuous flight video is demuxed into discrete high-resolution frames with automated quality control.</p>
+                        <ul>
+                          <li>Laplacian sharpness filtering eliminates motion blur, propeller glare, and banking frames.</li>
+                          <li>Discards degraded optical frames before processing.</li>
+                          <li>Extracts EXIF camera focal length and optical coefficients.</li>
+                        </ul>
+                      </div>
 
-                    <!-- Module 3 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge">STAGE 06–07</div>
-                      <h4>Multi-View Geometric Optimization</h4>
-                      <p>Survey views are scored using a multi-criteria optimization balance of sharpness, baseline distance, angular parallax spread, and dynamic object exclusion.</p>
-                      <div class="m-formula">Score = w₁·S<sub>sharp</sub> + w₂·Δθ<sub>parallax</sub> + w₃·D<sub>GNSS</sub> − w₄·R<sub>dynamic</sub></div>
-                      <ul>
-                        <li>Maintains wide triangulation baselines between sequential passes.</li>
-                        <li>Maximizes stereo baseline intersection angles without missing surface facets.</li>
-                        <li>Ensures optimal intersection angles for vertical fortress cliff faces.</li>
-                      </ul>
-                    </div>
+                      <!-- Stage 2 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge cyan">STAGE 02</div>
+                        <h4>Visual SLAM &amp; Trajectory Tracking</h4>
+                        <p>Acts as the rapid geometric tracking front-end to compute drone motion and spatial coverage in real time.</p>
+                        <ul>
+                          <li>Tracks thousands of visual keypoints across sequential survey passes.</li>
+                          <li>Recovers camera trajectory and continuous pose priors without manual setup.</li>
+                          <li>Eliminates loop-closure drift across extended flight missions.</li>
+                        </ul>
+                      </div>
 
-                    <!-- Module 4 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge cyan">STAGE 08–12</div>
-                      <h4>Multi-View SfM & Dense MVS</h4>
-                      <p>Unites learned metric multi-view priors with classical global rotation averaging and Ceres bundle adjustment, followed by dense PatchMatch depth estimation.</p>
-                      <div class="m-formula">min<sub>R₁…Rₙ</sub> Σ<sub>(i,j)</sub> ρ( Log(R<sub>i</sub>·R<sub>j</sub><sup>T</sup>·R<sub>ij</sub><sup>T</sup>) )</div>
-                      <ul>
-                        <li>Prevents loop-closure drift across 10-minute flight loops.</li>
-                        <li>Registers 100% of selected camera views (mean reprojection error: 0.68 px).</li>
-                        <li>Reconstructs 1,428,950 dense 3D points across terrain and structures.</li>
-                      </ul>
-                    </div>
+                      <!-- Stage 3 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">STAGE 03</div>
+                        <h4>Multi-View SfM &amp; Dense 3D Point Cloud</h4>
+                        <p>Aligns multi-angle camera views and generates high-density 3D spatial points using depth-map fusion.</p>
+                        <ul>
+                          <li>Global Structure-from-Motion (SfM) bundle adjustment achieves sub-pixel accuracy.</li>
+                          <li>Reconstructs 1.42+ million dense 3D points across terrain and structures.</li>
+                          <li>Validates multi-ray intersection for all vertical facades and cliff faces.</li>
+                        </ul>
+                      </div>
 
-                    <!-- Module 5 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge">STAGE 13–16</div>
-                      <h4>Screened Poisson Meshing & UV Texturing</h4>
-                      <p>Computes watertight manifold polygonal surface meshes from oriented point normals, optimizing octree depth to retain architectural edges while filtering noise.</p>
-                      <div class="m-formula">∇·∇χ = ∇·<span class="eq-var">V⃗</span> ⟹ Watertight Manifold Surface</div>
-                      <ul>
-                        <li>Poisson octree depth 11 generates exactly 200,000 smooth polygon faces.</li>
-                        <li>Global multi-band UV texture blending maps 4K camera details.</li>
-                        <li>Exports directly to WebGL-ready PBR GLB format (10.1 MB).</li>
-                      </ul>
-                    </div>
-
-                    <!-- Module 6 -->
-                    <div class="methodology-card">
-                      <div class="m-card-badge cyan">STAGE 17–20</div>
-                      <h4>Geodetic Coordinate Fusion (EPSG:32630)</h4>
-                      <p>Transforms reconstructed metric point clouds and camera poses into real-world geographic coordinates using 7-DoF Sim(3) Helmert transformation and PROJ/GDAL.</p>
-                      <div class="m-formula">X<sub>UTM</sub> = s·R·X<sub>local</sub> + T &nbsp;⟹&nbsp; RMSE = 0.024 m</div>
-                      <ul>
-                        <li>Fuses satellite RTK/PPK GNSS logs with visual bundle adjustment.</li>
-                        <li>Aligns to WGS 84 / UTM Zone 30N (EPSG:32630) with millimeter residuals.</li>
-                        <li>Generates georeferenced GeoTIFF orthomosaics and DSM raster layers.</li>
-                      </ul>
+                      <!-- Stage 4 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge cyan">STAGE 04</div>
+                        <h4>Mesh Generation &amp; 4K Texture Blending</h4>
+                        <p>Produces watertight polygonal 3D models and projects crisp photographic textures ready for web inspection.</p>
+                        <ul>
+                          <li>Screened Poisson meshing creates clean, continuous manifold surfaces.</li>
+                          <li>Global multi-band UV texture blending maps 4K photographic detail.</li>
+                          <li>Exports directly to WebGL-ready PBR GLB format for 1:1 metric visualization.</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- ========================================================== -->
-              <!-- TAB 3: Geodesy & GCP Accuracy Checkpoints (Deep Details) -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 3: Geodesy & Accuracy -->
+              <!-- ========================================================== -->
+              <!-- SECTION 3: Geodesy & Accuracy                              -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-geodesy">
                 <div class="scroll-section-header"><i class="fa fa-crosshairs"></i> Geodesy &amp; Accuracy</div>
-              <div class="project-tab-pane" id="pane-tab-geodesy">
-                <div class="tab-pane-content">
-                  <div class="pane-header">
-                    <h3><i class="fa fa-crosshairs"></i> Geodetic Rigor & Accuracy Checkpoints</h3>
-                    <p>Quantitative survey accuracy verification combining ground control points (GCPs), camera calibration parameters, and coordinate reference system datum transformation residuals.</p>
-                  </div>
-
-                  <div class="geodesy-tables-container">
-                    <div class="geo-section-block">
-                      <h4><i class="fa fa-crosshairs"></i> Ground Control Point (GCP) Residual Analysis</h4>
-                      <table class="table table-bordered table-striped geo-table">
-                        <thead>
-                          <tr>
-                            <th>GCP ID</th>
-                            <th>Feature Location</th>
-                            <th>Easting (m)</th>
-                            <th>Northing (m)</th>
-                            <th>Elevation (m)</th>
-                            <th>East Error</th>
-                            <th>North Error</th>
-                            <th>Vert Error</th>
-                            <th>3D Total Residual</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>GCP-01</td><td>South Rampart Gun Emplacement</td><td>340482.114</td><td>6203088.420</td><td>24.312</td><td>+0.012 m</td><td>+0.009 m</td><td>+0.018 m</td><td><strong class="text-success">0.023 m</strong></td></tr>
-                          <tr><td>GCP-02</td><td>Historic Castle Gate Archway</td><td>340510.825</td><td>6203140.118</td><td>38.905</td><td>+0.014 m</td><td>+0.011 m</td><td>+0.015 m</td><td><strong class="text-success">0.023 m</strong></td></tr>
-                          <tr><td>GCP-03</td><td>River Clyde Pier Mooring Post</td><td>340455.302</td><td>6203112.784</td><td>4.110</td><td>+0.008 m</td><td>+0.015 m</td><td>+0.021 m</td><td><strong class="text-success">0.027 m</strong></td></tr>
-                          <tr><td>GCP-04</td><td>North Ridge Cliff Lookout</td><td>340540.912</td><td>6203130.655</td><td>72.450</td><td>+0.011 m</td><td>+0.013 m</td><td>+0.016 m</td><td><strong class="text-success">0.023 m</strong></td></tr>
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td colspan="5"><strong>Mean Survey Root Mean Square Error (RMSE):</strong></td>
-                            <td><strong>0.011 m</strong></td>
-                            <td><strong>0.012 m</strong></td>
-                            <td><strong>0.018 m</strong></td>
-                            <td><strong class="text-primary" style="font-size: 13px;">0.024 m (Survey-Grade)</strong></td>
-                          </tr>
-                        </tfoot>
-                      </table>
+                <div class="project-tab-pane" id="pane-tab-geodesy">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <div class="pane-header" style="margin-bottom: 24px;">
+                      <h3><i class="fa fa-crosshairs"></i> Survey-Grade Precision &amp; Georeferencing</h3>
+                      <p>Sub-centimeter geospatial alignment combining multi-band RTK satellite data, Ground Control Points (GCPs), and automated camera calibration.</p>
                     </div>
 
-                    <div class="geo-section-block">
-                      <h4><i class="fa fa-camera"></i> Intrinsic Camera Calibration Matrix</h4>
-                      <table class="table table-bordered geo-table">
-                        <thead>
-                          <tr><th>Parameter</th><th>Nominal Value</th><th>Optimized Value</th><th>Residual Uncertainty</th><th>Role in Geometric Distortion</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>Focal Length fx, fy</td><td>24.0 mm (3648 px)</td><td>3648.2 px / 3647.9 px</td><td>± 0.38 px</td><td>Principal distance from optical center to sensor plane</td></tr>
-                          <tr><td>Principal Point cx, cy</td><td>2736.0, 1824.0 px</td><td>2734.8 px, 1826.1 px</td><td>± 0.22 px</td><td>Intersection of optical axis with digital sensor array</td></tr>
-                          <tr><td>Radial Distortion k1, k2</td><td>0.0, 0.0</td><td>-0.0824, 0.0412</td><td>± 0.0004</td><td>Barrel distortion compensation across wide 24mm lens</td></tr>
-                          <tr><td>Tangential Distortion p1, p2</td><td>0.0, 0.0</td><td>0.0001, -0.0002</td><td>± 0.0001</td><td>Decentering distortion caused by physical lens tilt</td></tr>
-                        </tbody>
-                      </table>
+                    <div class="methodology-grid">
+                      <!-- Accuracy Card 1 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">PRECISION</div>
+                        <h4>Centimeter-Level Accuracy (±1.2 cm)</h4>
+                        <p>Achieves survey-grade spatial accuracy certified against physical Ground Control Points across the entire survey perimeter.</p>
+                        <ul>
+                          <li>Mean reprojection error of only <strong>0.42 px</strong> across all registered camera stations.</li>
+                          <li>Millimeter-level residual error after 7-DoF Sim(3) Helmert transformation.</li>
+                          <li>Ensures true-to-life 1:1 metric scale for volume, area, and distance analysis.</li>
+                        </ul>
+                      </div>
+
+                      <!-- Accuracy Card 2 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge cyan">DATUM</div>
+                        <h4>Standard Global CRS (EPSG:32630)</h4>
+                        <p>Reconstructed models and orthophotos are directly projected into standard cartographic coordinate systems.</p>
+                        <ul>
+                          <li>Projected directly to WGS 84 / UTM Zone 30N (EPSG:32630).</li>
+                          <li>Seamlessly imports into industry GIS tools (QGIS, ArcGIS, AutoCAD, Civil 3D).</li>
+                          <li>Exports georeferenced GeoTIFF orthomosaics and Digital Surface Models (DSM).</li>
+                        </ul>
+                      </div>
+
+                      <!-- Accuracy Card 3 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">CALIBRATION</div>
+                        <h4>Automated Sensor Self-Calibration</h4>
+                        <p>Self-calibrates camera optics during flight to remove wide-angle lens distortion automatically.</p>
+                        <ul>
+                          <li>Resolves principal point offsets and focal length parameters dynamically.</li>
+                          <li>Compensates for radial (k1, k2) and tangential (p1, p2) lens distortion.</li>
+                          <li>Guarantees distortion-free perspective geometry across every captured frame.</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- ========================================================== -->
-              <!-- TAB 4: Sensor & UAV Flight Telemetry (Deep Details) -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 4: Sensor & Flight Telemetry -->
+              <!-- ========================================================== -->
+              <!-- SECTION 4: Sensor & Flight Telemetry                       -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-telemetry">
-                <div class="scroll-section-header"><i class="fa fa-plane-departure"></i> Sensor &amp; Flight Telemetry</div>
-              <div class="project-tab-pane" id="pane-tab-telemetry">
-                <div class="tab-pane-content">
-                  <div class="pane-header">
-                    <h3><i class="fa fa-plane-departure"></i> UAV Flight Mission & Sensor Rig Telemetry</h3>
-                    <p>Telemetry recorded during autonomous grid and oblique perimeter inspection flight at Dumbarton Fortress, River Clyde.</p>
-                  </div>
-
-                  <div class="telemetry-specs-grid">
-                    <div class="spec-card">
-                      <div class="spec-icon"><i class="fa fa-helicopter"></i></div>
-                      <div class="spec-info">
-                        <span class="spec-title">Flight Envelope</span>
-                        <strong>64.5m AGL (Above Ground Level)</strong>
-                        <p>Cruise speed: 4.8 m/s · Flight duration: 10 mins · Total path: 1,840 m</p>
-                      </div>
+                <div class="scroll-section-header"><i class="fa fa-plane-departure"></i> Flight Telemetry</div>
+                <div class="project-tab-pane" id="pane-tab-telemetry">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <div class="pane-header" style="margin-bottom: 24px;">
+                      <h3><i class="fa fa-plane-departure"></i> UAV Flight Envelope &amp; Sensor Rig</h3>
+                      <p>Autonomous flight dynamics, camera optics, and satellite coverage recorded during survey operations.</p>
                     </div>
 
-                    <div class="spec-card">
-                      <div class="spec-icon"><i class="fa fa-camera"></i></div>
-                      <div class="spec-info">
-                        <span class="spec-title">Sensor Rig</span>
-                        <strong>Sony 1" Exmor CMOS 20MP</strong>
-                        <p>5472 × 3648 px · Mechanical shutter · ISO 100 · 1/800s exposure</p>
+                    <div class="telemetry-specs-grid">
+                      <div class="spec-card">
+                        <div class="spec-icon"><i class="fa fa-helicopter"></i></div>
+                        <div class="spec-info">
+                          <span class="spec-title">Flight Envelope</span>
+                          <strong>64.5m AGL Altitude Hold</strong>
+                          <p>4.8 m/s cruise speed · 10 min mission · 1,840 m total flight path</p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="spec-card">
-                      <div class="spec-icon"><i class="fa fa-satellite"></i></div>
-                      <div class="spec-info">
-                        <span class="spec-title">GNSS Satellite Lock</span>
-                        <strong>Multi-Band RTK Fixed (26 Satellites)</strong>
-                        <p>GPS L1/L2, GLONASS, Galileo, BeiDou · Horizontal accuracy: 0.010 m</p>
+                      <div class="spec-card">
+                        <div class="spec-icon"><i class="fa fa-camera"></i></div>
+                        <div class="spec-info">
+                          <span class="spec-title">Camera Sensor Rig</span>
+                          <strong>Sony 1" Exmor CMOS 20MP</strong>
+                          <p>5472 × 3648 px · Mechanical shutter · 1/800s ultra-fast exposure</p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="spec-card">
-                      <div class="spec-icon"><i class="fa fa-layer-group"></i></div>
-                      <div class="spec-info">
-                        <span class="spec-title">Stereo Overlap</span>
-                        <strong>78% Forward · 72% Lateral Overlap</strong>
-                        <p>Guarantees at least 5 intersecting camera rays per 3D surface point</p>
+                      <div class="spec-card">
+                        <div class="spec-icon"><i class="fa fa-satellite"></i></div>
+                        <div class="spec-info">
+                          <span class="spec-title">GNSS Satellite Lock</span>
+                          <strong>Multi-Band RTK Fixed (26 Satellites)</strong>
+                          <p>GPS, GLONASS, Galileo, BeiDou · 0.010 m real-time positional accuracy</p>
+                        </div>
+                      </div>
+
+                      <div class="spec-card">
+                        <div class="spec-icon"><i class="fa fa-layer-group"></i></div>
+                        <div class="spec-info">
+                          <span class="spec-title">Stereo Overlap</span>
+                          <strong>78% Forward · 72% Lateral Overlap</strong>
+                          <p>Guarantees at least 5 intersecting camera rays per 3D surface point</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-
-              <!-- ========================================================== -->
-              <!-- TAB GEOFENCING: Geofencing Details -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 5: Geofencing -->
+              <!-- ========================================================== -->
+              <!-- SECTION 5: Geofencing                                      -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-geofencing">
                 <div class="scroll-section-header"><i class="fa-solid fa-draw-polygon"></i> Geofencing</div>
-              <div class="project-tab-pane" id="pane-tab-geofencing">
-                <div class="tab-pane-content">
-                  <div class="pane-header">
-                    <h3><i class="fa-solid fa-draw-polygon"></i> Geofencing &amp; Operational Boundary Control</h3>
-                    <p>AeroSculpt enforces hardware-level and software-level geofence boundaries to ensure all UAV flight operations remain within authorised survey zones and comply with airspace regulations. Geofence data is embedded into every reconstructed asset and processing log.</p>
-                  </div>
-
-                  <div class="geofence-grid">
-                    <!-- Zone Info Card -->
-                    <div class="geofence-card geofence-active">
-                      <div class="geofence-card-header">
-                        <span class="geofence-live-tag"><span class="live-dot pulse"></span> GEOFENCE ACTIVE</span>
-                        <span class="geofence-zone-id">ZONE-GBR-55N-4W-001</span>
-                      </div>
-                      <div class="geofence-card-body">
-                        <div class="geofence-row">
-                          <span class="geofence-label">Survey Site</span>
-                          <strong class="geofence-val">Dumbarton Castle, Scotland, UK</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Geofence Origin</span>
-                          <strong class="geofence-val">55°56'14&quot; N, 4°33'48&quot; W (WGS 84)</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Survey Perimeter</span>
-                          <strong class="geofence-val">210 m × 195 m (42,500 m² · 4.25 ha)</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">CRS / Projection</span>
-                          <strong class="geofence-val">EPSG:32630 · WGS 84 / UTM zone 30N</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Max AGL Altitude</span>
-                          <strong class="geofence-val">120 m AGL (Survey: 64.5 m AGL)</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Airspace Class</span>
-                          <strong class="geofence-val">Class G · Uncontrolled · NOTAM Filed</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Geofence Type</span>
-                          <strong class="geofence-val">Polygonal Hard Boundary (RTH on breach)</strong>
-                        </div>
-                        <div class="geofence-row">
-                          <span class="geofence-label">Breach Action</span>
-                          <strong class="geofence-val text-warn">Return-to-Home + Mission Abort + Alert</strong>
-                        </div>
-                      </div>
+                <div class="project-tab-pane" id="pane-tab-geofencing">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <div class="pane-header" style="margin-bottom: 24px;">
+                      <h3><i class="fa-solid fa-draw-polygon"></i> Operational Safety &amp; Airspace Boundaries</h3>
+                      <p>Automated virtual safety boundaries keep drone missions compliant, secure, and contained within authorized airspace.</p>
                     </div>
 
-                    <!-- Geofence Rules Card -->
-                    <div class="geofence-card">
-                      <div class="geofence-card-header-plain">Geofence Enforcement Rules</div>
-                      <div class="geofence-rules-list">
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>Hard Boundary:</strong> RTH triggered immediately if UAV exceeds polygon perimeter by &gt;5 m buffer</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>Altitude Cap:</strong> Max 120 m AGL enforced in firmware; flight plan locked to 64.5 m AGL</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>No-Fly Zones:</strong> Active airport TFRs and restricted areas pre-loaded via NOTAM API</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>Dynamic Obstacles:</strong> On-board detect &amp; avoid for vehicles, humans, and animals (NTRO Key Challenge)</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>GPS Integrity:</strong> GNSS spoofing detection; fallback to barometric altitude + IMU dead-reckoning</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-circle-check text-success"></i>
-                          <span><strong>Border Survey Mode:</strong> Strategic area lockdown — mission encrypted, geofence polygon classified</span>
-                        </div>
-                        <div class="geofence-rule">
-                          <i class="fa-solid fa-triangle-exclamation text-warn"></i>
-                          <span><strong>RTK/PPK Correction:</strong> Optional RTK base station for cm-level positional accuracy within fence</span>
-                        </div>
+                    <div class="methodology-grid">
+                      <!-- Geofence 1 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">PERIMETER</div>
+                        <h4>Virtual Hard Boundary (4.25 ha)</h4>
+                        <p>Enforces strict polygonal boundaries around the survey site to prevent airspace deviations.</p>
+                        <ul>
+                          <li>Automated Return-to-Home (RTH) triggered if the UAV breaches the boundary buffer.</li>
+                          <li>Confines all flight operations within the 210m × 195m surveyed zone.</li>
+                          <li>Logs all perimeter compliance telemetry directly into the mission metadata.</li>
+                        </ul>
                       </div>
-                    </div>
 
-                    <!-- Geofence Applications per NTRO -->
-                    <div class="geofence-card geofence-applications">
-                      <div class="geofence-card-header-plain">NTRO Potential Applications (Geofenced Ops)</div>
-                      <div class="geofence-apps-grid">
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-shield-halved"></i>
-                          <span>Border &amp; Strategic Area Mapping</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-house-flood-water"></i>
-                          <span>Disaster Damage Assessment</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-city"></i>
-                          <span>Urban Planning &amp; Smart Cities</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-tower-observation"></i>
-                          <span>Infrastructure Inspection</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-helmet-safety"></i>
-                          <span>Construction Progress Monitoring</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-landmark"></i>
-                          <span>Archaeological Documentation</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-cube"></i>
-                          <span>3D Reconstruction</span>
-                        </div>
-                        <div class="geofence-app-item">
-                          <i class="fa-solid fa-crosshairs"></i>
-                          <span>Military Reconnaissance &amp; Mission Planning</span>
-                        </div>
+                      <!-- Geofence 2 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge cyan">AIRSPACE</div>
+                        <h4>Altitude Limits &amp; Airspace Compliance</h4>
+                        <p>Firmware-locked flight ceilings ensure full compliance with civil aviation regulations.</p>
+                        <ul>
+                          <li>Hard ceiling enforced below 120m AGL (survey flown at 64.5m AGL).</li>
+                          <li>Pre-loaded active airspace restrictions and NOTAM no-fly zones.</li>
+                          <li>Compliant with Class G uncontrolled airspace operational standards.</li>
+                        </ul>
                       </div>
-                    </div>
 
-                    <!-- NTRO Input Data Compliance Card -->
-                    <div class="geofence-card geofence-compliance">
-                      <div class="geofence-card-header-plain">NTRO Input Data Compliance</div>
-                      <table class="geofence-table">
-                        <thead>
-                          <tr><th>Input</th><th>Type</th><th>Status</th></tr>
-                        </thead>
-                        <tbody>
-                          <tr><td>Drone Video (1080p/4K)</td><td>Mandatory</td><td><span class="badge-ok">✓ Provided</span></td></tr>
-                          <tr><td>GPS Coordinates</td><td>Mandatory</td><td><span class="badge-ok">✓ Embedded EXIF + RTK</span></td></tr>
-                          <tr><td>Flight Metadata</td><td>Mandatory</td><td><span class="badge-ok">✓ Full Telemetry Log</span></td></tr>
-                          <tr><td>IMU Data</td><td>Optional</td><td><span class="badge-ok">✓ 6-DOF IMU</span></td></tr>
-                          <tr><td>Barometric Altitude</td><td>Optional</td><td><span class="badge-ok">✓ Dual-redundant</span></td></tr>
-                          <tr><td>Camera Intrinsics</td><td>Optional</td><td><span class="badge-ok">✓ Pre-calibrated</span></td></tr>
-                          <tr><td>RTK/PPK Corrections</td><td>Optional</td><td><span class="badge-ok">✓ Post-processed PPK</span></td></tr>
-                        </tbody>
-                      </table>
+                      <!-- Geofence 3 -->
+                      <div class="methodology-card">
+                        <div class="m-card-badge">FAIL-SAFE</div>
+                        <h4>Autonomous Safety Fail-Safes</h4>
+                        <p>Intelligent onboard systems protect ground personnel and preserve flight safety.</p>
+                        <ul>
+                          <li>Real-time dynamic obstacle detection for vehicles and structures.</li>
+                          <li>Anti-spoofing GNSS integrity check with instant fallback to IMU dead-reckoning.</li>
+                          <li>Automated emergency landing if battery reserve or link quality drops below threshold.</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- ========================================================== -->
-              <!-- TAB 5: Evidence-Aware Provenance Matrix (Deep Details) -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 6: Provenance Matrix -->
+              <!-- ========================================================== -->
+              <!-- SECTION 6: Provenance Matrix                               -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-provenance">
                 <div class="scroll-section-header"><i class="fa fa-shield-halved"></i> Provenance Matrix</div>
-              <div class="project-tab-pane" id="pane-tab-provenance">
-                <div class="tab-pane-content">
-                  <div class="pane-header">
-                    <h3><i class="fa fa-shield-halved"></i> Evidence-Aware 3D Representation & Quality Provenance</h3>
-                    <p>AeroSculpt distinguishes between geometry directly supported by sensor observations and geometry that was inferred. Every vertex is tagged with one of four explicit evidence states:</p>
-                  </div>
-
-                  <div class="evidence-matrix-grid">
-                    <div class="evidence-card observed">
-                      <div class="evidence-state-tag">STATE 01: OBSERVED</div>
-                      <div class="evidence-title">Directly Measured</div>
-                      <div class="evidence-desc">
-                        Geometry directly verified by multiple sharp, unoccluded multi-view camera rays with low reprojection residuals (&lt;0.8 px). 88.4% of Dumbarton Castle facade is in this verified state.
-                      </div>
+                <div class="project-tab-pane" id="pane-tab-provenance">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <div class="pane-header" style="margin-bottom: 24px;">
+                      <h3><i class="fa fa-shield-halved"></i> Evidence-Aware 3D Quality Provenance</h3>
+                      <p>Every vertex and surface is transparently tagged by its level of verification so surveyors know exactly what is real versus inferred.</p>
                     </div>
 
-                    <div class="evidence-card reconstructed">
-                      <div class="evidence-state-tag">STATE 02: RECONSTRUCTED</div>
-                      <div class="evidence-title">Multi-View Triangulated</div>
-                      <div class="evidence-desc">
-                        Recovered through global SfM and PatchMatch MVS depth consensus across multi-view baselines with verified parallax. Covers the fortress ramparts and surrounding lawn.
+                    <div class="evidence-matrix-grid">
+                      <div class="evidence-card observed">
+                        <div class="evidence-state-tag">STATE 01: OBSERVED</div>
+                        <div class="evidence-title">Directly Measured (88.4%)</div>
+                        <div class="evidence-desc">
+                          Geometry verified directly by multiple sharp, unoccluded drone camera rays with ultra-low reprojection error (&lt;0.8 px). Highest confidence.
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="evidence-card inferred">
-                      <div class="evidence-state-tag">STATE 03: INFERRED</div>
-                      <div class="evidence-title">Spatially Extrapolated</div>
-                      <div class="evidence-desc">
-                        Surfaces completed from surrounding structural evidence (e.g. road covered by tree foliage, ground beneath parked vehicles). Tagged with confidence weight 0.65.
+                      <div class="evidence-card reconstructed">
+                        <div class="evidence-state-tag">STATE 02: RECONSTRUCTED</div>
+                        <div class="evidence-title">Multi-View Triangulated</div>
+                        <div class="evidence-desc">
+                          Recovered through multi-angle Structure-from-Motion (SfM) and depth consensus across overlapping flight passes.
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="evidence-card unknown">
-                      <div class="evidence-state-tag">STATE 04: UNKNOWN</div>
-                      <div class="evidence-title">Insufficient Evidence / Data Gap</div>
-                      <div class="evidence-desc">
-                        Blind zones lacking adequate camera views or deep shadows, explicitly flagged for surveyor inspection rather than hallucinated or fabricated synthetically.
+                      <div class="evidence-card inferred">
+                        <div class="evidence-state-tag">STATE 03: INFERRED</div>
+                        <div class="evidence-title">Spatially Extrapolated</div>
+                        <div class="evidence-desc">
+                          Obscured areas (dense foliage, shadows) are filled based on surrounding structural continuity and clearly flagged for surveyor review—never fabricated.
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 7: Tactical Studio                                 -->
-              <!-- ========================================================== -->
               </section>
 
-              <!-- SECTION 7: Tactical Studio -->
+              <!-- ========================================================== -->
+              <!-- SECTION 7: Demo                                            -->
+              <!-- ========================================================== -->
               <section class="scroll-section" id="section-studio">
                 <div class="scroll-section-header"><i class="fa-solid fa-play-circle"></i> Demo</div>
-              <div class="project-tab-pane" id="pane-tab-studio">
-                <div class="tab-pane-content">
-                  <!-- Studio Pane Header -->
-                  <div class="pane-header">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-                      <div>
-                        <h3><i class="fa-solid fa-play-circle"></i> AeroSculpt Demo</h3>
-                      </div>
-                      <button type="button" class="btn btn-primary btn-md" id="btn-launch-studio-from-tab" style="font-weight: 700; padding: 10px 20px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);">
-                        <i class="fa fa-expand"></i> Launch Full Workstation (Fits Screen 100%)
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Studio Preview Card -->
-                  <div class="card" style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 18px; margin-bottom: 20px; color: var(--text-main);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px;"><i class="fa fa-cube" style="color:var(--nextgen-red)"></i> AEROSCULPT 3D RECONSTRUCTION VIEWER</span>
-                        <span class="pill-rtk">RTK Fixed 0.010m</span>
-                        <span class="badge-status-locked">EPSG:32630 Datum</span>
-                      </div>
-                      <div style="display: flex; gap: 6px;">
-                        <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-front" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Front View</button>
-                        <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-top" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Top GIS</button>
-                        <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-iso" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">3D Iso</button>
-                      </div>
-                    </div>
-
-                    <div style="position: relative; height: 320px; background: var(--bg-app); border: 1px solid var(--border-medium); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                      <!-- Quick specs overlay -->
-                      <div style="position: absolute; top: 12px; left: 14px; background: rgba(12, 13, 18, 0.85); border: 1px solid var(--border-medium); border-radius: 4px; padding: 6px 12px; font-size: 11px; z-index: 5;">
-                        <div style="color: var(--nextgen-cyan); font-weight: 700; margin-bottom: 2px;">Dumbarton Castle Ramparts</div>
-                        <div style="color: var(--text-muted); font-size: 10px; font-family: var(--font-mono);">Calibrated Trajectory · 1.42 cm/px GSD · 524k Triangles</div>
-                      </div>
-
-                      <div style="text-align: center; z-index: 5; max-width: 440px; padding: 20px;">
-                        <div style="width: 52px; height: 52px; background: var(--nextgen-red-subtle); border: 1px solid var(--nextgen-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--nextgen-red); font-size: 22px;">
-                          <i class="fa fa-cube"></i>
+                <div class="project-tab-pane" id="pane-tab-studio">
+                  <div class="tab-pane-content" style="padding: 24px 20px;">
+                    <!-- Studio Pane Header -->
+                    <div class="pane-header" style="margin-bottom: 20px;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div>
+                          <h3><i class="fa-solid fa-play-circle"></i> Interactive 3D Digital Twin Workstation</h3>
+                          <p>Launch the interactive 3D workstation to inspect reconstructed models, flight paths, and sensor telemetry in full-screen WebGL.</p>
                         </div>
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">AeroSculpt Demo</h4>
-                                                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">UAV 3D reconstruction viewer with live sensor feeds, GCP geodesy, and precision photogrammetric inspection.</p>
-                        <button type="button" class="btn btn-primary btn-sm" id="btn-launch-studio-from-preview" style="font-weight: 700; padding: 8px 18px;">
-                          <i class="fa fa-expand"></i> Open Full Viewport (Fits Screen 100%)
+                        <button type="button" class="btn btn-primary btn-md" id="btn-launch-studio-from-tab" style="font-weight: 700; padding: 10px 20px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);">
+                          <i class="fa fa-expand"></i> Launch Full Workstation (Fits Screen 100%)
                         </button>
                       </div>
+                    </div>
 
-                      <div style="position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: #64748b; font-family: var(--font-mono); z-index: 5;">
-                        WebGL 2.0 · Three.js · 1:1 Metric Scale
+                    <!-- Studio Preview Card -->
+                    <div class="card" style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 18px; margin-bottom: 20px; color: var(--text-main);">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                          <span style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px;"><i class="fa fa-cube" style="color:var(--nextgen-red)"></i> AEROSCULPT 3D WORKSTATION</span>
+                          <span class="pill-rtk">RTK Fixed 0.010m</span>
+                          <span class="badge-status-locked">EPSG:32630 Datum</span>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-front" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Front View</button>
+                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-top" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Top GIS</button>
+                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-iso" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">3D Iso</button>
+                        </div>
+                      </div>
+
+                      <div style="position: relative; height: 320px; background: var(--bg-app); border: 1px solid var(--border-medium); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <!-- Quick specs overlay -->
+                        <div style="position: absolute; top: 12px; left: 14px; background: rgba(12, 13, 18, 0.85); border: 1px solid var(--border-medium); border-radius: 4px; padding: 6px 12px; font-size: 11px; z-index: 5;">
+                          <div style="color: var(--nextgen-cyan); font-weight: 700; margin-bottom: 2px;">Dumbarton Castle Ramparts</div>
+                          <div style="color: var(--text-muted); font-size: 10px; font-family: var(--font-mono);">Calibrated Trajectory · 1.42 cm/px GSD · 524k Triangles</div>
+                        </div>
+
+                        <div style="text-align: center; z-index: 5; max-width: 460px; padding: 20px;">
+                          <div style="width: 52px; height: 52px; background: var(--nextgen-red-subtle); border: 1px solid var(--nextgen-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--nextgen-red); font-size: 22px;">
+                            <i class="fa fa-cube"></i>
+                          </div>
+                          <h4 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">AeroSculpt Demo Workstation</h4>
+                          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Inspect 3D digital twins, toggle optical sensor layers, measure true metric dimensions, and scrub flight trajectories in real time.</p>
+                          <button type="button" class="btn btn-primary btn-sm" id="btn-launch-studio-from-preview" style="font-weight: 700; padding: 8px 18px;">
+                            <i class="fa fa-expand"></i> Open Full Viewport (Fits Screen 100%)
+                          </button>
+                        </div>
+
+                        <div style="position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: #64748b; font-family: var(--font-mono); z-index: 5;">
+                          WebGL 2.0 · Three.js · 1:1 Metric Scale
+                        </div>
                       </div>
                     </div>
-                  </div>
 
+                    <!-- Clean 3-Card Summary -->
+                    <div class="methodology-grid">
+                      <div class="methodology-card">
+                        <div class="m-card-badge">VIEWPORT</div>
+                        <h4>Hardware-Accelerated 3D Engine</h4>
+                        <p>WebGL rendering powered by Three.js with sub-millimeter Draco mesh decompression.</p>
+                        <ul>
+                          <li>Color shading modes: RGB True Color, Elevation, Distance-to-Camera, and CAD Wireframe.</li>
+                          <li>Interactive 2-point measurement ruler for true metric distances and clearances.</li>
+                          <li>Calibrated UAV camera frustums showing exact survey capture stations.</li>
+                        </ul>
+                      </div>
 
+                      <div class="methodology-card">
+                        <div class="m-card-badge cyan">SENSORS</div>
+                        <h4>Real-Time Sensor &amp; SLAM Intel</h4>
+                        <p>Tactical sensor inspection panel synchronized with 3D model orientation.</p>
+                        <ul>
+                          <li>Optical sensor viewer with keypoint landmark overlays and feature matching.</li>
+                          <li>Spectral disparity depth heatmaps (Inferno, Turbo, Rainbow colormaps).</li>
+                          <li>Live flight camera feeds with continuous pose tracking.</li>
+                        </ul>
+                      </div>
 
-                  <!-- Studio Methodology Cards -->
-                  <div class="methodology-grid">
-                    <div class="methodology-card">
-                      <div class="m-card-badge">SECTION 3.1 & 3.2</div>
-                      <h4>3D Reconstruction Viewport</h4>
-                      <p>Hardware-accelerated Three.js canvas rendering watertight textured mesh, calibrated UAV camera frustums, optical laser sightline beam, ground metric datum grid, and 3D ROI bounding box.</p>
-                      <ul>
-                        <li>Color shading modes: RGB True Color, Turbo Elevation, Distance to Cam, CAD Solid.</li>
-                        <li>Real-time precision coordinate reticle HUD [X, Y, Z] on hover.</li>
-                        <li>Interactive 2-point measurement ruler for true metric distances.</li>
-                      </ul>
-                    </div>
-
-                    <div class="methodology-card">
-                      <div class="m-card-badge cyan">SECTION 3.3</div>
-                      <h4>Sensor Intel Drawer & 3D Controllers</h4>
-                      <p>Tactical side panel with multi-layer optical inspection and hands-on 3D navigation dock.</p>
-                      <ul>
-                        <li>270px Drone Optical Sensor Viewer with cv-image, cv-features, cv-landmarks, cv-residuals toggles.</li>
-                        <li>Directional D-Pad Cluster (▲, ◀, ⌂, ▶, ▼) with 4 camera orientation presets (Top, Front, Side, Iso).</li>
-                        <li>Spectral Disparity Depth View with Inferno, Turbo, Grayscale, Rainbow colormaps.</li>
-                      </ul>
-                    </div>
-
-                    <div class="methodology-card">
-                      <div class="m-card-badge">SECTION 3.4 & 3.5</div>
-                      <h4>Ground Control Drawer & Cinematic Scrubber</h4>
-                      <p>Survey-grade coordinate inspector with 9-decimal precision, real-time UAV attitude gauges, and mission trajectory timeline.</p>
-                      <ul>
-                        <li>GCP Geodesy table with locked georeference status and Pin/Revert/Delete actions.</li>
-                        <li>Real-time UAV attitude dials: Yaw, Pitch, Roll visual level indicators.</li>
-                        <li>Temporal mission timeline scrubber with variable play/pause speed.</li>
-                      </ul>
+                      <div class="methodology-card">
+                        <div class="m-card-badge">TELEMETRY</div>
+                        <h4>GCP Geodesy &amp; Attitude Dials</h4>
+                        <p>Survey-grade coordinate analysis and dynamic flight telemetry gauges.</p>
+                        <ul>
+                          <li>Ground Control Point (GCP) coordinate verification table with millimeter precision.</li>
+                          <li>Real-time UAV attitude gauges: Yaw, Pitch, Roll visual level indicators.</li>
+                          <li>Temporal mission timeline scrubber with variable playback control.</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
+              </section></section>
 
         <!-- Legacy Navigation Anchors for Single Dashboard Scrolling -->
         <div id="view-3d-model" class="content-view-anchor" style="display:none;"></div>
