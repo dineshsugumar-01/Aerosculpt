@@ -32,28 +32,22 @@
 
 ---
 
-## ⚡ Key Capabilities
+## ⚡ How It Works (Simple 4-Step Pipeline)
 
-### 1. 🛸 UAV Ingestion & Feature Tracking
-- **Intelligent Frame Demuxing**: High-resolution video streams are dynamically demuxed into discrete timestamped imagery.
-- **Sharpness Operators**: Dual Laplacian and Tenengrad sharpness kernels filter out motion blur, atmospheric haze, and banking rotations.
-- **Feature Extraction & Matching**: High-dimensional feature detection and robust descriptor matching (SIFT, SuperPoint, and FLANN/BF Matchers).
+Similar to Google Earth 3D mapping, AeroSculpt converts raw drone video into realistic, true-scale 3D models:
 
-### 2. 📐 Photogrammetry & Mathematical Precision
-- **Structure-from-Motion (SfM)**: Epipolar geometry and bundle adjustment to compute exact camera extrinsics and sparse 3D point clouds:
-  $$\mathbf{x}'^\top \mathbf{F} \, \mathbf{x} = 0$$
-- **Multi-View Stereo (MVS)**: Depth map fusion and dense point cloud reconstruction across multi-angle UAV baselines.
-- **Poisson Surface Reconstruction**: Octree-based implicit surface modeling producing manifold watertight meshes with high-resolution texture projection.
+1. **Capture & Filter**: Drone captures overlapping aerial video. Blurry, shaky, or glare frames are automatically filtered out, keeping only the clearest imagery.
+2. **Track & Match**: Finds matching visual landmarks across frames to determine the exact camera angle and position for each shot.
+3. **Build 3D Shape**: Connects matching points across multiple angles into a dense 3D wireframe mesh representing the terrain and structures.
+4. **Texture & Color**: Projects high-resolution photographic colors onto the 3D mesh, creating a realistic, interactive digital twin ready for web inspection.
 
-### 3. 🎮 Studio 3D Workstation
-- Full-bleed hardware-accelerated WebGL viewport powered by **Three.js**.
-- Support for Draco-compressed binary glTF (`.glb`) with sub-millimeter vertex accuracy.
-- Camera frustum visualization showing exact UAV capture poses across flight paths.
-- Mesh analysis: Polygon counts, vertex density, PBR shading toggles, and wireframe diagnostic modes.
+---
 
-### 4. 🛰️ SLAM Visual Odometry Engine
-- Visual odometry with real-time pose estimation and keyframe tracking.
-- HUD telemetry overlay displaying camera orientation, altitude, locked RTK status, and real-time coordinate geodesy.
+## 🎮 Workstation Features
+- **Interactive 3D Viewport**: Full-bleed WebGL viewer powered by Three.js with orbit navigation, wireframe modes, and Draco compression.
+- **Real-Time Visual Odometry (SLAM)**: Live camera tracking with HUD telemetry and RTK GPS coordinate geodesy (`EPSG:32630`).
+- **2D GIS & Orthomosaics**: Flight path mapping, geofencing safety boundaries, and high-resolution map tiles.
+- **Metric Measurement**: True-to-scale 1:1 dimension measurements, elevation profiles, and CAD-ready exports (`GLB`, `PLY`, `GeoTIFF`).
 
 ---
 

@@ -671,58 +671,38 @@
                 <div class="scroll-section-header"><i class="fa fa-diagram-project"></i> Pipeline Architecture</div>
                 <div class="project-tab-pane" id="pane-tab-architecture">
                   <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 24px;">
-                      <h3><i class="fa fa-diagram-project"></i> End-to-End UAV Photogrammetry Pipeline</h3>
-                      <p>How AeroSculpt transforms continuous drone video into photorealistic, survey-grade 3D assets in 4 straightforward stages.</p>
+                    <div class="pane-header" style="margin-bottom: 20px;">
+                      <h3><i class="fa fa-diagram-project"></i> How AeroSculpt Builds 3D Models</h3>
+                      <p>AeroSculpt transforms overlapping drone video into realistic, true-scale 3D models in four simple steps—similar to how modern 3D mapping and Google Earth create digital twins.</p>
                     </div>
 
-                    <div class="methodology-grid">
-                      <!-- Stage 1 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">STAGE 01</div>
-                        <h4>Drone Ingestion &amp; Quality Filtering</h4>
-                        <p>Continuous flight video is demuxed into discrete high-resolution frames with automated quality control.</p>
-                        <ul>
-                          <li>Laplacian sharpness filtering eliminates motion blur, propeller glare, and banking frames.</li>
-                          <li>Discards degraded optical frames before processing.</li>
-                          <li>Extracts EXIF camera focal length and optical coefficients.</li>
-                        </ul>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                      <!-- Step 1 -->
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #3b82f6;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(59,130,246,0.12); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">1</div>
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">1. Capture &amp; Filter</h4>
+                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">The drone records the site from multiple angles. Blurry or shaky frames are automatically filtered out, keeping only crystal-clear images.</p>
                       </div>
 
-                      <!-- Stage 2 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge cyan">STAGE 02</div>
-                        <h4>Visual SLAM &amp; Trajectory Tracking</h4>
-                        <p>Acts as the rapid geometric tracking front-end to compute drone motion and spatial coverage in real time.</p>
-                        <ul>
-                          <li>Tracks thousands of visual keypoints across sequential survey passes.</li>
-                          <li>Recovers camera trajectory and continuous pose priors without manual setup.</li>
-                          <li>Eliminates loop-closure drift across extended flight missions.</li>
-                        </ul>
+                      <!-- Step 2 -->
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #06b6d4;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(6,182,212,0.12); color: #06b6d4; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">2</div>
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">2. Track &amp; Match</h4>
+                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Common landmarks and visual points are matched across frames to calculate the exact position and angle of the camera for each shot.</p>
                       </div>
 
-                      <!-- Stage 3 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">STAGE 03</div>
-                        <h4>Multi-View SfM &amp; Dense 3D Point Cloud</h4>
-                        <p>Aligns multi-angle camera views and generates high-density 3D spatial points using depth-map fusion.</p>
-                        <ul>
-                          <li>Global Structure-from-Motion (SfM) bundle adjustment achieves sub-pixel accuracy.</li>
-                          <li>Reconstructs 1.42+ million dense 3D points across terrain and structures.</li>
-                          <li>Validates multi-ray intersection for all vertical facades and cliff faces.</li>
-                        </ul>
+                      <!-- Step 3 -->
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #10b981;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16,185,129,0.12); color: #10b981; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">3</div>
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">3. Build 3D Shape</h4>
+                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">By connecting matching points from different viewpoints, a dense 3D point cloud and solid mesh surface of the terrain and buildings are formed.</p>
                       </div>
 
-                      <!-- Stage 4 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge cyan">STAGE 04</div>
-                        <h4>Mesh Generation &amp; 4K Texture Blending</h4>
-                        <p>Produces watertight polygonal 3D models and projects crisp photographic textures ready for web inspection.</p>
-                        <ul>
-                          <li>Screened Poisson meshing creates clean, continuous manifold surfaces.</li>
-                          <li>Global multi-band UV texture blending maps 4K photographic detail.</li>
-                          <li>Exports directly to WebGL-ready PBR GLB format for 1:1 metric visualization.</li>
-                        </ul>
+                      <!-- Step 4 -->
+                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #f59e0b;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(245,158,11,0.12); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">4</div>
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">4. Texture &amp; Render</h4>
+                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">High-resolution photographic colors are projected onto the 3D model, generating a lightweight, realistic digital twin ready for web inspection.</p>
                       </div>
                     </div>
                   </div>
