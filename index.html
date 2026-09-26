@@ -4,1887 +4,1072 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AeroSculpt — Drone Photogrammetry & 3D Reconstruction Platform</title>
-  <meta name="description" content="AeroSculpt transforms continuous UAV survey imagery and video into georeferenced 3D textured models, dense point clouds, and high-resolution orthophotos.">
+  <title>AeroSculpt — Single-Pass Drone Video to Accurate 3D Model | NTRO SH/26158</title>
+  <meta name="description" content="AeroSculpt transforms a single continuous UAV video into an accurate, measurable, and georeferenced 3D model for real-world situational understanding. Aligned with NTRO Problem Statement 17.">
   
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles/main.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e293b'/><path d='M30 70 L50 25 L70 70 Z' fill='%233b82f6'/><circle cx='50' cy='48' r='10' fill='%23ffffff'/></svg>">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/workflow.css">
+  <link rel="icon" type="image/png" href="assets/aerosculpt_logo.png">
 </head>
 <body class="as-body">
-  <div id="wrapper">
-    <!-- Top Navigation Bar (AeroSculpt Style) -->
-    <nav id="navbar-top" class="navbar navbar-default navbar-static-top" role="navigation">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" id="sidebar-toggle" title="Toggle Navigation Sidebar">
-          <i class="fa fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="#dashboard" id="nav-brand-link">
-          <div class="brand-logo-icon">
-            <i class="fa-solid fa-layer-group"></i>
-          </div>
-          <span class="brand-name">AeroSculpt</span>
-          <span class="brand-version">v2.4</span>
-        </a>
+
+  <!-- ==========================================================================
+       Global Top Navigation Header
+       ========================================================================== -->
+  <header id="global-header">
+    <div class="header-brand" id="brand-home-link" title="AeroSculpt — Return to Landing Page">
+      <img src="assets/aerosculpt_logo.png" alt="AeroSculpt Official Logo" class="brand-logo-img">
+      <div class="brand-title-wrap">
+        <div class="brand-title">
+          AEROSCULPT
+          <span class="brand-badge">NTRO SH/26158</span>
+        </div>
+        <div class="brand-subtitle">Single-Pass UAV → 3D World</div>
       </div>
+    </div>
 
-      <!-- Top Right Badges & User Links -->
-      <ul class="nav navbar-top-links navbar-right">
-        <!-- AeroSculpt Processing Node Status -->
-        <li class="nav-item-node">
-          <button class="node-status-pill" id="btn-node-status" title="View AeroSculpt GPU Processing Node Specifications">
-            <span class="status-pulse-dot"></span>
-            <span class="node-label">AeroSculpt Node:</span>
-            <span class="node-state">Online</span>
-            <span class="node-hardware">8 Cores · 32GB · RTX GPU</span>
-          </button>
-        </li>
-
-        <!-- Quota Progress Indicator -->
-        <li class="nav-item-quota hidden-xs">
-          <div class="quota-pill" title="Workspace Storage Quota: 1.8 GB of 50.0 GB used">
-            <div class="quota-header">
-              <i class="fa fa-database fa-fw"></i>
-              <span>1.8 GB of 50.0 GB used</span>
-              <span class="quota-percent">4%</span>
-            </div>
-            <div class="quota-progress-bar">
-              <div class="quota-fill" style="width: 4%;"></div>
-            </div>
-          </div>
-        </li>
-
-        <!-- User Dropdown Menu -->
-        <li class="dropdown user-dropdown">
-          <button class="dropdown-toggle user-btn" id="user-menu-toggle" type="button" title="User Profile and Settings">
-            <div class="user-avatar"><i class="fa fa-user"></i></div>
-            <span class="user-greeting hidden-xs">admin</span>
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-user" id="user-dropdown-menu">
-            <li class="user-profile-header">
-              <strong>Administrator</strong>
-              <span class="user-email">admin@aerosculpt.local</span>
-            </li>
-            <li class="divider"></li>
-            <li><a href="javascript:void(0);" id="btn-show-nodes-menu"><i class="fa fa-wrench fa-fw"></i> Processing Nodes</a></li>
-            <li><a href="javascript:void(0);" id="btn-show-report-menu"><i class="fa fa-file-waveform fa-fw"></i> Diagnostic Report</a></li>
-            <li class="divider"></li>
-            <li><a href="javascript:void(0);" id="btn-sign-out"><i class="fa fa-arrow-right-from-bracket fa-fw"></i> Sign Out</a></li>
-          </ul>
-        </li>
-      </ul>
+    <!-- Center Navigation Tabs -->
+    <nav class="header-nav">
+      <button class="nav-link active" id="nav-btn-home" data-target="landing">
+        <i class="fa-solid fa-house"></i> Home
+      </button>
+      <button class="nav-link" id="nav-btn-upload" data-target="step-1">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+      </button>
+      <button class="nav-link" id="nav-btn-process" data-target="step-3">
+        <i class="fa-solid fa-gears"></i> Process
+      </button>
+      <button class="nav-link" id="nav-btn-viewer" data-target="step-4">
+        <i class="fa-solid fa-cube"></i> 3D Viewer
+      </button>
+      <button class="nav-link" id="nav-btn-export" data-target="step-5">
+        <i class="fa-solid fa-download"></i> Export
+      </button>
+      <button class="nav-link" id="nav-btn-docs">
+        <i class="fa-solid fa-book"></i> Docs
+      </button>
     </nav>
 
-    <!-- Main Container: Sidebar + Page Content Wrapper -->
-    <div class="app-container">
-      <!-- Left Sidebar Navigation -->
-      <aside class="navbar-default sidebar" id="app-sidebar" role="navigation">
-        <div class="sidebar-nav">
-          <ul class="nav" id="side-menu">
-            <li class="nav-item">
-              <a href="#dashboard" class="side-link active" data-view="dashboard" id="side-link-dashboard" title="AeroSculpt Mission Dashboard">
-                <i class="fa fa-tachometer-alt fa-fw"></i>
-                <span class="link-label">Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#3d-model" class="side-link" data-view="3d-model" id="side-link-3d" title="Inspect Reconstructed 3D GLB Model">
-                <i class="fa fa-cube fa-fw"></i>
-                <span class="link-label">3D Model</span>
-                <span class="badge badge-primary">GLB</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#map" class="side-link" data-view="map" id="side-link-map" title="Inspect 2D Orthomosaic and Flight Path">
-                <i class="fa fa-globe fa-fw"></i>
-                <span class="link-label">2D Map</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#video" class="side-link" data-view="video" id="side-link-video" title="Inspect AeroSculpt SLAM and Drone Feeds">
-                <i class="fa fa-video fa-fw"></i>
-                <span class="link-label">Video Feeds</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#studio" class="side-link" data-view="studio" id="side-link-studio" title="AeroSculpt Demo">
-                <i class="fa-solid fa-satellite-dish fa-fw"></i>
-                <span class="link-label">Demo</span>
-              </a>
-            </li>
+    <!-- Right Emblems & User Profile -->
+    <div class="header-right">
+      <div class="ntro-emblem-pill" title="Government of India / NTRO Problem Statement 17 System">
+        <span class="ntro-dot"></span>
+        <span>NTRO · PS-17</span>
+      </div>
 
-            <li class="nav-divider"></li>
-            <li class="nav-header">SYSTEM & NODES</li>
+      <div class="user-profile-badge" title="Authenticated Evaluator Session">
+        <div class="user-avatar-circle">E</div>
+        <span style="color: #cbd5e1;">Evaluator</span>
+      </div>
+    </div>
+  </header>
 
-            <li class="nav-item">
-              <a href="javascript:void(0);" class="side-link" id="side-link-nodes" title="View AeroSculpt GPU Processing Nodes">
-                <i class="fa fa-wrench fa-fw"></i>
-                <span class="link-label">Processing Nodes</span>
-                <span class="badge badge-success">1</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0);" class="side-link" id="side-link-admin" title="System Configuration & Account Settings">
-                <i class="fa fa-cogs fa-fw"></i>
-                <span class="link-label">Administration</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0);" class="side-link" id="side-link-docs" title="AeroSculpt Pipeline Documentation">
-                <i class="fa fa-circle-question fa-fw"></i>
-                <span class="link-label">Documentation</span>
-              </a>
-            </li>
-          </ul>
+  <!-- ==========================================================================
+       Screen 01: Landing Page (Hero)
+       ========================================================================== -->
+  <main id="view-landing" class="active">
+    <div class="hero-background-layer"></div>
+    <div class="hero-overlay-grid"></div>
+    <div class="hero-tactical-grid"></div>
 
-          <div class="sidebar-footer">
-            <div class="sidebar-footer-info">
-              <div class="pipeline-engine-pill">
-                <i class="fa-solid fa-microchip"></i> AeroSculpt Engine
-              </div>
-              <div class="crs-tag">CRS: EPSG:32630 (WGS 84 / UTM 30N)</div>
+    <div class="hero-content">
+      <div class="hero-pre-badge">
+        <i class="fa-solid fa-satellite-dish"></i> NTRO PROBLEM STATEMENT 17 · ADVANCED UAV GEOMATICS
+      </div>
+
+      <h1 class="hero-title">
+        <span class="gradient-text">AEROSCULPT</span>
+      </h1>
+
+      <h2 class="hero-subtitle">
+        Single-Pass UAV Video → Georeferenced 3D World
+      </h2>
+
+      <p class="hero-description">
+        Transform continuous drone flight video and asynchronous GNSS telemetry into accurate, measurable, and georeferenced 3D models with evidence-aware verification. Built specifically for reconnaissance, disaster assessment, and strategic infrastructure mapping.
+      </p>
+
+      <div class="hero-feature-chips">
+        <div class="feature-chip"><i class="fa-solid fa-bolt"></i> Single-Pass Processing</div>
+        <div class="feature-chip"><i class="fa-solid fa-earth-americas"></i> Georeferenced 3D Reconstruction</div>
+        <div class="feature-chip"><i class="fa-solid fa-ruler-combined"></i> Precision Metric Measurement</div>
+        <div class="feature-chip"><i class="fa-solid fa-shield-halved"></i> Evidence-Aware Verification</div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn-hero-primary" id="btn-hero-demo">
+          <i class="fa-solid fa-play"></i> Load Demo Mission
+        </button>
+        <button class="btn-hero-secondary" id="btn-hero-upload">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload Your Own Mission
+        </button>
+      </div>
+
+      <!-- 5-Step Operational Pipeline Overview Card -->
+      <div class="hero-workflow-preview">
+        <div class="workflow-preview-header">
+          <div class="workflow-preview-title">
+            <i class="fa-solid fa-diagram-project"></i> 5-Step Operational Workflow
+          </div>
+          <span style="font-size: 0.72rem; color: #94a3b8; font-family: var(--as-font-mono);">Static in computation · Dynamic in experience</span>
+        </div>
+
+        <div class="workflow-steps-mini">
+          <div class="step-mini-card">
+            <div class="step-mini-num">STEP 01</div>
+            <div class="step-mini-title">Upload & Configure</div>
+          </div>
+          <div class="step-mini-card">
+            <div class="step-mini-num">STEP 02</div>
+            <div class="step-mini-title">Validate Input</div>
+          </div>
+          <div class="step-mini-card">
+            <div class="step-mini-num">STEP 03</div>
+            <div class="step-mini-title">Timed Processing</div>
+          </div>
+          <div class="step-mini-card">
+            <div class="step-mini-num">STEP 04</div>
+            <div class="step-mini-title">3D View & Analyze</div>
+          </div>
+          <div class="step-mini-card">
+            <div class="step-mini-num">STEP 05</div>
+            <div class="step-mini-title">Validation & Export</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="hero-footer">
+        Built for strategic mapping, disaster response, and tactical reconnaissance. · SMART INDIA HACKATHON 2026
+      </footer>
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       Mission Selection Modal
+       ========================================================================== -->
+  <div class="as-modal-backdrop" id="modal-mission-picker">
+    <div class="as-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> Select Flight Mission Dataset</h2>
+          <p>Choose an authenticated UAV survey to simulate the single-pass reconstruction pipeline.</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-mission-modal" title="Close Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mission-cards-grid">
+          
+          <!-- Mission 02 (Recommended Default) -->
+          <div class="mission-card recommended selected" data-mission-id="pb2">
+            <div class="mission-card-badge">RECOMMENDED</div>
+            <div class="mission-number">MISSION 02 · POLAR RECON</div>
+            <h3 class="mission-name">Svalbard Arctic Reconnaissance</h3>
+            <div class="mission-scene-type">Rural / Glacial · Coastal Fjord</div>
+            <p class="mission-desc">High-latitude polar terrain with glacial rock formations, extreme lighting, low-contrast snow surfaces, and rugged coastal cliffs.</p>
+            <div class="mission-specs-list">
+              <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">05:18 (318 s)</span></div>
+              <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">513 frames</span></div>
+              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.031 m</span></div>
+              <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:32633 UTM</span></div>
+              <div class="spec-row"><span>Platform:</span> <span class="spec-val">DJI Mavic 3E RTK</span></div>
+            </div>
+          </div>
+
+          <!-- Mission 01 -->
+          <div class="mission-card" data-mission-id="pb1">
+            <div class="mission-card-badge">URBAN</div>
+            <div class="mission-number">MISSION 01 · CADASTRAL</div>
+            <h3 class="mission-name">Komorowice Cadastral Survey</h3>
+            <div class="mission-scene-type">Urban Area · Infrastructure</div>
+            <p class="mission-desc">Dense commercial parcel with multistory buildings, roadways, moving vehicles, and complex vertical building facades.</p>
+            <div class="mission-specs-list">
+              <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">03:42 (222 s)</span></div>
+              <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">94 frames</span></div>
+              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.021 m</span></div>
+              <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:2180 PUWG</span></div>
+              <div class="spec-row"><span>Platform:</span> <span class="spec-val">DJI Mini 3 Pro</span></div>
+            </div>
+          </div>
+
+          <!-- Mission 03 -->
+          <div class="mission-card" data-mission-id="pb3">
+            <div class="mission-card-badge">ALPINE</div>
+            <div class="mission-number">MISSION 03 · TOPOGRAPHIC</div>
+            <h3 class="mission-name">Zermatt Alpine Survey</h3>
+            <div class="mission-scene-type">Mountainous · Extreme Relief</div>
+            <p class="mission-desc">Steep alpine terrain with dramatic vertical relief, exposed bedrock ridges, avalanche protection, and sparse vegetation.</p>
+            <div class="mission-specs-list">
+              <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">04:02 (242 s)</span></div>
+              <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">181 frames</span></div>
+              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.011 m</span></div>
+              <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:2056 LV95</span></div>
+              <div class="spec-row"><span>Platform:</span> <span class="spec-val">senseFly eBee X</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-selected-summary">
+          Active Selection: <strong id="modal-summary-mission-name">Mission 02 · Svalbard Arctic Reconnaissance</strong>
+        </div>
+        <button class="btn-modal-confirm" id="btn-confirm-mission">
+          <span>Confirm & Start Step-by-Step Workflow</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Workflow Application Layout (#view-workflow)
+       ========================================================================== -->
+  <div id="view-workflow">
+    <!-- Left Persistent Stepper Sidebar -->
+    <aside class="workflow-sidebar">
+      <!-- Active Mission Status Chip -->
+      <div class="sidebar-mission-status-card">
+        <div class="mission-chip-label">ACTIVE MISSION DATASET</div>
+        <div class="mission-chip-name" id="sidebar-mission-name">M02 · Svalbard Arctic</div>
+        <div class="mission-chip-actions">
+          <span class="mission-chip-badge" id="sidebar-mission-type">Rural / Glacial</span>
+          <button class="btn-change-mission-sm" id="btn-sidebar-change-mission">
+            <i class="fa-solid fa-repeat"></i> Change
+          </button>
+        </div>
+      </div>
+
+      <!-- 5-Step Stepper List -->
+      <ul class="workflow-stepper-list">
+        <li class="stepper-item active" data-step="1" id="step-nav-1">
+          <div class="stepper-circle">1</div>
+          <div class="stepper-info">
+            <div class="stepper-title">Upload & Configure</div>
+            <div class="stepper-subtitle">Mission Data Ingest</div>
+          </div>
+        </li>
+
+        <li class="stepper-item" data-step="2" id="step-nav-2">
+          <div class="stepper-circle">2</div>
+          <div class="stepper-info">
+            <div class="stepper-title">Validate Input</div>
+            <div class="stepper-subtitle">Trajectory & Feasibility</div>
+          </div>
+        </li>
+
+        <li class="stepper-item" data-step="3" id="step-nav-3">
+          <div class="stepper-circle">3</div>
+          <div class="stepper-info">
+            <div class="stepper-title">Process Pipeline</div>
+            <div class="stepper-subtitle">Keyframes & Masking</div>
+          </div>
+        </li>
+
+        <li class="stepper-item" data-step="4" id="step-nav-4">
+          <div class="stepper-circle">4</div>
+          <div class="stepper-info">
+            <div class="stepper-title">3D View & Analyze</div>
+            <div class="stepper-subtitle">Interactive Model & Measure</div>
+          </div>
+        </li>
+
+        <li class="stepper-item" data-step="5" id="step-nav-5">
+          <div class="stepper-circle">5</div>
+          <div class="stepper-info">
+            <div class="stepper-title">Validation & Export</div>
+            <div class="stepper-subtitle">NTRO Metrics & Deliverables</div>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Sidebar Footer Telemetry -->
+      <div class="sidebar-footer-stats">
+        <div><strong>CRS:</strong> <span id="sidebar-datum-val">EPSG:32633 UTM</span></div>
+        <div><strong>COMPUTE:</strong> <span>T4 GPU Node (Online)</span></div>
+        <div><strong>STANDARDS:</strong> <span>NTRO PS-17 Compliant</span></div>
+      </div>
+    </aside>
+
+    <!-- Main Workflow Content Pane -->
+    <section class="workflow-content-pane">
+      
+      <!-- ==========================================================================
+           Step 1: Upload & Configuration
+           ========================================================================== -->
+      <div class="step-pane active" id="step-1-pane">
+        <div class="step-header-row">
+          <div class="step-title-wrap">
+            <h1><i class="fa-solid fa-cloud-arrow-up" style="color: var(--as-cyan);"></i> Upload Mission Data</h1>
+            <p>Provide UAV video and available sensor telemetry. Required fields are mandatory for 3D reconstruction.</p>
+          </div>
+          <div class="step-header-actions">
+            <button class="btn-step-action secondary" id="btn-step1-change-mission">
+              <i class="fa-solid fa-folder-open"></i> Change Mission
+            </button>
+            <button class="btn-step-action primary" id="btn-step1-start">
+              <span>Start Processing</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Mandatory Inputs (NTRO Problem 17) -->
+        <div class="step-section-heading">
+          <i class="fa-solid fa-circle-check"></i> Mandatory Inputs (NTRO PS-17 Required)
+        </div>
+        <div class="cards-horizontal-grid">
+          <!-- Mandatory Video -->
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title"><i class="fa-solid fa-video" style="color: var(--as-blue);"></i> UAV Video *</div>
+              <span class="badge-verified">✓ Verified</span>
+            </div>
+            <div class="input-card-preview-area">
+              <video id="step1-video-preview" class="input-video-preview" muted loop autoplay playsinline></video>
+            </div>
+            <div class="input-file-details">
+              <div class="input-file-name" id="step1-video-name">pb2_video.mp4</div>
+              <div id="step1-video-meta">05:18 · 1920×1080 · 30 FPS · 113.9 MB</div>
+            </div>
+          </div>
+
+          <!-- Mandatory GPS -->
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title"><i class="fa-solid fa-location-crosshairs" style="color: var(--as-cyan);"></i> GPS / GNSS *</div>
+              <span class="badge-verified">✓ Verified</span>
+            </div>
+            <div class="input-card-preview-area">
+              <i class="fa-solid fa-map-location-dot input-icon-placeholder" style="color: rgba(0, 240, 255, 0.4);"></i>
+            </div>
+            <div class="input-file-details">
+              <div class="input-file-name" id="step1-gps-name">flight_gnss_m02.csv</div>
+              <div id="step1-gps-meta">9,540 records · 10 Hz NMEA Stream</div>
+            </div>
+          </div>
+
+          <!-- Mandatory Flight Metadata -->
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title"><i class="fa-solid fa-file-code" style="color: var(--as-green);"></i> Flight Metadata *</div>
+              <span class="badge-verified">✓ Verified</span>
+            </div>
+            <div class="input-card-preview-area">
+              <i class="fa-solid fa-sliders input-icon-placeholder" style="color: rgba(16, 185, 129, 0.4);"></i>
+            </div>
+            <div class="input-file-details">
+              <div class="input-file-name" id="step1-meta-name">flight_meta_m02.json</div>
+              <div id="step1-meta-platform">DJI Mavic 3 Enterprise RTK</div>
             </div>
           </div>
         </div>
-      </aside>
 
-      <!-- Page Wrapper: Dynamic Views -->
-      <main id="page-wrapper">
-        <!-- ================================================================== -->
-        <!-- VIEW 1: DASHBOARD (Home Page in AeroSculpt Way) -->
-        <!-- ================================================================== -->
-        <section id="view-dashboard" class="content-view active">
-          <!-- AeroSculpt Hero Banner -->
-          <div class="nextgen-hero-banner">
-            <div class="nextgen-hero-left">
-              <div class="nextgen-hero-header-row">
-                <!-- AeroSculpt logo mark: drone hexagon -->
-                <div class="nextgen-hex-badge">
-                  <svg viewBox="0 0 32 32" width="26" height="26" fill="none">
-                    <polygon points="16 2 28 9 28 23 16 30 4 23 4 9 16 2" fill="rgba(255,69,40,0.2)" stroke="#ff4528" stroke-width="1.6"/>
-                    <!-- Drone body -->
-                    <circle cx="16" cy="16" r="3.5" fill="#ff4528"/>
-                    <!-- Drone arms -->
-                    <line x1="16" y1="16" x2="10" y2="10" stroke="#ff4528" stroke-width="1.2" opacity="0.8"/>
-                    <line x1="16" y1="16" x2="22" y2="10" stroke="#ff4528" stroke-width="1.2" opacity="0.8"/>
-                    <line x1="16" y1="16" x2="10" y2="22" stroke="#ff4528" stroke-width="1.2" opacity="0.8"/>
-                    <line x1="16" y1="16" x2="22" y2="22" stroke="#ff4528" stroke-width="1.2" opacity="0.8"/>
-                    <!-- Drone propellers -->
-                    <circle cx="9.5" cy="9.5" r="2.2" stroke="#ff4528" stroke-width="1.2" fill="none" opacity="0.7"/>
-                    <circle cx="22.5" cy="9.5" r="2.2" stroke="#ff4528" stroke-width="1.2" fill="none" opacity="0.7"/>
-                    <circle cx="9.5" cy="22.5" r="2.2" stroke="#ff4528" stroke-width="1.2" fill="none" opacity="0.7"/>
-                    <circle cx="22.5" cy="22.5" r="2.2" stroke="#ff4528" stroke-width="1.2" fill="none" opacity="0.7"/>
-                  </svg>
-                </div>
-                <div class="nextgen-hero-divider"></div>
-                <div class="nextgen-hero-nav-links">
-                  <span class="nextgen-hero-nav-item active">AeroSculpt Platform</span>
-                  <a href="#dash-section-3d" class="nextgen-hero-nav-item">3D Models <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                  <a href="#dash-section-map" class="nextgen-hero-nav-item">Orthophoto <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                  <a href="#dash-section-video" class="nextgen-hero-nav-item">UAV Feeds <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                  <a href="#studio" class="nextgen-hero-nav-item">Demo <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                </div>
+        <!-- Section: Optional Inputs (Extended Sensors) -->
+        <div class="step-section-heading">
+          <i class="fa-solid fa-cubes-stacked"></i> Optional Sensor Inputs (NTRO PS-17 Extended)
+        </div>
+        <div class="cards-horizontal-grid optional-inputs">
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title" style="font-size: 0.78rem;"><i class="fa-solid fa-compass"></i> IMU Data</div>
+              <span class="badge-verified" style="background: rgba(59, 130, 246, 0.15); color: var(--as-blue); border-color: rgba(59, 130, 246, 0.3);">100 Hz</span>
+            </div>
+            <div class="input-file-details" style="margin-top: 8px;">
+              <div class="input-file-name">flight_imu.csv</div>
+              <div>60,000 records · Sync</div>
+            </div>
+          </div>
+
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title" style="font-size: 0.78rem;"><i class="fa-solid fa-tower-broadcast"></i> RTK / PPK</div>
+              <span class="badge-verified">Available</span>
+            </div>
+            <div class="input-file-details" style="margin-top: 8px;">
+              <div class="input-file-name">rtk_corrections.csv</div>
+              <div>Base station locked</div>
+            </div>
+          </div>
+
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title" style="font-size: 0.78rem;"><i class="fa-solid fa-camera"></i> Camera Intrinsics</div>
+              <span class="badge-verified">Calibrated</span>
+            </div>
+            <div class="input-file-details" style="margin-top: 8px;">
+              <div class="input-file-name">camera_meta.json</div>
+              <div id="step1-camera-desc">Hasselblad L2D-20c</div>
+            </div>
+          </div>
+
+          <div class="input-data-card">
+            <div class="input-card-top">
+              <div class="input-card-title" style="font-size: 0.78rem;"><i class="fa-solid fa-gauge-high"></i> Baro Altitude</div>
+              <span class="badge-verified">Logged</span>
+            </div>
+            <div class="input-file-details" style="margin-top: 8px;">
+              <div class="input-file-name">baro_altitude.csv</div>
+              <div>10 Hz MSL Pressure</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Reconstruction Settings -->
+        <div class="step-section-heading">
+          <i class="fa-solid fa-sliders"></i> Reconstruction Configuration
+        </div>
+        <div class="reconstruction-settings-box">
+          <div>
+            <div class="setting-group-title">Target Scene Classification</div>
+            <div class="setting-pill-options" id="scene-type-options">
+              <button class="setting-pill-btn" data-scene="urban">Urban Area</button>
+              <button class="setting-pill-btn active" data-scene="rural">Rural / Glacial</button>
+              <button class="setting-pill-btn" data-scene="mountainous">Mountainous</button>
+              <button class="setting-pill-btn" data-scene="coastal">Coastal</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="setting-group-title">Reconstruction Precision Mode</div>
+            <div class="setting-pill-options" id="mode-options">
+              <button class="setting-pill-btn" data-mode="fast">Fast (Preview)</button>
+              <button class="setting-pill-btn active" data-mode="balanced">Balanced (Standard)</button>
+              <button class="setting-pill-btn" data-mode="high">High Precision (Survey-Grade)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================================================
+           Step 2: Input Validation
+           ========================================================================== -->
+      <div class="step-pane" id="step-2-pane">
+        <div class="step-header-row">
+          <div class="step-title-wrap">
+            <h1><i class="fa-solid fa-clipboard-check" style="color: var(--as-green);"></i> Input Validation & Feasibility</h1>
+            <p>Checking data integrity, sensor synchronization, and trajectory feasibility prior to 3D compute.</p>
+          </div>
+          <div class="step-header-actions">
+            <button class="btn-step-action secondary" id="btn-step2-back">
+              <i class="fa-solid fa-arrow-left"></i> Back to Upload
+            </button>
+            <button class="btn-step-action primary" id="btn-step2-proceed">
+              <span>Proceed to Processing</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="validation-grid-layout">
+          <!-- 2D GNSS Flight Trajectory Canvas -->
+          <div class="validation-card">
+            <div class="validation-card-header">
+              <div class="validation-card-title">
+                <i class="fa-solid fa-route" style="color: var(--as-cyan);"></i> Flight Path Trajectory Preview (GNSS 10Hz)
               </div>
+              <span class="badge-verified">✓ Trajectory Valid</span>
+            </div>
 
-              <!-- Hero title: AeroSculpt brand -->
-              <h1 class="nextgen-hero-title">
-                <span class="hero-title-line">AeroSculpt</span>
-                <span class="hero-title-line hero-title-accent">Drone 3D</span>
-                <span class="hero-title-line">Reconstruction Platform</span>
-              </h1>
-              <p class="nextgen-hero-desc">
-                AI-enabled single-pass drone video to 3D reconstruction system — generating georeferenced, metrically accurate 3D meshes of terrain, buildings, facades, roads, and vegetation from a single UAV flight path. Submitted to <strong class="nextgen-highlight">NTRO · Theme: Drone / Robotics</strong>.
-              </p>
-
-              <!-- Active mission badge: single dataset only -->
-              <div class="hero-single-mission-tag">
-                <span class="live-dot pulse"></span>
-                <span class="mission-tag-label">ACTIVE MISSION</span>
-                <strong class="mission-tag-name">Svalbard Arctic 3D Scan</strong>
-                <span class="mission-tag-badge">NTRO · GLB · EPSG:32630</span>
+            <div class="flight-path-canvas-wrap">
+              <canvas id="flight-path-canvas" width="600" height="320"></canvas>
+              <div class="canvas-overlay-legend">
+                <div class="canvas-legend-item">
+                  <span class="legend-dot" style="background: var(--as-green);"></span> Takeoff (Start)
+                </div>
+                <div class="canvas-legend-item">
+                  <span class="legend-dot" style="background: var(--as-cyan);"></span> UAV Flight Spline
+                </div>
+                <div class="canvas-legend-item">
+                  <span class="legend-dot" style="background: var(--as-red);"></span> Landing (End)
+                </div>
               </div>
             </div>
 
-            <!-- Hero Right: Spinning 3D Block Visualization -->
-            <div class="nextgen-hero-right">
-              <div class="hero-3d-block-scene">
-                <!-- Status bar -->
-                <div class="hero-3d-status-bar">
-                  <span class="intel-live-tag"><span class="live-dot pulse"></span> AEROSCULPT LIVE</span>
-                  <span class="intel-crs">Dumbarton Castle</span>
-                </div>
-                <!-- Spinning 3D CSS Cube -->
-                <div class="hero-3d-stage">
-                  <div class="hero-3d-scene" id="hero-cube-scene">
-                    <div class="hero-cube" id="hero-cube">
-                      <div class="hero-cube-face hero-cube-front"><span>3D</span></div>
-                      <div class="hero-cube-face hero-cube-back"><span>GLB</span></div>
-                      <div class="hero-cube-face hero-cube-left"><span>UAV</span></div>
-                      <div class="hero-cube-face hero-cube-right"><span>GCP</span></div>
-                      <div class="hero-cube-face hero-cube-top"><span>SLAM</span></div>
-                      <div class="hero-cube-face hero-cube-bottom"><span>MVS</span></div>
-                    </div>
-                  </div>
-                  <!-- Pedestal base glow -->
-                  <div class="hero-3d-pedestal"></div>
-                  <div class="hero-3d-glow"></div>
-                </div>
-                <!-- Info strip below cube -->
-                <div class="hero-3d-info-strip">
-                  <div class="hero-3d-info-item">
-                    <span class="hero-3d-info-label">SURVEY SITE</span>
-                    <strong class="hero-3d-info-val">Dumbarton Castle, Scotland</strong>
-                  </div>
-                  <div class="hero-3d-info-item">
-                    <span class="hero-3d-info-label">ACCURACY</span>
-                    <strong class="hero-3d-info-val text-success">0.42 px · Sub-Pixel</strong>
-                  </div>
-                  <div class="hero-3d-info-item">
-                    <span class="hero-3d-info-label">PROCESSING</span>
-                    <strong class="hero-3d-info-val">&lt;15 min · RTX GPU</strong>
-                  </div>
-                  <div class="hero-3d-info-item">
-                    <span class="hero-3d-info-label">OUTPUT</span>
-                    <strong class="hero-3d-info-val">GLB · OBJ · LAS · GeoTIFF</strong>
-                  </div>
-                </div>
+            <div class="validation-stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">Flight Duration:</span>
+                <span class="stat-val" id="step2-duration">05:18 (318 s)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">GPS Records:</span>
+                <span class="stat-val" id="step2-gps-count">9,540 pts (10 Hz)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Ground Sampling Distance:</span>
+                <span class="stat-val" id="step2-gsd">2.4 cm/px</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Est. Compute Duration:</span>
+                <span class="stat-val" id="step2-compute-time" style="color: var(--as-cyan);">~11 min (T4 GPU)</span>
               </div>
             </div>
           </div>
 
-          <!-- ================================================================== -->
-          <!-- UNIFIED COMMAND GRID: [3D Model GLB] + [2D Map] + [Video Feeds]    -->
-          <!-- All unified on the single dashboard in Nextgen Web Services style  -->
-          <!-- ================================================================== -->
-          <div class="nextgen-command-grid">
-            <!-- LEFT COLUMN: [3D Model GLB] Inspector -->
-            <div class="command-card card-3d-model" id="dash-section-3d">
-              <div class="command-card-header">
-                <div class="card-header-left">
-                  <span class="nextgen-pill-badge red"><i class="fa-solid fa-cube"></i> 3D MODEL (GLB)</span>
-                  <h3 class="command-card-title" id="model-card-title">Longyearbyen Svalbard — Arctic 3D Scan</h3>
-                </div>
+          <!-- Data Quality Checklist & CRS -->
+          <div class="validation-card">
+            <div class="validation-card-header">
+              <div class="validation-card-title">
+                <i class="fa-solid fa-list-check" style="color: var(--as-blue);"></i> Data Quality Checks
+              </div>
+              <span class="badge-verified">6 / 6 Passed</span>
+            </div>
 
-                <!-- 3D Toolbar Controls -->
-                <div class="card-header-tools">
-                  <!-- Render Mode Selector -->
-                  <div class="btn-group render-mode-group">
-                    <button type="button" class="btn btn-xs btn-primary active" id="btn-mode-textured" title="Display Photorealistic PBR Texture Map">
-                      <i class="fa fa-palette"></i> Textured PBR
-                    </button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-mode-wireframe" title="Display Polygon Wireframe Mesh">
-                      <i class="fa fa-border-all"></i> Wireframe
-                    </button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-mode-points" title="Display Dense Elevation Point Cloud">
-                      <i class="fa fa-cloud"></i> Point Cloud
-                    </button>
-                  </div>
-
-                  <!-- Camera View Presets -->
-                  <div class="btn-group camera-presets-group">
-                    <button type="button" class="btn btn-xs btn-default" id="btn-cam-front" title="Front Elevation View">Front</button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-cam-top" title="Nadir 90° Top-Down GIS View">Top</button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-cam-iso" title="Isometric Perspective">Iso</button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-cam-reset" title="Recenter Camera Orbit">Recenter</button>
-                  </div>
-
-                  <!-- Utilities -->
-                  <div class="btn-group utility-group">
-                    <button type="button" class="btn btn-xs btn-default active" id="btn-toggle-grid" title="Toggle UTM Metric Datum Ground Grid">
-                      <i class="fa fa-border-all"></i> Grid
-                    </button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-toggle-spin" title="Auto-Rotate 360° Orbit">
-                      <i class="fa fa-arrows-rotate"></i> 360° Orbit
-                    </button>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-fullscreen-3d" title="Toggle Fullscreen Viewport">
-                      <i class="fa fa-expand"></i>
-                    </button>
-                  </div>
+            <div class="checklist-items">
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>Video Container & Codec Valid</div>
+                  <div class="check-meta-desc">H.264 / AVC · Continuous stream · 0 dropped frames</div>
                 </div>
               </div>
 
-              <!-- 3D Viewport with Studio Pedestal & Neon Flanking Tube Lights -->
-              <div class="viewer-viewport-container nextgen-3d-stage" id="viewer-3d-canvas-box">
-                <!-- Atmospheric Vertical Neon Light Pillars (Signature Nextgen visual!) -->
-                <div class="nextgen-light-tube left" title="Volumetric Neon Ambient Stage Tube Left"></div>
-                <div class="nextgen-light-tube right" title="Volumetric Neon Ambient Stage Tube Right"></div>
-                <div class="nextgen-light-tube center-rear" title="Volumetric Ambient Stage Tube Rear"></div>
-
-                <!-- Loading Indicator Overlay -->
-                <div class="model-loader-overlay" id="model-loader">
-                  <div class="loader-spinner"></div>
-                  <div class="loader-text">Streaming Reconstructed 3D Mesh...</div>
-                  <div class="loader-sub" id="model-loader-filename">Task-of-2026-09-10T143406911Z-textured_model.glb</div>
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>GPS & Video Timestamps Synchronized</div>
+                  <div class="check-meta-desc">Time offset Δt &lt; 0.02s · Hardware locked</div>
                 </div>
+              </div>
 
-                <!-- Floating Overlay: Navigation Instructions & Telemetry HUD -->
-                <div class="viewer-hud-overlay">
-                  <div class="hud-card">
-                    <div class="hud-item"><span class="hud-key">Orbit:</span> Left Drag</div>
-                    <div class="hud-item"><span class="hud-key">Pan:</span> Right Drag</div>
-                    <div class="hud-item"><span class="hud-key">Zoom:</span> Scroll</div>
-                  </div>
-                  <div class="hud-card stats-hud">
-                    <div class="hud-stat-line"><span>Polygons:</span> <strong id="hud-poly-count">200,000</strong></div>
-                    <div class="hud-stat-line"><span>Vertices:</span> <strong id="hud-vertex-count">102,480</strong></div>
-                    <div class="hud-stat-line"><span>Texture:</span> <strong>4096 x 4096 px</strong></div>
-                    <div class="hud-stat-line"><span>Scale:</span> <strong>1:1 True Metric (m)</strong></div>
-                  </div>
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>Flight Metadata Integrity</div>
+                  <div class="check-meta-desc">Sensor dimensions and focal length verified</div>
                 </div>
+              </div>
 
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>IMU Stream Continuity</div>
+                  <div class="check-meta-desc">100 Hz accelerometer & gyro drift bounded</div>
+                </div>
+              </div>
+
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>Camera Calibration Feasibility</div>
+                  <div class="check-meta-desc">Brown-Conrady lens distortion model supported</div>
+                </div>
+              </div>
+
+              <div class="check-item">
+                <i class="fa-solid fa-circle-check check-icon"></i>
+                <div>
+                  <div>RTK Differential Positioning</div>
+                  <div class="check-meta-desc">Fixed carrier-phase solution active</div>
+                </div>
               </div>
             </div>
 
-            <!-- RIGHT STACKED COLUMN: [2D Map] & [Video Feeds] -->
-            <div class="command-right-col">
-              <!-- Upper Card: [2D Map] Orthomosaic & Flight Trajectory -->
-              <div class="command-card card-2d-map" id="dash-section-map">
-                <div class="command-card-header">
-                  <div class="card-header-left">
-                    <span class="nextgen-pill-badge cyan"><i class="fa-solid fa-map"></i> 2D MAP</span>
-                    <h4 class="command-card-subtitle">Orthomosaic &amp; Flight Trajectory</h4>
-                  </div>
-                  <div class="card-header-tools">
-                    <div class="btn-group map-layers-group">
-                      <button type="button" class="btn btn-xs btn-primary active" id="btn-layer-ortho" title="Toggle Reconstructed Orthophoto"><i class="fa fa-map"></i> Ortho</button>
-                      <button type="button" class="btn btn-xs btn-default active" id="btn-layer-cameras" title="Toggle UAV Camera Trajectory"><i class="fa fa-camera"></i> Trajectory</button>
-                      <button type="button" class="btn btn-xs btn-default active" id="btn-layer-gcp" title="Toggle GCP Pins"><i class="fa fa-crosshairs"></i> GCP</button>
-                      <button type="button" class="btn btn-xs btn-default active" id="btn-layer-polygon" title="Toggle Boundary Box"><i class="fa fa-draw-polygon"></i> Bounds</button>
-                    </div>
-                    <button type="button" class="btn btn-xs btn-default" id="btn-reset-map-zoom" title="Reset Viewport to Survey Extents"><i class="fa fa-arrows-to-eye"></i></button>
-                  </div>
-                </div>
-
-                <div class="map-viewport-container nextgen-map-box">
-                  <canvas id="flight-map-canvas"></canvas>
-
-                  <!-- Map HUD Overlay -->
-                  <div class="map-hud-overlay mini-map-hud">
-                    <div class="mini-telemetry">
-                      <span><i class="fa-solid fa-location-crosshairs text-cyan"></i> 55°56'14" N, 4°33'48" W</span>
-                      <span><i class="fa-solid fa-layer-group"></i> EPSG:32630</span>
-                      <span><i class="fa-solid fa-plane-up"></i> 64.5m AGL</span>
-                      <span><i class="fa-solid fa-expand"></i> 210m x 195m</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Lower Card: [Video Feeds] Drone Inspection & Visual Odometry -->
-              <div class="command-card card-video-feeds" id="dash-section-video">
-                <div class="command-card-header">
-                  <div class="card-header-left">
-                    <span class="nextgen-pill-badge red pulse"><i class="fa-solid fa-video"></i> VIDEO FEEDS</span>
-                    <h4 class="command-card-subtitle" id="video-breadcrumb-feed-name">Longyearbyen Svalbard Arctic Scan</h4>
-                  </div>
-                </div>
-
-                <div class="video-viewport-container nextgen-video-box">
-                  <div class="video-player-frame">
-                    <div class="video-hud-strip">
-                      <div class="hud-pill-active">
-                        <span class="live-dot pulse"></span>
-                        <span id="hud-feed-title">AEROSCULPT · UAV SURVEY STREAM</span>
-                      </div>
-                      <div class="hud-pill-telemetry">
-                        <span class="hud-mono" id="meta-video-res">HD · LOCKED</span>
-                      </div>
-                    </div>
-                    <video id="drone-inspection-video" controls autoplay loop muted preload="auto" playsinline src="datasets/pb2_video.mp4">
-                      Your browser does not support HTML5 video playback.
-                    </video>
-                  </div>
-                  <div class="video-meta-strip">
-                    <div class="meta-item"><i class="fa-solid fa-file-video text-muted"></i> <span id="meta-video-name">datasets/pb2_video.mp4</span></div>
-                    <div class="meta-item"><i class="fa-solid fa-hard-drive text-muted"></i> <span id="meta-video-size">108.6 MB</span></div>
-                    <div class="meta-item"><i class="fa-solid fa-camera text-muted"></i> <span id="meta-video-type">DJI Mavic 3 Enterprise Wide</span></div>
-                  </div>
-                </div>
-              </div>
+            <div style="margin-top: 20px; padding: 14px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 8px;">
+              <div style="font-size: 0.72rem; color: var(--as-cyan); font-weight: 800; text-transform: uppercase; margin-bottom: 4px;">Coordinate Reference System (CRS)</div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: #ffffff;" id="step2-crs-name">EPSG:32633 (WGS 84 / UTM Zone 33N)</div>
+              <div style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono); margin-top: 4px;">Universal Transverse Mercator · Northern Hemisphere</div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- NTRO Evaluation Criteria KPI Grid -->
-          <div class="kpi-section-header">
-            <span class="kpi-section-title"><i class="fa-solid fa-chart-bar"></i> NTRO Evaluation Criteria &amp; Performance Metrics</span>
-            <span class="kpi-section-org">National Technical Research Organisation · Category: Software · Theme: Drone / Robotics</span>
+      <!-- ==========================================================================
+           Step 3: Processing Pipeline (Dynamic Experience)
+           ========================================================================== -->
+      <div class="step-pane" id="step-3-pane">
+        <div class="step-header-row">
+          <div class="step-title-wrap">
+            <h1><i class="fa-solid fa-gears" style="color: var(--as-cyan);"></i> Processing Mission</h1>
+            <p>Analyzing video, selecting keyframes, reconstructing 3D model and aligning with real-world coordinates.</p>
           </div>
-          <div class="kpi-metrics-grid nextgen-kpi-grid">
-            <div class="kpi-card kpi-highlight">
-              <div class="kpi-val tabular-nums" id="kpi-val-reproj">0.42<span class="kpi-unit">px</span></div>
-              <div class="kpi-label">Reconstruction Accuracy <span class="kpi-weight">30%</span></div>
-              <div class="kpi-detail">Sub-pixel reprojection error via bundle-adjustment across all single-pass frames. Target: ≤ 1 m spatial accuracy met.</div>
+          <div class="step-header-actions">
+            <button class="btn-step-action secondary" id="btn-step3-replay">
+              <i class="fa-solid fa-arrow-rotate-right"></i> Re-run Pipeline
+            </button>
+            <button class="btn-step-action primary" id="btn-step3-view-3d">
+              <span>View 3D Model & Analysis</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Bar & Stage Indicator -->
+        <div class="pipeline-progress-container">
+          <div class="progress-header-row">
+            <div class="progress-title-text" id="pipeline-status-text">
+              <span class="ntro-dot"></span> Pipeline Active: Adaptive 3D Reconstruction...
             </div>
-            <div class="kpi-card kpi-highlight">
-              <div class="kpi-val tabular-nums" id="kpi-val-gsd">100<span class="kpi-unit">%</span></div>
-              <div class="kpi-label">Model Completeness <span class="kpi-weight">20%</span></div>
-              <div class="kpi-detail">Full scene coverage — terrain, building facades, rooftops, roads, vegetation &amp; obstacles. Entire visible scene reconstructed.</div>
-            </div>
-            <div class="kpi-card kpi-highlight">
-              <div class="kpi-val tabular-nums" id="kpi-val-budget">&lt; 15<span class="kpi-unit">min</span></div>
-              <div class="kpi-label">Processing Speed <span class="kpi-weight">20%</span></div>
-              <div class="kpi-detail">00:14:22 on RTX GPU node for 10-min 4K flight. NTRO target: &lt;15 min for 10-min video ✓</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-val tabular-nums" id="kpi-val-accuracy">≤ 1<span class="kpi-unit">m</span></div>
-              <div class="kpi-label">Spatial Accuracy <span class="kpi-weight">NTRO Target</span></div>
-              <div class="kpi-detail">0.024 m absolute geodetic error via Sim(3) Helmert 7-DoF datum to WGS 84 / UTM 30N (EPSG:32630)</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-val tabular-nums" id="kpi-val-points">1.43<span class="kpi-unit">M</span></div>
-              <div class="kpi-label">Innovation <span class="kpi-weight">15%</span></div>
-              <div class="kpi-detail">Single-pass SLAM VO + dense MVS + geofenced boundary enforcement. No multi-pass or GCP dependency.</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-val tabular-nums" id="kpi-val-mesh">6<span class="kpi-unit">fmt</span></div>
-              <div class="kpi-label">Scalability &amp; UI <span class="kpi-weight">15%</span></div>
-              <div class="kpi-detail">Exports: OBJ, PLY, LAS, GeoTIFF, .glb/.gltf, .fbx. Web-based viewer + desktop client. GPU-local node auto-routing.</div>
-            </div>
+            <div class="progress-percent-text" id="pipeline-percent-text">0%</div>
           </div>
 
-          <!-- Dashboard Toolbar (Search, Filter, Add Project) -->
-          <div class="dashboard-toolbar">
-            <div class="toolbar-left">
-              <span class="project-count-badge">Projects <strong>(1)</strong></span>
-              <div class="search-box">
-                <i class="fa fa-search search-icon"></i>
-                <input type="text" id="project-search-input" placeholder="Search tasks, models, or telemetry..." class="form-control input-sm">
+          <div class="pipeline-progress-bar-track">
+            <div class="pipeline-progress-bar-fill" id="pipeline-progress-fill"></div>
+          </div>
+
+          <!-- 7-Stage Pipeline Checklist -->
+          <div class="pipeline-stages-list" id="pipeline-stages-list">
+            <!-- Dynamically populated or static mapped chips -->
+            <div class="pipeline-stage-chip" data-stage="1">
+              <div class="stage-chip-num">01</div>
+              <div class="stage-chip-title">Input Analysis</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:05</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="2">
+              <div class="stage-chip-num">02</div>
+              <div class="stage-chip-title">Keyframe Selection</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:18</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="3">
+              <div class="stage-chip-num">03</div>
+              <div class="stage-chip-title">Scene Understanding</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:32</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="4">
+              <div class="stage-chip-num">04</div>
+              <div class="stage-chip-title">Adaptive 3D (SfM)</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">02:14</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="5">
+              <div class="stage-chip-num">05</div>
+              <div class="stage-chip-title">Georeferencing</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:45</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="6">
+              <div class="stage-chip-num">06</div>
+              <div class="stage-chip-title">Metric Validation</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:20</div>
+            </div>
+            <div class="pipeline-stage-chip" data-stage="7">
+              <div class="stage-chip-num">07</div>
+              <div class="stage-chip-title">Generating Output</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:15</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Keyframe Gallery -->
+        <div class="keyframe-gallery-box">
+          <div class="keyframe-gallery-header">
+            <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-film" style="color: var(--as-cyan);"></i> Extracted Keyframe Stream
+            </div>
+            <span style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono);" id="keyframe-count-badge">Displaying sampled frames</span>
+          </div>
+
+          <div class="keyframe-strip" id="keyframe-strip-container">
+            <!-- Dynamically populated keyframe cards with real images -->
+          </div>
+        </div>
+
+        <!-- AI Scene Understanding & Semantic Masking Panel -->
+        <div class="semantic-segmentation-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--as-green);"></i> Scene Understanding & Dynamic Object Masking (NTRO PS-17)
+            </div>
+            <span style="font-size: 0.72rem; color: var(--as-cyan); font-family: var(--as-font-mono);">YOLOv8 + SAM Segmentation Active</span>
+          </div>
+
+          <div class="semantic-filters-row">
+            <div class="semantic-tag"><span class="tag-dot" style="background: #ef4444;"></span> Buildings</div>
+            <div class="semantic-tag"><span class="tag-dot" style="background: #3b82f6;"></span> Roads / Ground</div>
+            <div class="semantic-tag"><span class="tag-dot" style="background: #10b981;"></span> Vegetation</div>
+            <div class="semantic-tag"><span class="tag-dot" style="background: #f59e0b;"></span> Vehicles</div>
+            <div class="semantic-tag"><span class="tag-dot" style="background: #a855f7;"></span> Dynamic Pedestrians (Masked Out)</div>
+          </div>
+
+          <div class="semantic-previews-grid" id="semantic-previews-grid">
+            <!-- 4 segmented preview tiles -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================================================
+           Step 4: 3D View & Analyze (Interactive Three.js Viewport)
+           ========================================================================== -->
+      <div class="step-pane" id="step-4-pane">
+        <div class="step-header-row">
+          <div class="step-title-wrap">
+            <h1><i class="fa-solid fa-cube" style="color: var(--as-cyan);"></i> 3D World Viewer & Analysis</h1>
+            <p>Interactive georeferenced 3D textured mesh, dense point cloud inspection, and precision metric measurement.</p>
+          </div>
+          <div class="step-header-actions">
+            <button class="btn-step-action secondary" id="btn-step4-back">
+              <i class="fa-solid fa-arrow-left"></i> Back to Processing
+            </button>
+            <button class="btn-step-action primary" id="btn-step4-export">
+              <span>View Validation & Deliverables</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="viewer-workspace-container">
+          <!-- Left Tool Palette -->
+          <div class="viewer-tools-sidebar">
+            <div>
+              <div class="tools-group-title">Display Layers</div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="tool-toggle-item active" id="toggle-layer-mesh">
+                  <span><i class="fa-solid fa-draw-polygon fa-fw"></i> Textured Mesh</span>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="tool-toggle-item" id="toggle-layer-points">
+                  <span><i class="fa-solid fa-braille fa-fw"></i> Point Cloud</span>
+                  <i class="fa-solid fa-circle"></i>
+                </div>
+                <div class="tool-toggle-item active" id="toggle-layer-roi">
+                  <span><i class="fa-solid fa-vector-square fa-fw"></i> Bounding Box</span>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="tool-toggle-item active" id="toggle-layer-frustums">
+                  <span><i class="fa-solid fa-camera fa-fw"></i> Drone Cameras</span>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="tool-toggle-item active" id="toggle-layer-grid">
+                  <span><i class="fa-solid fa-border-all fa-fw"></i> Metric Datum Grid</span>
+                  <i class="fa-solid fa-check"></i>
+                </div>
               </div>
             </div>
-            <div class="toolbar-right">
-              <button class="btn btn-primary btn-sm" id="btn-add-project" title="Create a New Photogrammetry Survey Container">
-                <i class="fa fa-plus-circle"></i> Add New Survey Project
+
+            <div>
+              <div class="tools-group-title">Analysis Tools</div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="tool-toggle-item active" id="tool-mode-orbit">
+                  <span><i class="fa-solid fa-arrows-spin fa-fw"></i> Orbit Rotate</span>
+                </div>
+                <div class="tool-toggle-item" id="tool-mode-measure">
+                  <span><i class="fa-solid fa-ruler fa-fw"></i> 2-Point Measure</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="tools-group-title">Camera Presets</div>
+              <div class="view-preset-btns-grid">
+                <button class="btn-preset-view" id="btn-cam-iso">Iso</button>
+                <button class="btn-preset-view" id="btn-cam-top">Top</button>
+                <button class="btn-preset-view" id="btn-cam-front">Front</button>
+                <button class="btn-preset-view" id="btn-cam-side">Side</button>
+              </div>
+              <button class="btn-preset-view" id="btn-cam-reset" style="width: 100%; margin-top: 6px;">
+                <i class="fa-solid fa-crosshairs"></i> Reset Framing
               </button>
             </div>
           </div>
 
-          <!-- Projects List Container -->
-          <div class="projects-list-container">
-            <!-- Project Card (AeroSculpt ProjectListItem) -->
-            <div class="project-list-item card">
-              <div class="project-card-header">
-                <div class="project-meta-col">
-                  <div class="project-title-row">
-                    <h2 class="project-name" id="project-heading">Dumbarton Castle Survey & 3D Reconstruction</h2>
-                    <div class="tag-badges">
-                      <span class="tag-badge">NTRO</span>
-                      <span class="tag-badge">Single-Pass UAV</span>
-                      <span class="tag-badge">3D Mesh / Point Cloud</span>
-                      <span class="tag-badge">GLB · OBJ · LAS · GeoTIFF</span>
-                      <span class="tag-badge">EPSG:32633</span>
-                      <span class="tag-badge">Geofenced Zone</span>
-                    </div>
-                  </div>
-                  <p class="project-description" id="project-description-text">
-                    High-resolution drone 3D scan of the Arctic settlement of Longyearbyen, Svalbard at 78°N — capturing town infrastructure, glacial terrain, and permafrost geology. DJI Mavic 3 Enterprise Wide survey covering 65,000 m² at 2.1 cm/px GSD. EPSG:32633 UTM 33N georeferenced mesh with H: 0.031m · V: 0.048m RMSE accuracy.
-                  </p>
-                </div>
-
-              </div>
-
-              <!-- Section scroll navigation: topics, no switching buttons -->
-              <nav class="section-scroll-nav" aria-label="Project sections">
-                <a href="#section-tasks" class="scroll-nav-item active"><i class="fa fa-tasks"></i> Tasks &amp; 3D Assets</a>
-                <a href="#section-architecture" class="scroll-nav-item"><i class="fa fa-diagram-project"></i> Pipeline Architecture</a>
-                <a href="#section-geodesy" class="scroll-nav-item"><i class="fa fa-crosshairs"></i> Geodesy &amp; Accuracy</a>
-                <a href="#section-telemetry" class="scroll-nav-item"><i class="fa fa-plane-departure"></i> Flight Telemetry</a>
-                <a href="#section-geofencing" class="scroll-nav-item"><i class="fa-solid fa-draw-polygon"></i> Geofencing</a>
-                <a href="#section-provenance" class="scroll-nav-item"><i class="fa fa-shield-halved"></i> Provenance</a>
-                <a href="#section-studio" class="scroll-nav-item"><i class="fa-solid fa-play-circle"></i> Demo</a>
-              </nav>
-              <!-- hidden tab stubs for JS compat -->
-              <div style="display:none">
-                <button class="project-tab-btn active" data-tab="tab-tasks" id="btn-tab-tasks"></button>
-                <button class="project-tab-btn" data-tab="tab-architecture"></button>
-                <button class="project-tab-btn" data-tab="tab-geodesy"></button>
-                <button class="project-tab-btn" data-tab="tab-telemetry"></button>
-                <button class="project-tab-btn" data-tab="tab-geofencing" id="btn-tab-geofencing"></button>
-                <button class="project-tab-btn" data-tab="tab-provenance"></button>
-                <button class="project-tab-btn" data-tab="tab-studio" id="btn-tab-studio"></button>
-              </div>
-
-              <!-- ===================== SCROLL SECTIONS ===================== -->
-              <div class="project-scroll-sections">
-
-                            <!-- ========================================================== -->
-              <!-- SECTION 1: Tasks & 3D Assets                               -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-tasks">
-                <div class="scroll-section-header"><i class="fa fa-tasks"></i> Tasks &amp; 3D Assets</div>
-                <div class="project-tab-pane active" id="pane-tab-tasks">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <!-- Pane Header -->
-                    <div class="pane-header" style="margin-bottom: 20px;">
-                      <h3><i class="fa fa-tasks"></i> Reconstructed 3D Assets &amp; Survey Tasks</h3>
-                      <p>AeroSculpt processes continuous drone flight imagery into high-precision textured 3D models, georeferenced orthophotos, and real-time visual odometry feeds.</p>
-                    </div>
-
-                    <!-- Meaningful Action Buttons Bar -->
-                    <div class="task-action-buttons-bar" style="margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                      <div class="action-buttons-left" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <button type="button" class="btn btn-primary btn-sm btn-action-3d" id="btn-open-3d" title="Launch Interactive 3D Textured Mesh Viewer">
-                          <i class="fa fa-cube"></i>
-                          <span>Inspect 3D Model (GLB)</span>
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm" id="btn-open-map" title="Open 2D Orthophoto and Drone Flight Path Map">
-                          <i class="fa fa-globe"></i>
-                          <span>2D Orthomosaic Map</span>
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" id="btn-open-video" title="Inspect Drone Visual Tracking and Flight Video Streams">
-                          <i class="fa fa-video"></i>
-                          <span>Drone Flight Feeds</span>
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" id="btn-open-report" title="View Detailed Photogrammetric Quality Diagnostics &amp; GCP Residuals">
-                          <i class="fa-regular fa-file-lines"></i>
-                          <span>Quality &amp; GCP Report</span>
-                        </button>
-                        <!-- Download Assets Dropdown -->
-                        <div class="btn-group dropdown">
-                          <button type="button" class="btn btn-default btn-sm dropdown-toggle" id="btn-download-assets" title="Download Reconstructed 3D Meshes, Orthomosaics, and Point Clouds">
-                            <i class="fa fa-download"></i>
-                            <span>Export Assets</span>
-                            <i class="fa fa-caret-down"></i>
-                          </button>
-                          <ul class="dropdown-menu download-menu" id="download-dropdown-menu">
-                            <li class="dropdown-header">3D Meshes &amp; Geometry</li>
-                            <li><a href="Task-of-2026-09-10T143406911Z-textured_model.glb" download><i class="fa fa-cube fa-fw"></i> Textured Model (.glb) <span class="size-hint">10.1 MB</span></a></li>
-                            <li><a href="javascript:void(0);" id="dl-ply"><i class="fa fa-circle-nodes fa-fw"></i> Dense Point Cloud (.laz / .ply) <span class="size-hint">15.4 MB</span></a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">AeroSculpt SLAM &amp; Tracking Feeds</li>
-                            <li><a href="assets/aerosculpt_slam_tracking.mp4" download><i class="fa fa-video fa-fw"></i> AeroSculpt SLAM Visual Tracking (.mp4) <span class="size-hint">5.7 MB</span></a></li>
-                            <li><a href="assets/ray_video.mp4" download><i class="fa fa-bolt fa-fw"></i> Ray-Cast Multi-View Geometry (.mp4) <span class="size-hint">4.6 MB</span></a></li>
-                            <li><a href="assets/matching_video.mp4" download><i class="fa fa-diagram-project fa-fw"></i> Feature Matching Stream (.mp4) <span class="size-hint">346 KB</span></a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">2D GIS &amp; Orthomosaics</li>
-                            <li><a href="javascript:void(0);" id="dl-ortho"><i class="fa fa-map fa-fw"></i> Orthophoto GeoTIFF (.tif) <span class="size-hint">38.2 MB</span></a></li>
-                            <li><a href="javascript:void(0);" id="dl-dsm"><i class="fa fa-layer-group fa-fw"></i> Digital Surface Model DSM (.tif) <span class="size-hint">12.5 MB</span></a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Survey Diagnostics &amp; Footage</li>
-                            <li><a href="javascript:void(0);" id="dl-report"><i class="fa-regular fa-file-pdf fa-fw"></i> Quality Report (.pdf) <span class="size-hint">2.1 MB</span></a></li>
-                            <li><a href="VIDEO-2026-09-20-17-40-19.mp4" download><i class="fa fa-file-video fa-fw"></i> Raw UAV Flight Survey Video (.mp4) <span class="size-hint">11.6 MB</span></a></li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div class="action-buttons-right" style="margin-left: auto;">
-                        <button type="button" class="btn btn-default btn-xs" id="btn-copy-task-id" title="Copy Task ID">
-                          <i class="fa-regular fa-clipboard" id="copy-task-icon"></i>
-                          <span id="task-id-text" style="font-family: var(--font-mono); font-size: 11px;">Task-of-2026-09-10T143406911Z</span>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-xs btn-delete-task" id="btn-delete-task-action" title="Delete Task Data" style="display:none;">
-                          <i class="fa fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Clean Quick Metric Highlights -->
-                    <div class="task-metrics-grid">
-                      <div class="metric-card-box">
-                        <div class="metric-card-lbl">Survey Area</div>
-                        <div class="metric-card-val">42,500 m² <span class="metric-card-sub">(4.25 ha)</span></div>
-                      </div>
-                      <div class="metric-card-box">
-                        <div class="metric-card-lbl">Resolution (GSD)</div>
-                        <div class="metric-card-val" style="color: var(--nextgen-cyan);">1.42 cm/px <span class="metric-card-sub">at 64.5m</span></div>
-                      </div>
-                      <div class="metric-card-box">
-                        <div class="metric-card-lbl">Dense 3D Points</div>
-                        <div class="metric-card-val">1,428,950 <span class="metric-card-sub">vertices</span></div>
-                      </div>
-                      <div class="metric-card-box">
-                        <div class="metric-card-lbl">Coordinate Datum</div>
-                        <div class="metric-card-val" style="font-family: var(--font-mono); font-size: 13px;">EPSG:32630 <span class="badge-status-locked" style="margin-left: 2px;">RTK</span></div>
-                      </div>
-                    </div>
-
-                    <!-- Visual Deliverables Showcase (3D Model + SLAM Hero) -->
-                    <div class="task-showcase-grid">
-                      <!-- 3D Model Interactive Card -->
-                      <div class="task-thumbnail-wrapper" id="thumb-preview-box" title="Click to launch 3D Model Viewer">
-                        <div class="thumb-canvas-container">
-                          <canvas id="thumb-canvas" width="480" height="320" style="width: 100%; height: 100%;"></canvas>
-                          <div class="thumb-overlay-badge">
-                            <i class="fa fa-cube"></i> Inspect 3D Model
-                          </div>
-                          <div class="thumb-model-tag">GLB 3D MESH READY</div>
-                        </div>
-                        <div class="thumb-caption">
-                          <strong>Reconstructed 3D Mesh (GLB)</strong>
-                          <span>Interactive hardware-accelerated 3D model with true metric dimensions</span>
-                        </div>
-                      </div>
-
-                      <!-- PB2 Svalbard Arctic Drone Feed -->
-                      <div class="task-thumbnail-wrapper" id="dash-slam-video-card" title="Click to open Full Video Feed View" style="cursor: pointer;">
-                        <div class="thumb-canvas-container" style="height: calc(100% - 60px); position: relative; background: #000;">
-                          <video id="dash-slam-video" autoplay loop muted playsinline src="datasets/pb2_video.mp4" style="width: 100%; height: 100%; object-fit: cover;"></video>
-                          <div class="slam-feed-corner-tag top-left">
-                            <i class="fa fa-snowflake"></i> Longyearbyen · 78°N Arctic
-                          </div>
-                          <div class="slam-feed-corner-tag bottom-right">
-                            EPSG:32633 · UTM 33N
-                          </div>
-                        </div>
-                        <div class="thumb-caption">
-                          <strong>Svalbard Arctic Drone 3D Scan</strong>
-                          <span>DJI Mavic 3 Enterprise — Arctic settlement terrain &amp; infrastructure</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Hidden/Collapsible Elements for Script Compatibility -->
-                    <div id="task-list-body" style="display:none;"></div>
-                    <div id="task-expanded-panel" style="display:none;"></div>
-                    <button id="task-expand-btn" style="display:none;"></button>
-                    <a id="task-name-link" style="display:none;"></a>
-                    <span id="task-dataset-badge" style="display:none;"></span>
-                    <button id="task-actions-btn" style="display:none;"></button>
-                    <div id="task-actions-dropdown" style="display:none;"></div>
-                    <a id="action-view-3d" style="display:none;"></a>
-                    <a id="action-view-map" style="display:none;"></a>
-                    <a id="action-view-video" style="display:none;"></a>
-                    <a id="action-view-report" style="display:none;"></a>
-                    <a id="action-restart" style="display:none;"></a>
-                    <a id="action-duplicate" style="display:none;"></a>
-                    <a id="action-delete" style="display:none;"></a>
-                    <div id="console-stream-box" style="display:none;">
-                      <button id="btn-copy-console"></button>
-                      <button id="btn-clear-console"></button>
-                      <div id="console-output-text"></div>
-                    </div>
-                    <button id="btn-console-on" style="display:none;"></button>
-                    <button id="btn-console-off" style="display:none;"></button>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 2: Pipeline Architecture                           -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-architecture">
-                <div class="scroll-section-header"><i class="fa fa-diagram-project"></i> Pipeline Architecture</div>
-                <div class="project-tab-pane" id="pane-tab-architecture">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 20px;">
-                      <h3><i class="fa fa-diagram-project"></i> How AeroSculpt Builds 3D Models</h3>
-                      <p>AeroSculpt transforms overlapping drone video into realistic, true-scale 3D models in four simple steps—similar to how modern 3D mapping and Google Earth create digital twins.</p>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-                      <!-- Step 1 -->
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #3b82f6;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(59,130,246,0.12); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">1</div>
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">1. Capture &amp; Filter</h4>
-                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">The drone records the site from multiple angles. Blurry or shaky frames are automatically filtered out, keeping only crystal-clear images.</p>
-                      </div>
-
-                      <!-- Step 2 -->
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #06b6d4;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(6,182,212,0.12); color: #06b6d4; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">2</div>
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">2. Track &amp; Match</h4>
-                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Common landmarks and visual points are matched across frames to calculate the exact position and angle of the camera for each shot.</p>
-                      </div>
-
-                      <!-- Step 3 -->
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #10b981;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16,185,129,0.12); color: #10b981; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">3</div>
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">3. Build 3D Shape</h4>
-                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">By connecting matching points from different viewpoints, a dense 3D point cloud and solid mesh surface of the terrain and buildings are formed.</p>
-                      </div>
-
-                      <!-- Step 4 -->
-                      <div style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 8px; padding: 18px 16px; border-top: 3px solid #f59e0b;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(245,158,11,0.12); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-bottom: 12px;">4</div>
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">4. Texture &amp; Render</h4>
-                        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">High-resolution photographic colors are projected onto the 3D model, generating a lightweight, realistic digital twin ready for web inspection.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 3: Geodesy & Accuracy                              -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-geodesy">
-                <div class="scroll-section-header"><i class="fa fa-crosshairs"></i> Geodesy &amp; Accuracy</div>
-                <div class="project-tab-pane" id="pane-tab-geodesy">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 24px;">
-                      <h3><i class="fa fa-crosshairs"></i> Survey-Grade Precision &amp; Georeferencing</h3>
-                      <p>Sub-centimeter geospatial alignment combining multi-band RTK satellite data, Ground Control Points (GCPs), and automated camera calibration.</p>
-                    </div>
-
-                    <div class="methodology-grid">
-                      <!-- Accuracy Card 1 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">PRECISION</div>
-                        <h4>Centimeter-Level Accuracy (±1.2 cm)</h4>
-                        <p>Achieves survey-grade spatial accuracy certified against physical Ground Control Points across the entire survey perimeter.</p>
-                        <ul>
-                          <li>Mean reprojection error of only <strong>0.42 px</strong> across all registered camera stations.</li>
-                          <li>Millimeter-level residual error after 7-DoF Sim(3) Helmert transformation.</li>
-                          <li>Ensures true-to-life 1:1 metric scale for volume, area, and distance analysis.</li>
-                        </ul>
-                      </div>
-
-                      <!-- Accuracy Card 2 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge cyan">DATUM</div>
-                        <h4>Standard Global CRS (EPSG:32630)</h4>
-                        <p>Reconstructed models and orthophotos are directly projected into standard cartographic coordinate systems.</p>
-                        <ul>
-                          <li>Projected directly to WGS 84 / UTM Zone 30N (EPSG:32630).</li>
-                          <li>Seamlessly imports into industry GIS tools (QGIS, ArcGIS, AutoCAD, Civil 3D).</li>
-                          <li>Exports georeferenced GeoTIFF orthomosaics and Digital Surface Models (DSM).</li>
-                        </ul>
-                      </div>
-
-                      <!-- Accuracy Card 3 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">CALIBRATION</div>
-                        <h4>Automated Sensor Self-Calibration</h4>
-                        <p>Self-calibrates camera optics during flight to remove wide-angle lens distortion automatically.</p>
-                        <ul>
-                          <li>Resolves principal point offsets and focal length parameters dynamically.</li>
-                          <li>Compensates for radial (k1, k2) and tangential (p1, p2) lens distortion.</li>
-                          <li>Guarantees distortion-free perspective geometry across every captured frame.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 4: Sensor & Flight Telemetry                       -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-telemetry">
-                <div class="scroll-section-header"><i class="fa fa-plane-departure"></i> Flight Telemetry</div>
-                <div class="project-tab-pane" id="pane-tab-telemetry">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 24px;">
-                      <h3><i class="fa fa-plane-departure"></i> UAV Flight Envelope &amp; Sensor Rig</h3>
-                      <p>Autonomous flight dynamics, camera optics, and satellite coverage recorded during survey operations.</p>
-                    </div>
-
-                    <div class="telemetry-specs-grid">
-                      <div class="spec-card">
-                        <div class="spec-icon"><i class="fa fa-helicopter"></i></div>
-                        <div class="spec-info">
-                          <span class="spec-title">Flight Envelope</span>
-                          <strong>64.5m AGL Altitude Hold</strong>
-                          <p>4.8 m/s cruise speed · 10 min mission · 1,840 m total flight path</p>
-                        </div>
-                      </div>
-
-                      <div class="spec-card">
-                        <div class="spec-icon"><i class="fa fa-camera"></i></div>
-                        <div class="spec-info">
-                          <span class="spec-title">Camera Sensor Rig</span>
-                          <strong>Sony 1" Exmor CMOS 20MP</strong>
-                          <p>5472 × 3648 px · Mechanical shutter · 1/800s ultra-fast exposure</p>
-                        </div>
-                      </div>
-
-                      <div class="spec-card">
-                        <div class="spec-icon"><i class="fa fa-satellite"></i></div>
-                        <div class="spec-info">
-                          <span class="spec-title">GNSS Satellite Lock</span>
-                          <strong>Multi-Band RTK Fixed (26 Satellites)</strong>
-                          <p>GPS, GLONASS, Galileo, BeiDou · 0.010 m real-time positional accuracy</p>
-                        </div>
-                      </div>
-
-                      <div class="spec-card">
-                        <div class="spec-icon"><i class="fa fa-layer-group"></i></div>
-                        <div class="spec-info">
-                          <span class="spec-title">Stereo Overlap</span>
-                          <strong>78% Forward · 72% Lateral Overlap</strong>
-                          <p>Guarantees at least 5 intersecting camera rays per 3D surface point</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 5: Geofencing                                      -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-geofencing">
-                <div class="scroll-section-header"><i class="fa-solid fa-draw-polygon"></i> Geofencing</div>
-                <div class="project-tab-pane" id="pane-tab-geofencing">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 24px;">
-                      <h3><i class="fa-solid fa-draw-polygon"></i> Operational Safety &amp; Airspace Boundaries</h3>
-                      <p>Automated virtual safety boundaries keep drone missions compliant, secure, and contained within authorized airspace.</p>
-                    </div>
-
-                    <div class="methodology-grid">
-                      <!-- Geofence 1 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">PERIMETER</div>
-                        <h4>Virtual Hard Boundary (4.25 ha)</h4>
-                        <p>Enforces strict polygonal boundaries around the survey site to prevent airspace deviations.</p>
-                        <ul>
-                          <li>Automated Return-to-Home (RTH) triggered if the UAV breaches the boundary buffer.</li>
-                          <li>Confines all flight operations within the 210m × 195m surveyed zone.</li>
-                          <li>Logs all perimeter compliance telemetry directly into the mission metadata.</li>
-                        </ul>
-                      </div>
-
-                      <!-- Geofence 2 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge cyan">AIRSPACE</div>
-                        <h4>Altitude Limits &amp; Airspace Compliance</h4>
-                        <p>Firmware-locked flight ceilings ensure full compliance with civil aviation regulations.</p>
-                        <ul>
-                          <li>Hard ceiling enforced below 120m AGL (survey flown at 64.5m AGL).</li>
-                          <li>Pre-loaded active airspace restrictions and NOTAM no-fly zones.</li>
-                          <li>Compliant with Class G uncontrolled airspace operational standards.</li>
-                        </ul>
-                      </div>
-
-                      <!-- Geofence 3 -->
-                      <div class="methodology-card">
-                        <div class="m-card-badge">FAIL-SAFE</div>
-                        <h4>Autonomous Safety Fail-Safes</h4>
-                        <p>Intelligent onboard systems protect ground personnel and preserve flight safety.</p>
-                        <ul>
-                          <li>Real-time dynamic obstacle detection for vehicles and structures.</li>
-                          <li>Anti-spoofing GNSS integrity check with instant fallback to IMU dead-reckoning.</li>
-                          <li>Automated emergency landing if battery reserve or link quality drops below threshold.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 6: Provenance Matrix                               -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-provenance">
-                <div class="scroll-section-header"><i class="fa fa-shield-halved"></i> Provenance Matrix</div>
-                <div class="project-tab-pane" id="pane-tab-provenance">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <div class="pane-header" style="margin-bottom: 24px;">
-                      <h3><i class="fa fa-shield-halved"></i> Evidence-Aware 3D Quality Provenance</h3>
-                      <p>Every vertex and surface is transparently tagged by its level of verification so surveyors know exactly what is real versus inferred.</p>
-                    </div>
-
-                    <div class="evidence-matrix-grid">
-                      <div class="evidence-card observed">
-                        <div class="evidence-state-tag">STATE 01: OBSERVED</div>
-                        <div class="evidence-title">Directly Measured (88.4%)</div>
-                        <div class="evidence-desc">
-                          Geometry verified directly by multiple sharp, unoccluded drone camera rays with ultra-low reprojection error (&lt;0.8 px). Highest confidence.
-                        </div>
-                      </div>
-
-                      <div class="evidence-card reconstructed">
-                        <div class="evidence-state-tag">STATE 02: RECONSTRUCTED</div>
-                        <div class="evidence-title">Multi-View Triangulated</div>
-                        <div class="evidence-desc">
-                          Recovered through multi-angle Structure-from-Motion (SfM) and depth consensus across overlapping flight passes.
-                        </div>
-                      </div>
-
-                      <div class="evidence-card inferred">
-                        <div class="evidence-state-tag">STATE 03: INFERRED</div>
-                        <div class="evidence-title">Spatially Extrapolated</div>
-                        <div class="evidence-desc">
-                          Obscured areas (dense foliage, shadows) are filled based on surrounding structural continuity and clearly flagged for surveyor review—never fabricated.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ========================================================== -->
-              <!-- SECTION 7: Demo                                            -->
-              <!-- ========================================================== -->
-              <section class="scroll-section" id="section-studio">
-                <div class="scroll-section-header"><i class="fa-solid fa-play-circle"></i> Demo</div>
-                <div class="project-tab-pane" id="pane-tab-studio">
-                  <div class="tab-pane-content" style="padding: 24px 20px;">
-                    <!-- Studio Pane Header -->
-                    <div class="pane-header" style="margin-bottom: 20px;">
-                      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-                        <div>
-                          <h3><i class="fa-solid fa-play-circle"></i> Interactive 3D Digital Twin Workstation</h3>
-                          <p>Launch the interactive 3D workstation to inspect reconstructed models, flight paths, and sensor telemetry in full-screen WebGL.</p>
-                        </div>
-                        <button type="button" class="btn btn-primary btn-md" id="btn-launch-studio-from-tab" style="font-weight: 700; padding: 10px 20px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);">
-                          <i class="fa fa-expand"></i> Launch Full Workstation (Fits Screen 100%)
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Studio Preview Card -->
-                    <div class="card" style="background: var(--bg-surface-card); border: 1px solid var(--border-medium); border-radius: 6px; padding: 18px; margin-bottom: 20px; color: var(--text-main);">
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                          <span style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px;"><i class="fa fa-cube" style="color:var(--nextgen-red)"></i> AEROSCULPT 3D WORKSTATION</span>
-                          <span class="pill-rtk">RTK Fixed 0.010m</span>
-                          <span class="badge-status-locked">EPSG:32630 Datum</span>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-front" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Front View</button>
-                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-top" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">Top GIS</button>
-                          <button type="button" class="btn btn-xs btn-default" id="tab-preview-cam-iso" style="background: var(--bg-surface-secondary); color: var(--text-main); border-color: var(--border-medium);">3D Iso</button>
-                        </div>
-                      </div>
-
-                      <div style="position: relative; height: 320px; background: var(--bg-app); border: 1px solid var(--border-medium); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                        <!-- Quick specs overlay -->
-                        <div style="position: absolute; top: 12px; left: 14px; background: rgba(12, 13, 18, 0.85); border: 1px solid var(--border-medium); border-radius: 4px; padding: 6px 12px; font-size: 11px; z-index: 5;">
-                          <div style="color: var(--nextgen-cyan); font-weight: 700; margin-bottom: 2px;">Dumbarton Castle Ramparts</div>
-                          <div style="color: var(--text-muted); font-size: 10px; font-family: var(--font-mono);">Calibrated Trajectory · 1.42 cm/px GSD · 524k Triangles</div>
-                        </div>
-
-                        <div style="text-align: center; z-index: 5; max-width: 460px; padding: 20px;">
-                          <div style="width: 52px; height: 52px; background: var(--nextgen-red-subtle); border: 1px solid var(--nextgen-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--nextgen-red); font-size: 22px;">
-                            <i class="fa fa-cube"></i>
-                          </div>
-                          <h4 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">AeroSculpt Demo Workstation</h4>
-                          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Inspect 3D digital twins, toggle optical sensor layers, measure true metric dimensions, and scrub flight trajectories in real time.</p>
-                          <button type="button" class="btn btn-primary btn-sm" id="btn-launch-studio-from-preview" style="font-weight: 700; padding: 8px 18px;">
-                            <i class="fa fa-expand"></i> Open Full Viewport (Fits Screen 100%)
-                          </button>
-                        </div>
-
-                        <div style="position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: #64748b; font-family: var(--font-mono); z-index: 5;">
-                          WebGL 2.0 · Three.js · 1:1 Metric Scale
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Clean 3-Card Summary -->
-                    <div class="methodology-grid">
-                      <div class="methodology-card">
-                        <div class="m-card-badge">VIEWPORT</div>
-                        <h4>Hardware-Accelerated 3D Engine</h4>
-                        <p>WebGL rendering powered by Three.js with sub-millimeter Draco mesh decompression.</p>
-                        <ul>
-                          <li>Color shading modes: RGB True Color, Elevation, Distance-to-Camera, and CAD Wireframe.</li>
-                          <li>Interactive 2-point measurement ruler for true metric distances and clearances.</li>
-                          <li>Calibrated UAV camera frustums showing exact survey capture stations.</li>
-                        </ul>
-                      </div>
-
-                      <div class="methodology-card">
-                        <div class="m-card-badge cyan">SENSORS</div>
-                        <h4>Real-Time Sensor &amp; SLAM Intel</h4>
-                        <p>Tactical sensor inspection panel synchronized with 3D model orientation.</p>
-                        <ul>
-                          <li>Optical sensor viewer with keypoint landmark overlays and feature matching.</li>
-                          <li>Spectral disparity depth heatmaps (Inferno, Turbo, Rainbow colormaps).</li>
-                          <li>Live flight camera feeds with continuous pose tracking.</li>
-                        </ul>
-                      </div>
-
-                      <div class="methodology-card">
-                        <div class="m-card-badge">TELEMETRY</div>
-                        <h4>GCP Geodesy &amp; Attitude Dials</h4>
-                        <p>Survey-grade coordinate analysis and dynamic flight telemetry gauges.</p>
-                        <ul>
-                          <li>Ground Control Point (GCP) coordinate verification table with millimeter precision.</li>
-                          <li>Real-time UAV attitude gauges: Yaw, Pitch, Roll visual level indicators.</li>
-                          <li>Temporal mission timeline scrubber with variable playback control.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section></section>
-
-        <!-- Legacy Navigation Anchors for Single Dashboard Scrolling -->
-        <div id="view-3d-model" class="content-view-anchor" style="display:none;"></div>
-        <div id="view-map" class="content-view-anchor" style="display:none;"></div>
-        <div id="view-video" class="content-view-anchor" style="display:none;"></div>
-
-        <!-- ================================================================== -->
-        <!-- VIEW 5: AEROSCULPT TACTICAL STUDIO -->
-        <!-- ================================================================== -->
-        <section id="view-studio" class="content-view">
-          <div class="studio-workstation-wrapper">
-            <!-- 3.1 Top Command Bar (Floating Glass Capsule) -->
-            <header class="aerosculpt-top-bar">
-              <div class="top-bar-brand">
-                <button type="button" class="btn btn-xs btn-default btn-studio-back-dash" id="btn-studio-back-dash" title="Return to AeroSculpt Dashboard">
-                  <i class="fa fa-arrow-left"></i> <span class="hidden-xs">Dashboard</span>
-                </button>
-                <div class="brand-capsule">
-                  <div class="brand-hex-icon"><i class="fa-solid fa-satellite-dish"></i></div>
-                  <div class="brand-text-col">
-                    <span class="studio-title">AEROSCULPT STUDIO</span>
-                    <span class="mission-tag" id="studio-mission-tag">AEROSCULPT STUDIO · STANDBY</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Survey Dataset Switcher -->
-              <div class="studio-dataset-pill">
-                <i class="fa fa-layer-group text-primary"></i>
-                <label for="studio-dataset-selector" class="hidden-xs">Dataset:</label>
-                <select id="studio-dataset-selector" class="studio-dataset-select" title="Switch Survey Dataset">
-                  <option value="" selected disabled>Select Prebuild Dataset...</option>
-                  <option value="01">01 · Komorowice Cadastral Survey (26.2 MB)</option>
-                  <option value="02">02 · Svalbard Arctic 3D Scan (34.7 MB)</option>
-                  <option value="03">03 · Zermatt Alpine Survey (31.7 MB)</option>
-                </select>
-              </div>
-
-              <!-- Mode Switcher Tabs -->
-              <div class="studio-mode-switcher">
-                <button type="button" class="mode-tab-btn active" id="btn-mode-twin" title="3D Digital Twin Full-Canvas View">
-                  <i class="fa fa-globe"></i> <span>3D Twin Studio</span>
-                </button>
-                <button type="button" class="mode-tab-btn" id="btn-mode-sensor" title="Toggle Sensor Intel Drawer (Right)">
-                  <i class="fa fa-camera"></i> <span>Sensor Intel</span>
-                </button>
-                <button type="button" class="mode-tab-btn" id="btn-mode-gcp" title="Toggle Ground Control & Telemetry Drawer (Left)">
-                  <i class="fa fa-crosshairs"></i> <span>GCP Geodesy</span>
-                </button>
-              </div>
-
-              <!-- Quick Action Cluster -->
-              <div class="studio-action-cluster">
-                <button type="button" class="studio-tool-btn" id="btn-studio-ingest" title="Ingest Video (Ctrl+I)">
-                  <i class="fa fa-cloud-arrow-up"></i> <span>Ingest Video</span>
-                </button>
-                <button type="button" class="studio-tool-btn btn-highlight" id="btn-studio-compute" title="Compute 3D Multi-View Reconstruction">
-                  <i class="fa fa-microchip"></i> <span>Compute 3D</span>
-                </button>
-                <button type="button" class="studio-tool-btn" id="btn-studio-export" title="Export Deliverables (.ply, .obj, .json)">
-                  <i class="fa fa-download"></i> <span>Export</span>
-                </button>
-                <button type="button" class="studio-tool-btn" id="btn-studio-focus" title="Focus Mode (Tab) - Toggle Drawers">
-                  <i class="fa fa-arrows-left-right-to-line"></i> <span class="hidden-sm hidden-xs">Focus</span>
-                </button>
-                <button type="button" class="studio-tool-btn" id="btn-studio-fullscreen" title="Full Screen Viewport (Fits Screen 100%)">
-                  <i class="fa fa-expand"></i> <span class="hidden-sm hidden-xs">Full Screen</span>
-                </button>
-                <button type="button" class="studio-tool-btn" id="btn-studio-help" title="Tactical Keyboard Guide (F1)">
-                  <i class="fa fa-keyboard"></i>
-                </button>
-              </div>
-            </header>
-
-            <!-- Main Studio Workspace (Left Drawer + 3D Viewport + Right Drawer) -->
-            <div class="studio-stage-container" id="studio-stage-container">
-
-              <!-- ============================================================== -->
-              <!-- 3.4 Ground Control & Telemetry Drawer (Left Tactical Panel)    -->
-              <!-- ============================================================== -->
-              <aside class="studio-drawer studio-drawer-left open" id="studio-left-drawer">
-                <div class="drawer-header">
-                  <div class="drawer-title-group">
-                    <i class="fa fa-crosshairs"></i>
-                    <span>Ground Control & Telemetry</span>
-                  </div>
-                  <button type="button" class="drawer-close-btn" id="btn-close-left-drawer" title="Collapse Drawer">
-                    <i class="fa fa-chevron-left"></i>
-                  </button>
-                </div>
-
-                <div class="drawer-scroll-body">
-                  <!-- Section 0: Output Deliverables & Precision Metrology -->
-                  <div class="tactical-card" id="studio-output-deliverables-card">
-                    <div class="t-card-header">
-                      <h5><i class="fa fa-box-archive text-success"></i> Output Deliverables & Precision</h5>
-                      <span class="badge" id="studio-output-badge" style="background:#334155;color:#94a3b8;">STANDBY</span>
-                    </div>
-
-                    <div class="output-metrics-grid">
-                      <div class="out-stat-chip">
-                        <span class="out-lbl">Ground Sampling Dist (GSD)</span>
-                        <strong class="out-val" id="studio-out-gsd">—</strong>
-                      </div>
-                      <div class="out-stat-chip">
-                        <span class="out-lbl">Mean Reproj Error</span>
-                        <strong class="out-val" id="studio-out-reproj">—</strong>
-                      </div>
-                      <div class="out-stat-chip">
-                        <span class="out-lbl">Watertight Triangles</span>
-                        <strong class="out-val" id="studio-out-poly">—</strong>
-                      </div>
-                      <div class="out-stat-chip">
-                        <span class="out-lbl">Positional Accuracy (RMSE)</span>
-                        <strong class="out-val" id="studio-out-rmse">—</strong>
-                      </div>
-                    </div>
-
-                    <div class="output-files-list" id="studio-output-files-list">
-                      <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-cube text-muted"></i> <span class="out-file-name" id="studio-out-glb-name">No dataset loaded</span></div>
-                        <span class="out-file-size" id="studio-out-glb-size">—</span>
-                      </div>
-                      <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-video text-muted"></i> <span class="out-file-name" id="studio-out-vid-name">No stream active</span></div>
-                        <span class="out-file-size" id="studio-out-vid-size">—</span>
-                      </div>
-                      <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-file-pdf text-muted"></i> <span class="out-file-name">survey_quality_report.pdf</span></div>
-                        <span class="out-file-size">—</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Section 1: Ground Control Points (GCP Geodesy) -->
-                  <div class="tactical-card">
-                    <div class="t-card-header">
-                      <h5><i class="fa fa-location-dot"></i> Ground Control Points (GCP)</h5>
-                      <span class="badge-status-locked" id="studio-datum-badge" style="background:rgba(51,65,85,0.5);border-color:#475569;color:#94a3b8;">Standby</span>
-                    </div>
-
-                    <div class="gcp-table-shell">
-                      <table class="gcp-points-table">
-                        <thead>
-                          <tr><th>GCP ID</th><th>Landmark Name</th><th>Status</th></tr>
-                        </thead>
-                        <tbody id="studio-gcp-table-body">
-                          <tr><td colspan="3" style="text-align:center;color:#64748b;padding:14px;font-size:11px;">Standby · No Ground Control Points active</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <!-- Coordinate Inspector (Editable Inputs with Spinboxes) -->
-                    <div class="coord-inspector-box">
-                      <div class="inspector-title">Coordinate Inspector · <span id="active-gcp-title">GCP-01</span></div>
-                      <div class="coord-input-row">
-                        <label>Latitude (°N):</label>
-                        <input type="number" step="0.000000001" class="coord-spinbox" id="inp-gcp-lat" value="55.937222000">
-                      </div>
-                      <div class="coord-input-row">
-                        <label>Longitude (°W):</label>
-                        <input type="number" step="0.000000001" class="coord-spinbox" id="inp-gcp-lon" value="-4.558333000">
-                      </div>
-                      <div class="coord-input-row">
-                        <label>Elevation (m MSL):</label>
-                        <input type="number" step="0.001" class="coord-spinbox" id="inp-gcp-elev" value="24.312">
-                      </div>
-                    </div>
-
-                    <!-- GCP Action Buttons -->
-                    <div class="gcp-btn-cluster">
-                      <button type="button" class="btn btn-xs btn-primary" id="btn-pin-gcp"><i class="fa fa-thumbtack"></i> Pin New GCP</button>
-                      <button type="button" class="btn btn-xs btn-default" id="btn-revert-gcp"><i class="fa fa-rotate-left"></i> Revert</button>
-                      <button type="button" class="btn btn-xs btn-danger" id="btn-delete-gcp"><i class="fa fa-trash"></i> Delete</button>
-                    </div>
-                  </div>
-
-                  <!-- Section 2: Flight Telemetry Inspector -->
-                  <div class="tactical-card">
-                    <div class="t-card-header">
-                      <h5><i class="fa fa-plane-up"></i> UAV Flight Dynamics</h5>
-                      <span class="pill-rtk">RTK Fixed 26 SAT</span>
-                    </div>
-
-                    <!-- Attitude Dials / Gauges -->
-                    <div class="attitude-meters-grid">
-                      <div class="att-meter-box">
-                        <span class="att-label">YAW</span>
-                        <div class="att-dial-visual"><div class="dial-needle" id="needle-yaw" style="transform: rotate(142deg);"></div></div>
-                        <strong class="att-val" id="val-yaw">142.6°</strong>
-                      </div>
-                      <div class="att-meter-box">
-                        <span class="att-label">PITCH</span>
-                        <div class="att-dial-visual"><div class="dial-needle horiz" id="needle-pitch" style="transform: translateY(-3px);"></div></div>
-                        <strong class="att-val" id="val-pitch">-3.2°</strong>
-                      </div>
-                      <div class="att-meter-box">
-                        <span class="att-label">ROLL</span>
-                        <div class="att-dial-visual"><div class="dial-needle horiz" id="needle-roll" style="transform: rotate(1deg);"></div></div>
-                        <strong class="att-val" id="val-roll">+0.8°</strong>
-                      </div>
-                    </div>
-
-                    <!-- Position & Altitude -->
-                    <div class="telemetry-stat-list">
-                      <div class="t-stat-row">
-                        <span class="lbl">Altitude (AGL):</span>
-                        <span class="val" id="val-alt-agl">64.5 m</span>
-                      </div>
-                      <div class="t-stat-row">
-                        <span class="lbl">Elevation (MSL):</span>
-                        <span class="val" id="val-alt-msl">88.8 m</span>
-                      </div>
-                      <div class="t-stat-row">
-                        <span class="lbl">Flight Speed:</span>
-                        <span class="val">4.8 m/s (Cruise)</span>
-                      </div>
-                      <div class="t-stat-row">
-                        <span class="lbl">Distance to Target:</span>
-                        <span class="val" id="val-dist-target">48.2 m</span>
-                      </div>
-                    </div>
-
-                    <!-- Sensor Intel Rig -->
-                    <div class="sensor-specs-capsule">
-                      <div class="spec-head"><i class="fa fa-camera"></i> Sony 1" Exmor CMOS 20MP</div>
-                      <div class="spec-body">
-                        <span>Focal: 24mm (3648 px)</span> · <span>Exp: 1/800s</span> · <span>ISO: 100</span> · <span>PP: [2734.8, 1826.1]</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-
-              <!-- ============================================================== -->
-              <!-- 3.2 Full-Bleed 3D Digital Twin Viewport (Center Stage)        -->
-              <!-- ============================================================== -->
-              <main class="studio-viewport-container" id="studio-viewport-container">
-
-                <!-- Floating Viewport HUD Toolbar (Suspended Top Center) -->
-                <div class="floating-hud-toolbar" id="studio-floating-hud">
-                  <div class="hud-tool-group">
-                    <button type="button" class="hud-btn" id="studio-btn-reset-extents" title="Reset Extents (R)">
-                      <i class="fa fa-arrows-to-eye"></i> <span>Reset (R)</span>
-                    </button>
-                    <button type="button" class="hud-btn active" id="studio-btn-toggle-frustums" title="Toggle Frustums (C)">
-                      <i class="fa fa-video"></i> <span>Frustums (C)</span>
-                    </button>
-                    <button type="button" class="hud-btn" id="studio-btn-toggle-landmarks" title="Toggle Landmarks (L)">
-                      <i class="fa fa-cloud"></i> <span>Landmarks (L)</span>
-                    </button>
-                    <button type="button" class="hud-btn active" id="studio-btn-toggle-mesh" title="Toggle Surface Mesh">
-                      <i class="fa fa-cube"></i> <span>Mesh</span>
-                    </button>
-                    <button type="button" class="hud-btn active" id="studio-btn-toggle-grid" title="Toggle Datum Grid (G)">
-                      <i class="fa fa-border-all"></i> <span>Grid (G)</span>
-                    </button>
-                    <button type="button" class="hud-btn active" id="studio-btn-toggle-roi" title="Toggle ROI Box (S)">
-                      <i class="fa fa-vector-square"></i> <span>ROI (S)</span>
-                    </button>
-                    <button type="button" class="hud-btn active" id="studio-btn-toggle-gcp" title="Toggle GCP Pins">
-                      <i class="fa fa-crosshairs"></i> <span>GCP</span>
-                    </button>
-                    <button type="button" class="hud-btn" id="studio-btn-toggle-orbit" title="Toggle 360° Continuous Orbit">
-                      <i class="fa fa-arrows-rotate"></i> <span>360° Orbit</span>
-                    </button>
-                    <button type="button" class="hud-btn" id="studio-btn-ruler" title="Measurement Ruler Tool">
-                      <i class="fa fa-ruler-combined"></i> <span>Ruler</span>
-                    </button>
-                  </div>
-
-                  <!-- Color Shading Mode Dropdown -->
-                  <div class="hud-shading-group">
-                    <label class="shading-label"><i class="fa fa-palette"></i> Shading:</label>
-                    <select class="shading-select" id="studio-shading-select">
-                      <option value="rgb">RGB True Color</option>
-                      <option value="turbo">Turbo Elevation</option>
-                      <option value="depth">Distance to Cam</option>
-                      <option value="cad">CAD Solid</option>
-                    </select>
-                  </div>
-                </div>
-
-                <!-- 3D WebGL Canvas Box -->
-                <div class="studio-canvas-box" id="studio-viewport-canvas-box">
-                  <!-- Loading overlay -->
-                  <div class="studio-viewport-loader" id="studio-viewport-loader">
-                    <div class="spinner-border text-info" role="status"></div>
-                    <span>Streaming AeroSculpt 3D Digital Twin...</span>
-                  </div>
-                </div>
-
-                <!-- Real-time Precision Coordinate Reticle HUD (Cursor Hover) -->
-                <div class="studio-reticle-hud" id="studio-hud-coords">
-                  X: <strong>0.00m</strong> · Y: <strong>0.00m</strong> · Z: <strong>0.00m</strong>
-                </div>
-
-                <!-- Interactive Measurement Ruler Readout Pill -->
-                <div class="studio-ruler-readout" id="studio-ruler-readout" style="display: none;">
-                  <i class="fa fa-ruler"></i>
-                  <span>Distance: <strong id="studio-ruler-val">0.000 m</strong></span>
-                  <button type="button" class="btn-clear-ruler" id="studio-btn-clear-ruler">&times;</button>
-                </div>
-
-                <!-- Viewport Bottom Status Bar -->
-                <div class="studio-viewport-footer">
-                  <div class="vf-left">
-                    <span class="dot-online"></span>
-                    <span>WebGL 2.0 Hardware Accelerated</span> ·
-                    <span>200,000 Polygons</span> ·
-                    <span>1:1 True Metric Scale</span>
-                  </div>
-                  <div class="vf-right">
-                    <span>EPSG:32630 UTM 30N</span>
-                  </div>
-                </div>
-              </main>
-
-              <!-- ============================================================== -->
-              <!-- 3.3 Sensor Intel Drawer (Right Tactical Panel - 420px)        -->
-              <!-- ============================================================== -->
-              <aside class="studio-drawer studio-drawer-right open" id="studio-right-drawer">
-                <div class="drawer-header">
-                  <div class="drawer-title-group">
-                    <i class="fa fa-camera-viewfinder"></i>
-                    <span>Sensor Intel & Controllers</span>
-                  </div>
-                  <button type="button" class="drawer-close-btn" id="btn-close-right-drawer" title="Collapse Drawer">
-                    <i class="fa fa-chevron-right"></i>
-                  </button>
-                </div>
-
-                <div class="drawer-scroll-body">
-                  <!-- Sub-Navigation for Sensor Panel: [Optical Sensor View] / [Spectral Depth] -->
-                  <div class="sensor-tab-strip">
-                    <button type="button" class="s-tab-btn active" id="btn-tab-keyframe" data-pane="pane-keyframe-view">
-                      <i class="fa fa-image"></i> Optical Sensor View
-                    </button>
-                    <button type="button" class="s-tab-btn" id="btn-tab-depth" data-pane="pane-depth-view">
-                      <i class="fa fa-wave-square"></i> Spectral Depth
-                    </button>
-                  </div>
-
-                  <!-- TAB 1: Optical Sensor View (Expanded to 270px height) -->
-                  <div class="sensor-pane active" id="pane-keyframe-view">
-                    <div class="sensor-frame-card">
-                      <!-- Sub-toolbar layer toggles -->
-                      <div class="sensor-layer-bar">
-                        <button type="button" class="s-layer-btn active" id="toggle-layer-image" title="Toggle Optical Background">
-                          <span>cv-image</span>
-                        </button>
-                        <button type="button" class="s-layer-btn active" id="toggle-layer-features" title="Toggle 2D Feature Tracks">
-                          <span>cv-features</span>
-                        </button>
-                        <button type="button" class="s-layer-btn active" id="toggle-layer-landmarks" title="Toggle 3D Landmark Projections">
-                          <span>cv-landmarks</span>
-                        </button>
-                        <button type="button" class="s-layer-btn active" id="toggle-layer-residuals" title="Toggle Reprojection Residual Vectors">
-                          <span>cv-residuals</span>
-                        </button>
-                      </div>
-
-                      <!-- Keyframe Image Canvas Container -->
-                      <div class="keyframe-canvas-stage">
-                        <canvas id="studio-keyframe-canvas" width="380" height="240"></canvas>
-                        <!-- Interactive Reticle Crosshair -->
-                        <div class="optical-reticle-crosshair"></div>
-                        <!-- Metadata Chip -->
-                        <div class="keyframe-meta-chip">
-                          <span id="keyframe-filename-chip">Standby — No Feed</span>
-                          <span class="chip-res">—</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- TAB 2: Spectral Depth View Tab -->
-                  <div class="sensor-pane" id="pane-depth-view">
-                    <div class="spectral-depth-card">
-                      <div class="depth-canvas-stage">
-                        <canvas id="studio-depth-canvas" width="380" height="220"></canvas>
-                      </div>
-                      <div class="depth-ctrl-row">
-                        <label>Colormap:</label>
-                        <div class="btn-group btn-group-xs" id="depth-colormap-group">
-                          <button type="button" class="btn btn-default active" data-map="inferno">Inferno</button>
-                          <button type="button" class="btn btn-default" data-map="turbo">Turbo</button>
-                          <button type="button" class="btn btn-default" data-map="grayscale">Grayscale</button>
-                          <button type="button" class="btn btn-default" data-map="rainbow">Rainbow</button>
-                        </div>
-                      </div>
-                      <div class="depth-range-bar">
-                        <span>Range: <strong>Near: 12.4m</strong></span>
-                        <span><strong>Far: 88.2m</strong></span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 3D Viewport Controllers Dock (Below Frames) -->
-                  <div class="tactical-card controllers-dock-card">
-                    <div class="t-card-header collapsible-header" id="dock-collapse-toggle">
-                      <h5><i class="fa fa-gamepad"></i> 3D Viewport Controllers</h5>
-                      <i class="fa fa-chevron-down" id="dock-caret"></i>
-                    </div>
-
-                    <div class="dock-body" id="dock-body-content">
-                      <!-- Directional D-Pad Cluster -->
-                      <div class="dpad-wrapper">
-                        <div class="dpad-cluster">
-                          <button type="button" class="dpad-btn dpad-up" id="dpad-up" title="Orbit / Tilt Up"><i class="fa fa-caret-up"></i></button>
-                          <div class="dpad-mid-row">
-                            <button type="button" class="dpad-btn dpad-left" id="dpad-left" title="Orbit Left"><i class="fa fa-caret-left"></i></button>
-                            <button type="button" class="dpad-btn dpad-home" id="dpad-home" title="Center Home"><i class="fa fa-house"></i></button>
-                            <button type="button" class="dpad-btn dpad-right" id="dpad-right" title="Orbit Right"><i class="fa fa-caret-right"></i></button>
-                          </div>
-                          <button type="button" class="dpad-btn dpad-down" id="dpad-down" title="Orbit / Tilt Down"><i class="fa fa-caret-down"></i></button>
-                        </div>
-
-                        <!-- Quick Zoom Buttons -->
-                        <div class="quick-zoom-col">
-                          <button type="button" class="btn btn-sm btn-default" id="btn-dock-zoom-in" title="Zoom In"><i class="fa fa-plus"></i></button>
-                          <button type="button" class="btn btn-sm btn-default" id="btn-dock-zoom-out" title="Zoom Out"><i class="fa fa-minus"></i></button>
-                          <button type="button" class="btn btn-sm btn-default" id="btn-dock-turntable" title="Auto-Orbit 360°"><i class="fa fa-rotate"></i></button>
-                        </div>
-                      </div>
-
-                      <!-- Camera Orientation Presets -->
-                      <div class="dock-presets-row">
-                        <button type="button" class="btn btn-xs btn-default" id="dock-cam-top">Top</button>
-                        <button type="button" class="btn btn-xs btn-default active" id="dock-cam-front">Front</button>
-                        <button type="button" class="btn btn-xs btn-default" id="dock-cam-side">Side</button>
-                        <button type="button" class="btn btn-xs btn-default" id="dock-cam-iso">3D Iso</button>
-                      </div>
-
-                      <!-- Model Point Size Stepper -->
-                      <div class="point-size-stepper-row">
-                        <span class="stepper-label">Point Size:</span>
-                        <div class="stepper-box">
-                          <button type="button" class="stepper-btn" id="btn-pt-minus">−</button>
-                          <span class="stepper-val" id="val-point-size">1.0px</span>
-                          <button type="button" class="stepper-btn" id="btn-pt-plus">+</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
+          <!-- Center 3D WebGL Canvas Area -->
+          <div class="viewer-webgl-area">
+            <!-- Top Sub-Navigation Tabs -->
+            <div class="viewer-top-modes-bar">
+              <button class="mode-tab-btn active" id="tab-3d-model">3D Model (PBR)</button>
+              <button class="mode-tab-btn" id="tab-3d-pointcloud">Dense Point Cloud</button>
+              <button class="mode-tab-btn" id="tab-3d-wireframe">Wireframe Inspection</button>
+              <button class="mode-tab-btn" id="tab-3d-evidence">Evidence Confidence</button>
             </div>
 
-            <!-- ============================================================== -->
-            <!-- 3.5 Cinematic Mission Timeline (Bottom Scrubber Dock)          -->
-            <!-- ============================================================== -->
-            <footer class="studio-timeline-dock" id="studio-cameraSelectorDock">
-              <div class="timeline-controls-cluster">
-                <!-- Play / Pause Slideshow -->
-                <button type="button" class="btn btn-sm btn-primary" id="btn-timeline-play" title="Play / Pause Slideshow (Space)">
-                  <i class="fa fa-play" id="icon-timeline-play"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-default" id="btn-timeline-loop" title="Loop Flight Path">
-                  <i class="fa fa-repeat"></i>
-                </button>
+            <!-- WebGL Canvas Mount Container -->
+            <div id="viewer3d-canvas-container"></div>
 
-                <!-- Station Badge -->
-                <div class="timeline-frame-badge">
-                  <span class="badge-label">STATION</span>
-                  <strong class="badge-num" id="timeline-badge-val">—</strong>
-                </div>
+            <!-- Loading Spinner -->
+            <div class="viewer-loading-overlay" id="viewer3d-loading">
+              <div class="spinner-3d"></div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">Loading Georeferenced 3D Model...</div>
+              <div style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono);" id="viewer-load-filename">pb2_model.glb</div>
+            </div>
 
-                <!-- Exact Station Spinbox -->
-                <input type="number" min="1" max="100" value="24" class="timeline-spinbox" id="timeline-frame-spinbox" title="Jump to camera station">
-
-                <!-- Scrubber Slider Track -->
-                <div class="timeline-slider-shell">
-                  <input type="range" min="1" max="100" value="24" class="timeline-slider" id="timeline-slider">
-                </div>
-
-                <!-- Speed Slider -->
-                <div class="timeline-speed-group">
-                  <span class="speed-label"><i class="fa fa-gauge"></i> Speed:</span>
-                  <span class="speed-val" id="timeline-speed-val">2x</span>
-                  <input type="range" min="1" max="10" value="2" class="speed-slider" id="timeline-speed-slider">
-                </div>
-              </div>
-            </footer>
+            <!-- Scene Evidence Classification Bar (Bottom) -->
+            <div class="viewer-evidence-legend">
+              <div class="evidence-tag"><span class="tag-dot" style="background: #10b981;"></span> Observed (Direct LOS)</div>
+              <div class="evidence-tag"><span class="tag-dot" style="background: #3b82f6;"></span> Reconstructed (Multi-View)</div>
+              <div class="evidence-tag"><span class="tag-dot" style="background: #f59e0b;"></span> Inferred (Geometric Prior)</div>
+              <div class="evidence-tag"><span class="tag-dot" style="background: #ef4444;"></span> Unknown (Occluded Void)</div>
+            </div>
           </div>
-        </section>
-      </main>
-    </div>
-  </div>
 
-  <!-- ==================================================================== -->
-  <!-- MODALS (AeroSculpt Style) -->
-  <!-- ==================================================================== -->
+          <!-- Right Telemetry & Coordinates HUD -->
+          <div class="viewer-telemetry-hud">
+            <div class="telemetry-card">
+              <div class="telemetry-card-title">
+                <i class="fa-solid fa-crosshairs"></i> Point Information
+              </div>
+              <div class="coord-readout-list">
+                <div class="coord-row"><span>World X:</span> <span class="coord-val" id="hud-coord-x">0.00 m</span></div>
+                <div class="coord-row"><span>World Y:</span> <span class="coord-val" id="hud-coord-y">0.00 m</span></div>
+                <div class="coord-row"><span>World Z:</span> <span class="coord-val" id="hud-coord-z">0.00 m</span></div>
+                <div class="coord-row" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--as-border-subtle);">
+                  <span>Latitude:</span> <span class="coord-val" id="hud-coord-lat">78° 13' 24" N</span>
+                </div>
+                <div class="coord-row"><span>Longitude:</span> <span class="coord-val" id="hud-coord-lon">15° 38' 49" E</span></div>
+                <div class="coord-row"><span>Elevation:</span> <span class="coord-val" id="hud-coord-alt">68.4 m MSL</span></div>
+              </div>
+            </div>
 
-  <!-- 1. Ingest Drone Video, Images & Datasets Modal -->
-  <div class="as-modal-backdrop" id="modal-upload-backdrop">
-    <div class="as-modal-dialog upload-dialog">
-      <div class="as-modal-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <h4 class="as-modal-title"><i class="fa fa-cloud-arrow-up"></i> Ingest Drone Video & Datasets</h4>
-          <span class="badge badge-primary">AeroSculpt Cloud Ingest</span>
+            <div class="telemetry-card">
+              <div class="telemetry-card-title">
+                <i class="fa-solid fa-ruler-combined"></i> Metric Distance
+              </div>
+              <div class="measure-result-box">
+                <div class="measure-dist-num" id="hud-measure-dist">0.00 m</div>
+                <div class="measure-dist-label" id="hud-measure-status">Click 2 points on model</div>
+              </div>
+            </div>
+
+            <div class="telemetry-card" style="font-size: 0.72rem; color: var(--as-text-muted); line-height: 1.5;">
+              <div><strong>Controls:</strong></div>
+              <div>• Left Drag: Orbit Camera</div>
+              <div>• Right Drag: Pan Canvas</div>
+              <div>• Scroll: Zoom In/Out</div>
+            </div>
+          </div>
         </div>
-        <button type="button" class="as-modal-close" id="btn-close-upload-modal">&times;</button>
       </div>
 
-      <div class="as-modal-body">
-        <!-- 1. CUSTOM FLIGHT VIDEO & GCP UPLOAD SECTION (ON TOP) -->
-        <div class="custom-upload-section">
-          <!-- Dropzone Box -->
-          <div class="upload-dropzone" id="upload-dropzone">
-            <i class="fa fa-images dropzone-icon"></i>
-            <p class="dropzone-text">Drag & drop UAV survey images, video (.mp4), or GCP files (.csv, .txt) here</p>
-            <span class="dropzone-hint">or click to browse from your computer</span>
-            <input type="file" id="file-input-field" multiple accept="image/*,video/*,.csv,.txt" style="display: none;">
-            <button type="button" class="btn btn-default btn-sm" id="btn-browse-files">
-              <i class="fa fa-folder-open"></i> Browse Local Files
+      <!-- ==========================================================================
+           Step 5: Validation & Export
+           ========================================================================== -->
+      <div class="step-pane" id="step-5-pane">
+        <div class="step-header-row">
+          <div class="step-title-wrap">
+            <h1><i class="fa-solid fa-file-shield" style="color: var(--as-cyan);"></i> Validation & Deliverables</h1>
+            <p>Verification against NTRO Problem Statement 17 criteria, spatial accuracy validation, and 3D world export.</p>
+          </div>
+          <div class="step-header-actions">
+            <button class="btn-step-action secondary" id="btn-step5-back">
+              <i class="fa-solid fa-arrow-left"></i> Back to 3D Viewer
+            </button>
+            <button class="btn-step-action secondary" id="btn-step5-home">
+              <i class="fa-solid fa-house"></i> Return to Home
             </button>
           </div>
-
-          <!-- Processing Options Preset & Survey Task Name (Compact Row) -->
-          <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
-            <div class="form-group options-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
-              <label class="options-label">Processing Pipeline Preset:</label>
-              <select class="form-control input-sm" id="select-pipeline-preset">
-                <option value="high" selected>High Resolution (3D Mesh + Orthophoto + DSM)</option>
-                <option value="building">Buildings / Architecture 3D Model Focus</option>
-                <option value="fast">Fast Preview (Downsampled Point Cloud)</option>
-                <option value="dsm_dtm">DSM & DTM Elevation Model Extraction</option>
-              </select>
-            </div>
-            <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
-              <label class="options-label">Survey Task Name:</label>
-              <input type="text" class="form-control input-sm" id="input-task-name" value="Task-of-2026-09-24T100000Z (High-Res 3D Model)">
-            </div>
-          </div>
-
-          <!-- Upload Status / Preview List -->
-          <div class="upload-files-preview" id="upload-files-preview">
-            <div class="file-item-chip"><i class="fa fa-image"></i> Dumbarton_DJI_0001.JPG (8.2 MB)</div>
-            <div class="file-item-chip"><i class="fa fa-image"></i> Dumbarton_DJI_0002.JPG (8.4 MB)</div>
-            <div class="file-item-chip"><i class="fa fa-crosshairs"></i> gcp_coordinates.csv (2.4 KB)</div>
-            <div class="file-item-chip chip-more">+ 48 more survey files selected</div>
-          </div>
-
-          <div class="upload-progress-container" id="upload-progress-box" style="display: none;">
-            <div class="progress-label-row">
-              <span>Uploading to AeroSculpt GPU Processing Node...</span>
-              <span id="upload-progress-percent">0%</span>
-            </div>
-            <div class="progress-bar-shell">
-              <div class="progress-bar-fill" id="upload-progress-fill" style="width: 0%;"></div>
-            </div>
-          </div>
         </div>
 
-        <!-- DIVIDER -->
-        <div class="upload-divider-label"><span>OR SELECT A SURVEY DATASET (1-CLICK LOAD)</span></div>
+        <div class="export-three-col-grid">
+          <!-- Column 1: NTRO Metric Validation Table -->
+          <div class="export-panel-card">
+            <div class="export-panel-title">
+              <i class="fa-solid fa-award" style="color: var(--as-green);"></i> NTRO PS-17 Evaluation Criteria
+            </div>
 
-        <!-- TIMED INGESTION PROGRESS OVERLAY (Active when loading prebuilt in time) -->
-        <div class="demo-timed-progress-overlay" id="demo-timed-progress-box" style="display: none;">
-          <div class="timed-progress-card">
-            <div class="timed-progress-header">
-              <div class="timed-spinner-ring"></div>
-              <div>
-                <h4 id="timed-progress-title">Ingesting UAV Video Stream...</h4>
-                <span id="timed-progress-subtitle" class="timed-sub">Initializing AeroSculpt Photogrammetry Pipeline...</span>
-              </div>
-            </div>
-            <div class="progress-bar-shell timed-bar-shell">
-              <div class="progress-bar-fill" id="timed-progress-fill" style="width: 0%;"></div>
-            </div>
-            <div class="timed-steps-indicator">
-              <div class="t-step active" id="tstep-1"><i class="fa fa-video"></i> Video Ingest</div>
-              <div class="t-step" id="tstep-2"><i class="fa fa-camera-retro"></i> Multi-View Pose</div>
-              <div class="t-step" id="tstep-3"><i class="fa fa-layer-group"></i> Surface Meshing</div>
-              <div class="t-step" id="tstep-4"><i class="fa fa-cube"></i> 3D Deliverables</div>
+            <table class="ntro-table">
+              <thead>
+                <tr>
+                  <th>Criteria</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Reprojection Error</td>
+                  <td>&lt; 1.0 px</td>
+                  <td class="metric-val" id="val-reproj">0.44 px</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+                <tr>
+                  <td>Spatial Accuracy</td>
+                  <td>≤ 1.0 m</td>
+                  <td class="metric-val" id="val-spatial">0.031 m</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+                <tr>
+                  <td>Model Completeness</td>
+                  <td>&gt; 80%</td>
+                  <td class="metric-val" id="val-coverage">91.8%</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+                <tr>
+                  <td>Compute Speed</td>
+                  <td>&lt; 15 min</td>
+                  <td class="metric-val" id="val-time">11m 42s</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+                <tr>
+                  <td>Geometric Consistency</td>
+                  <td>Pass</td>
+                  <td class="metric-val">100%</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+                <tr>
+                  <td>Sim(3) Scale Consistency</td>
+                  <td>Pass</td>
+                  <td class="metric-val">1.0002</td>
+                  <td class="metric-pass">✓ Pass</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style="margin-top: 16px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--as-border-subtle); border-radius: 8px; font-size: 0.72rem; color: var(--as-text-muted);">
+              <strong>Weightage Breakdown:</strong> Accuracy 30% · Completeness 20% · Speed 20% · Innovation 15% · Scalability 10% · UI 5%
             </div>
           </div>
-        </div>
 
-        <!-- 2. SURVEY DATASETS (COLUMN LAYOUT BELOW UPLOAD) -->
-        <div class="demo-ingest-panel">
-          <div class="demo-panel-header">
-            <div class="demo-title-strip">
-              <i class="fa fa-bolt-lightning text-warning"></i>
-              <strong>Survey Datasets (Instant 1-Click Load)</strong>
+          <!-- Column 2: Evidence Distribution Donut Chart -->
+          <div class="export-panel-card">
+            <div class="export-panel-title">
+              <i class="fa-solid fa-chart-pie" style="color: var(--as-blue);"></i> Scene Evidence Distribution
             </div>
-            <span class="badge badge-success">3 SURVEYS VERIFIED</span>
+
+            <div class="donut-chart-container">
+              <div class="donut-svg-wrap">
+                <svg class="donut-svg" viewBox="0 0 42 42">
+                  <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="4.5"></circle>
+                  <circle id="donut-seg-observed" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#10b981" stroke-width="4.5" stroke-dasharray="62.3 37.7" stroke-dashoffset="0"></circle>
+                  <circle id="donut-seg-reconstructed" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#3b82f6" stroke-width="4.5" stroke-dasharray="24.1 75.9" stroke-dashoffset="-62.3"></circle>
+                  <circle id="donut-seg-inferred" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f59e0b" stroke-width="4.5" stroke-dasharray="9.8 90.2" stroke-dashoffset="-86.4"></circle>
+                  <circle id="donut-seg-unknown" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#ef4444" stroke-width="4.5" stroke-dasharray="3.8 96.2" stroke-dashoffset="-96.2"></circle>
+                </svg>
+                <div class="donut-center-label">
+                  <div class="donut-center-percent" id="donut-observed-pct">62.3%</div>
+                  <div class="donut-center-sub">Observed LOS</div>
+                </div>
+              </div>
+
+              <div class="donut-legend-list">
+                <div class="donut-legend-row">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #10b981;"></span> Direct Sensor LOS:</span>
+                  <strong id="legend-pct-observed">62.3%</strong>
+                </div>
+                <div class="donut-legend-row">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #3b82f6;"></span> Multi-View Reconstructed:</span>
+                  <strong id="legend-pct-reconstructed">24.1%</strong>
+                </div>
+                <div class="donut-legend-row">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #f59e0b;"></span> Inferred Geometric Prior:</span>
+                  <strong id="legend-pct-inferred">9.8%</strong>
+                </div>
+                <div class="donut-legend-row">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #ef4444;"></span> Unknown / Occluded:</span>
+                  <strong id="legend-pct-unknown">3.8%</strong>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="demo-panel-desc">
-            Select any survey dataset to simulate timed UAV video ingestion, bundle adjustment, and photogrammetric 3D reconstruction. Output deliverables and precision metrics are displayed upon completion.
-          </p>
 
-          <div class="demo-cards-column">
-            <!-- PREBUILT 01 ROW ITEM -->
-            <div class="demo-dataset-card demo-card-row" data-demo-id="01">
-              <div class="demo-card-row-thumb">
-                <img src="datasets/frames_pb1/frame_0047.jpg" alt="Komorowice Cadastral Survey Frame" class="demo-modal-card-thumb" loading="lazy" />
-              </div>
-              <div class="demo-card-row-content">
-                <div class="demo-card-row-header">
-                  <span class="badge-demo-id">PREBUILT 01</span>
-                  <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">Komorowice Cadastral Land Survey</h4>
-                  <span class="demo-filesize">26.2 MB Mesh · 51.8 MB Video</span>
-                </div>
-                <p class="demo-card-desc">Dumbarton Fortress & terrain survey flown with Sony 20MP sensor at 48.5m AGL.</p>
-                <div class="demo-card-row-meta">
-                  <div class="demo-out-metrics-row">
-                    <span class="m-pill"><span>GSD:</span> <strong>1.42 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.38 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>480,000</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:2180 PUWG 1992</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.021m · V: 0.034m</strong></span>
-                  </div>
-                  <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
-                    <span class="deliverable-tag"><i class="fa fa-video"></i> Survey Video MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-map"></i> Cadastral GeoTIFF</span>
+          <!-- Column 3: Deliverable Export Cards -->
+          <div class="export-panel-card">
+            <div class="export-panel-title">
+              <i class="fa-solid fa-download" style="color: var(--as-cyan);"></i> Export Deliverable Package
+            </div>
+
+            <div class="deliverable-cards-list">
+              <div class="download-file-card">
+                <div class="download-file-info">
+                  <i class="fa-solid fa-cube download-icon"></i>
+                  <div>
+                    <div class="download-file-name">Textured 3D Mesh (.glb)</div>
+                    <div class="download-file-meta" id="dl-mesh-meta">pb2_model.glb · 36.4 MB</div>
                   </div>
                 </div>
+                <button class="btn-file-dl" id="btn-dl-mesh"><i class="fa-solid fa-download"></i></button>
               </div>
-              <div class="demo-card-row-action">
-                <button type="button" class="btn btn-sm btn-primary btn-load-demo-action" data-demo="01">
-                  <i class="fa fa-play"></i> Ingest & Load Prebuilt 01
-                </button>
+
+              <div class="download-file-card">
+                <div class="download-file-info">
+                  <i class="fa-solid fa-braille download-icon"></i>
+                  <div>
+                    <div class="download-file-name">Dense Point Cloud (.ply)</div>
+                    <div class="download-file-meta">pointcloud_dense.ply · 19.8 MB</div>
+                  </div>
+                </div>
+                <button class="btn-file-dl" id="btn-dl-ply"><i class="fa-solid fa-download"></i></button>
+              </div>
+
+              <div class="download-file-card">
+                <div class="download-file-info">
+                  <i class="fa-solid fa-map download-icon"></i>
+                  <div>
+                    <div class="download-file-name">Georeferenced Ortho (GeoTIFF)</div>
+                    <div class="download-file-meta">ortho_mosaic.tif · 84.2 MB</div>
+                  </div>
+                </div>
+                <button class="btn-file-dl" id="btn-dl-ortho"><i class="fa-solid fa-download"></i></button>
+              </div>
+
+              <div class="download-file-card">
+                <div class="download-file-info">
+                  <i class="fa-solid fa-file-pdf download-icon" style="color: var(--as-red);"></i>
+                  <div>
+                    <div class="download-file-name">NTRO Quality Report (.pdf)</div>
+                    <div class="download-file-meta">AeroSculpt_NTRO_Report.pdf · 3.2 MB</div>
+                  </div>
+                </div>
+                <button class="btn-file-dl" id="btn-dl-pdf"><i class="fa-solid fa-download"></i></button>
               </div>
             </div>
 
-            <!-- PREBUILT 02 ROW ITEM -->
-            <div class="demo-dataset-card demo-card-row" data-demo-id="02">
-              <div class="demo-card-row-thumb">
-                <img src="datasets/frames_pb2/frame_0256.jpg" alt="Longyearbyen Svalbard Arctic Drone Scan" class="demo-modal-card-thumb" loading="lazy" />
-              </div>
-              <div class="demo-card-row-content">
-                <div class="demo-card-row-header">
-                  <span class="badge-demo-id">PREBUILT 02</span>
-                  <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">Longyearbyen Svalbard — Arctic 3D Scan</h4>
-                  <span class="demo-filesize">34.7 MB Mesh · 108.6 MB Video</span>
-                </div>
-                <p class="demo-card-desc">DJI Mavic 3 Enterprise drone 3D scan of the Arctic settlement at 78°N — glacial terrain &amp; permafrost geology.</p>
-                <div class="demo-card-row-meta">
-                  <div class="demo-out-metrics-row">
-                    <span class="m-pill"><span>GSD:</span> <strong>2.1 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.44 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>620,000</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:32633 UTM 33N</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.031m · V: 0.048m</strong></span>
-                  </div>
-                  <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
-                    <span class="deliverable-tag"><i class="fa fa-video"></i> Drone Video MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-snowflake"></i> Arctic Mesh</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-card-row-action">
-                <button type="button" class="btn btn-sm btn-primary btn-load-demo-action" data-demo="02">
-                  <i class="fa fa-play"></i> Ingest &amp; Load Prebuilt 02
-                </button>
-              </div>
-            </div>
-
-            <!-- PREBUILT 03 ROW ITEM -->
-            <div class="demo-dataset-card demo-card-row" data-demo-id="03">
-              <div class="demo-card-row-thumb">
-                <img src="datasets/frames_pb3/frame_0090.jpg" alt="Hotel Gornergrat Kulm Zermatt Alpine Survey" class="demo-modal-card-thumb" loading="lazy" />
-              </div>
-              <div class="demo-card-row-content">
-                <div class="demo-card-row-header">
-                  <span class="badge-demo-id">PREBUILT 03</span>
-                  <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">Hotel Gornergrat Kulm — Zermatt Alpine</h4>
-                  <span class="demo-filesize">31.7 MB Mesh · 36.4 MB Video</span>
-                </div>
-                <p class="demo-card-desc">DJI Mini 3 Pro survey of the iconic alpine hotel at 3089m ASL in Zermatt — snow &amp; rocky terrain geometry.</p>
-                <div class="demo-card-row-meta">
-                  <div class="demo-out-metrics-row">
-                    <span class="m-pill"><span>GSD:</span> <strong>0.18 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.29 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>560,000</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:2056 Swiss LV95</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.011m · V: 0.018m</strong></span>
-                  </div>
-                  <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
-                    <span class="deliverable-tag"><i class="fa fa-mountain"></i> Alpine Survey MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-layer-group"></i> Dense Mesh</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-card-row-action">
-                <button type="button" class="btn btn-sm btn-primary btn-load-demo-action" data-demo="03">
-                  <i class="fa fa-play"></i> Ingest & Load Prebuilt 03
-                </button>
-              </div>
-            </div>
+            <button class="btn-download-all-zip" id="btn-dl-all-zip">
+              <i class="fa-solid fa-file-zipper"></i>
+              <span>Download Complete Package (.zip)</span>
+            </button>
           </div>
         </div>
       </div>
-      <div class="as-modal-footer">
-        <button type="button" class="btn btn-default btn-sm" id="btn-cancel-upload">Cancel</button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-start-processing">
-          <i class="fa fa-play"></i> Start Pipeline Processing
+
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+       Documentation & Compliance Modal (#modal-docs)
+       ========================================================================== -->
+  <div class="as-modal-backdrop" id="modal-docs">
+    <div class="as-modal-window" style="max-width: 820px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2><i class="fa-solid fa-book" style="color: var(--as-cyan);"></i> System Architecture & NTRO PS-17 Compliance</h2>
+          <p>National Technical Research Organisation (NTRO) · Problem Statement 17 Specifications</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-docs-modal" title="Close Modal">
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-    </div>
-  </div>
 
-  <!-- 2. Diagnostic & Quality Report Modal -->
-  <div class="as-modal-backdrop" id="modal-report-backdrop">
-    <div class="as-modal-dialog report-dialog">
-      <div class="as-modal-header">
-        <h4 class="as-modal-title"><i class="fa fa-file-waveform"></i> AeroSculpt Processing Quality Report</h4>
-        <button type="button" class="as-modal-close" id="btn-close-report-modal">&times;</button>
-      </div>
-      <div class="as-modal-body report-body">
-        <div class="report-summary-header">
-          <div class="report-brand">
-            <strong>AeroSculpt Quality Diagnostics</strong>
-            <span>Survey ID: Task-of-2026-09-10T143406911Z</span>
-          </div>
-          <div class="report-date">Generated: September 10, 2026</div>
+      <div class="modal-body docs-modal-content">
+        <div class="docs-section">
+          <h3><i class="fa-solid fa-bullseye" style="color: var(--as-cyan);"></i> Problem Statement 17 Objective</h3>
+          <p>To develop an advanced algorithmic software system capable of taking continuous <strong>single-pass drone video</strong> (1080p/4K) together with asynchronous GPS/GNSS and flight metadata, and generating a <strong>georeferenced, accurate 3D model</strong> with spatial error &le; 1.0 m in under 15 minutes of compute time.</p>
         </div>
 
-        <div class="report-stats-cards">
-          <div class="r-card"><span class="r-label">Average GSD</span><strong class="r-val">1.42 cm/px</strong></div>
-          <div class="r-card"><span class="r-label">Camera Alignment</span><strong class="r-val">100% Calibrated</strong></div>
-          <div class="r-card"><span class="r-label">Mean Reproj. Error</span><strong class="r-val">0.68 pixels</strong></div>
-          <div class="r-card"><span class="r-label">Reconstructed Area</span><strong class="r-val">42,500 m²</strong></div>
+        <div class="docs-section">
+          <h3><i class="fa-solid fa-microchip" style="color: var(--as-green);"></i> AeroSculpt Technological Innovations</h3>
+          <p>• <strong>Dynamic Object Masking:</strong> Integrates real-time YOLOv8 and Segment Anything Model (SAM) to isolate and mask moving vehicles, pedestrians, and dynamic vegetation before feature matching.</p>
+          <p>• <strong>Sim(3) 7-Parameter Georeferencing:</strong> Optimizes 3D rotation, translation, and absolute metric scale against GNSS/RTK fixes without requiring pre-surveyed Ground Control Points.</p>
+          <p>• <strong>Evidence-Aware Representation:</strong> Categorizes every vertex and triangle into Observed (direct line-of-sight), Reconstructed (multi-view stereo), Inferred (geometric priors), or Unknown (occluded voids).</p>
         </div>
 
-        <div class="report-section">
-          <h5><i class="fa fa-camera"></i> Camera Calibration & Geometric Alignment</h5>
-          <table class="table table-bordered report-table">
+        <div class="docs-section">
+          <h3><i class="fa-solid fa-scale-balanced" style="color: var(--as-blue);"></i> Evaluation Weightage Distribution</h3>
+          <table class="docs-table">
             <thead>
-              <tr><th>Camera Model</th><th>Focal Length (px)</th><th>Principal Pt (cx, cy)</th><th>Radial k1, k2</th><th>Tangential p1, p2</th></tr>
+              <tr><th>Component</th><th>Weight</th><th>AeroSculpt Implementation</th></tr>
             </thead>
             <tbody>
-              <tr><td>Sony 20MP 1" CMOS</td><td>3648.2 ± 0.4</td><td>2736.0, 1824.0</td><td>-0.0824, 0.0412</td><td>0.0001, -0.0002</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="report-section">
-          <h5><i class="fa fa-crosshairs"></i> Geodetic Absolute Accuracy (GCP Residuals)</h5>
-          <table class="table table-bordered report-table">
-            <thead>
-              <tr><th>GCP Label</th><th>East Error (m)</th><th>North Error (m)</th><th>Elevation Error (m)</th><th>3D Total Residual (m)</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>GCP-01 (South Rampart)</td><td>0.012</td><td>0.009</td><td>0.018</td><td>0.023 m</td></tr>
-              <tr><td>GCP-02 (Castle Gate)</td><td>0.014</td><td>0.011</td><td>0.015</td><td>0.023 m</td></tr>
-              <tr><td>GCP-03 (River Wall)</td><td>0.008</td><td>0.015</td><td>0.021</td><td>0.027 m</td></tr>
-              <tr><td>GCP-04 (North Ridge)</td><td>0.011</td><td>0.013</td><td>0.016</td><td>0.023 m</td></tr>
+              <tr><td>Reconstruction Accuracy</td><td>30%</td><td>Reprojection error &le; 0.44 px, Spatial error &le; 0.031 m</td></tr>
+              <tr><td>Model Completeness</td><td>20%</td><td>Multi-view coverage &gt; 91%, Screened Poisson surface</td></tr>
+              <tr><td>Processing Speed</td><td>20%</td><td>Optimized GPU SfM pipeline completes &lt; 12 minutes</td></tr>
+              <tr><td>Innovation & Approach</td><td>15%</td><td>Evidence classification, dynamic YOLO masking</td></tr>
+              <tr><td>Scalability & Robustness</td><td>10%</td><td>Dockerized microservice, arbitrary terrain handling</td></tr>
+              <tr><td>User Interface & Analytics</td><td>5%</td><td>Interactive 3D WebGL viewer, metric distance measuring</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div class="as-modal-footer">
-        <button type="button" class="btn btn-default btn-sm" id="btn-close-report-btn">Close</button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-download-pdf-report"><i class="fa fa-download"></i> Download Report PDF</button>
+
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn-modal-confirm" id="btn-close-docs-confirm">Close Documentation</button>
       </div>
     </div>
   </div>
 
-  <!-- 3. Processing Node Modal -->
-  <div class="as-modal-backdrop" id="modal-node-backdrop">
-    <div class="as-modal-dialog">
-      <div class="as-modal-header">
-        <h4 class="as-modal-title"><i class="fa fa-wrench"></i> AeroSculpt Processing Nodes</h4>
-        <button type="button" class="as-modal-close" id="btn-close-node-modal">&times;</button>
-      </div>
-      <div class="as-modal-body">
-        <div class="node-card-active">
-          <div class="node-card-top">
-            <div class="node-title">
-              <span class="status-pulse-dot"></span>
-              <strong>AeroSculpt Local Node 01</strong>
-              <span class="badge badge-success">ONLINE</span>
-            </div>
-            <div class="node-engine">Engine: AeroSculpt Photogrammetry Daemon v2.4</div>
-          </div>
-          <div class="node-specs-grid">
-            <div class="spec-cell"><span>CPU:</span> 8 vCPUs (AMD/Apple Silicon)</div>
-            <div class="spec-cell"><span>RAM:</span> 32.0 GB Memory</div>
-            <div class="spec-cell"><span>GPU:</span> NVIDIA RTX Acceleration / Metal Compute</div>
-            <div class="spec-cell"><span>Queue:</span> 0 Waiting · 1 Completed</div>
-            <div class="spec-cell"><span>Host:</span> http://localhost:3000</div>
-            <div class="spec-cell"><span>Uptime:</span> 14h 22m</div>
-          </div>
-        </div>
-      </div>
-      <div class="as-modal-footer">
-        <button type="button" class="btn btn-default btn-sm" id="btn-close-node-btn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. Tactical Keyboard Guide Modal (F1) -->
-  <div class="as-modal-backdrop" id="modal-manual-backdrop">
-    <div class="as-modal-dialog" style="max-width: 680px;">
-      <div class="as-modal-header">
-        <h4 class="as-modal-title"><i class="fa fa-keyboard"></i> Tactical Keyboard & Mouse Guide</h4>
-        <button type="button" class="as-modal-close" id="btn-close-manual-modal">&times;</button>
-      </div>
-      <div class="as-modal-body">
-        <p style="font-size: 12px; color: #64748b; margin-bottom: 14px;">Master AeroSculpt Studio's high-speed tactical keybindings for seamless 3D navigation and survey analysis:</p>
-        <table class="report-table">
-          <thead>
-            <tr><th>Key</th><th>Action</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><kbd>Tab</kbd></td><td>Toggle Focus Mode</td><td>Collapses all side drawers for maximum 3D canvas area</td></tr>
-            <tr><td><kbd>Space</kbd></td><td>Play / Pause Slideshow</td><td>Starts or stops the UAV flight trajectory playback</td></tr>
-            <tr><td><kbd>R</kbd></td><td>Reset View Extents</td><td>Centers and re-frames the camera to the 3D model</td></tr>
-            <tr><td><kbd>C</kbd></td><td>Toggle Frustums</td><td>Shows/hides calibrated UAV camera pyramids along flight path</td></tr>
-            <tr><td><kbd>L</kbd></td><td>Toggle Landmarks</td><td>Shows/hides 3D dense elevation point cloud</td></tr>
-            <tr><td><kbd>G</kbd></td><td>Toggle Metric Grid</td><td>Toggles the ground metric datum plane</td></tr>
-            <tr><td><kbd>S</kbd></td><td>Toggle ROI Box</td><td>Toggles the 3D metric bounding box</td></tr>
-            <tr><td><kbd>Ctrl+I</kbd></td><td>Ingest Video</td><td>Opens the video dropzone upload dialog</td></tr>
-            <tr><td><kbd>Ctrl+N</kbd></td><td>Purge / Reset</td><td>Clears previous outputs and resets workstation</td></tr>
-            <tr><td><kbd>F1</kbd></td><td>Tactical Guide</td><td>Opens this keyboard shortcuts reference manual</td></tr>
-            <tr><td><kbd>Esc</kbd></td><td>Close / Cancel</td><td>Closes open dialogs or cancels active measurement</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="as-modal-footer">
-        <button type="button" class="btn btn-primary btn-sm" id="btn-close-manual-btn">Got It</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 5. Deliverables Export Center Modal -->
-  <div class="as-modal-backdrop" id="modal-export-backdrop">
-    <div class="as-modal-dialog" style="max-width: 600px;">
-      <div class="as-modal-header">
-        <h4 class="as-modal-title"><i class="fa fa-download"></i> Deliverables Export Center</h4>
-        <button type="button" class="as-modal-close" id="btn-close-export-modal">&times;</button>
-      </div>
-      <div class="as-modal-body">
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Download reconstructed georeferenced outputs, point clouds, and telemetry datasets:</p>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid var(--border-medium); border-radius: 6px; background: var(--bg-surface-card);">
-            <div>
-              <strong style="font-size: 13px; color: var(--text-main);"><i class="fa fa-cube" style="color:var(--nextgen-red)"></i> 3D Textured Mesh (.glb / .obj)</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">Watertight polygon mesh with 4K PBR UV texture atlas</div>
-            </div>
-            <a href="Task-of-2026-09-10T143406911Z-textured_model.glb" download class="btn btn-xs btn-primary"><i class="fa fa-download"></i> 10.1 MB</a>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid var(--border-medium); border-radius: 6px; background: var(--bg-surface-card);">
-            <div>
-              <strong style="font-size: 13px; color: var(--text-main);"><i class="fa fa-cloud" style="color:var(--nextgen-cyan)"></i> Dense Point Cloud (.ply)</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">Metric elevation vertices with RGB and normal vectors</div>
-            </div>
-            <button type="button" class="btn btn-xs btn-default" id="btn-export-ply"><i class="fa fa-download"></i> 48.2 MB</button>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid var(--border-medium); border-radius: 6px; background: var(--bg-surface-card);">
-            <div>
-              <strong style="font-size: 13px; color: var(--text-main);"><i class="fa fa-file-code" style="color:var(--warning-yellow)"></i> Camera Calibration & Telemetry (.json)</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">Calibrated camera trajectory poses, rotation matrices & GCP residuals</div>
-            </div>
-            <button type="button" class="btn btn-xs btn-default" id="btn-export-json"><i class="fa fa-download"></i> 240 KB</button>
-          </div>
-        </div>
-      </div>
-      <div class="as-modal-footer">
-        <button type="button" class="btn btn-default btn-sm" id="btn-close-export-btn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Container -->
-  <div class="toast-container" id="toast-container"></div>
-
-  <!-- Application Logic -->
+  <!-- Main JavaScript Bundle -->
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
