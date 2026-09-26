@@ -26,7 +26,7 @@ export const DEMO_DATASETS = {
     maxFrames: 94,
     format: 'pb1_model.glb',
     rotationY: 0,
-    rotX: -Math.PI / 2,
+    rotX: 0,
     scaleFactor: 1.0,
     fileSize: '26.2 MB',
     videoSize: '51.8 MB',
@@ -57,7 +57,7 @@ export const DEMO_DATASETS = {
     maxFrames: 513,
     format: 'pb2_model.glb',
     rotationY: 0,
-    rotX: -Math.PI / 2,
+    rotX: 0,
     scaleFactor: 1.0,
     fileSize: '34.7 MB',
     videoSize: '108.6 MB',
@@ -88,7 +88,7 @@ export const DEMO_DATASETS = {
     maxFrames: 181,
     format: 'pb3_model.glb',
     rotationY: 0,
-    rotX: -Math.PI / 2,
+    rotX: 0,
     scaleFactor: 1.0,
     fileSize: '31.7 MB',
     videoSize: '36.4 MB',
@@ -1872,13 +1872,13 @@ class AeroSculptApp {
       });
     });
 
-    // 4. Set initial active dataset to 01
+    // 4. Set initial active dataset metadata (NO model preload - user must click)
     setTimeout(() => {
-      this.selectDatasetOnDashboard('01', false);
+      this.selectDatasetOnDashboard('02', false, true);
     }, 100);
   }
 
-  selectDatasetOnDashboard(demoId, showToast = true) {
+  selectDatasetOnDashboard(demoId, showToast = true, metaOnlyNoModel = false) {
     const dataset = DEMO_DATASETS[demoId];
     if (!dataset) return;
     this.currentDemoId = demoId;
@@ -1897,14 +1897,17 @@ class AeroSculptApp {
     const modelCardTitle = document.getElementById('model-card-title');
     if (modelCardTitle) modelCardTitle.textContent = dataset.name;
 
-    // 3. Load 3D Model into Viewport
-    if (this.viewer3d) {
+    // 3. Load 3D Model into Viewport (skip on initial meta-only call)
+    if (!metaOnlyNoModel && this.viewer3d) {
       this.viewer3d.loadModel(
         dataset.modelUrl,
         dataset.rotationY || 0,
         dataset.scaleFactor || 1,
         dataset.rotX !== undefined ? dataset.rotX : -Math.PI / 2
       );
+    } else if (metaOnlyNoModel && this.viewer3d) {
+      // Show empty placeholder state - no model loaded
+      this.viewer3d.showEmptyState && this.viewer3d.showEmptyState();
     }
 
     // 4. Update HUD Overlays (polygons / vertices)

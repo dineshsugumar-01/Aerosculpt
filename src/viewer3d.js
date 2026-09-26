@@ -72,12 +72,8 @@ export class AeroSculptViewer {
     this.grid.material.transparent = true;
     this.scene.add(this.grid);
 
-    // 7. Load Reconstructed GLB Model
-    const baseUrl = import.meta.env.BASE_URL || './';
-    const modelPath = baseUrl.endsWith('/')
-      ? `${baseUrl}Task-of-2026-09-10T143406911Z-textured_model.glb`
-      : `${baseUrl}/Task-of-2026-09-10T143406911Z-textured_model.glb`;
-    this.loadModel(modelPath);
+    // 7. Show empty state on init — model loads only when user selects a dataset
+    this.showEmptyState();
 
     // 8. Event Listeners & Resize Observer
     window.addEventListener('resize', () => this.onWindowResize());
@@ -108,7 +104,59 @@ export class AeroSculptViewer {
     this.scene.add(underLight);
   }
 
+  // Show clean empty viewport — no model loaded, grid only
+  showEmptyState() {
+    // Remove any existing model
+    const toRemove = [];
+    this.scene.children.forEach(child => {
+      if (child.name === 'TerrainModelContainer' || child === this.modelContainer || child === this.model) {
+        toRemove.push(child);
+      }
+    });
+    toRemove.forEach(obj => this.scene.remove(obj));
+    this.modelContainer = null;
+    this.model = null;
+    this.isLoaded = false;
+
+    // Reset camera to clean overhead angle
+    this.camera.position.set(0, 35, 55);
+    if (this.controls) {
+      this.controls.target.set(0, 0, 0);
+      this.controls.update();
+    }
+
+    // Hide loader overlay if visible
+    const loaderOverlay = document.getElementById('model-loader');
+    if (loaderOverlay) {
+      loaderOverlay.style.display = 'none';
+    }
+
+    // Show empty state HUD
+    const canvas = this.renderer ? this.renderer.domElement : null;
+    if (canvas) {
+      // Remove any previous empty-state overlay
+      const prev = canvas.parentElement && canvas.parentElement.querySelector('.viewer-empty-state');
+      if (prev) prev.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'viewer-empty-state';
+      overlay.innerHTML = `
+        <div class="viewer-empty-inner">
+          <i class="fa fa-cube fa-2x" style="color:#3b82f6;margin-bottom:10px;animation:pulse 2s infinite;"></i>
+          <div style="font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">No Dataset Loaded</div>
+          <div style="font-size:11px;color:#64748b;">Click <strong style="color:#3b82f6">Ingest Video</strong> to load a prebuild dataset</div>
+        </div>`;
+      overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;background:rgba(10,13,20,0.5);border-radius:inherit;';
+      if (canvas.parentElement) canvas.parentElement.style.position = 'relative';
+      if (canvas.parentElement) canvas.parentElement.appendChild(overlay);
+    }
+  }
+
   loadModel(url, rotationY = 0, scaleFactor = 1, rotX = -Math.PI / 2) {
+    // Remove empty state overlay if present
+    const emptyOverlay = this.container && this.container.querySelector('.viewer-empty-state');
+    if (emptyOverlay) emptyOverlay.remove();
+
     this.currentLoadId = (this.currentLoadId || 0) + 1;
     const loadId = this.currentLoadId;
 
