@@ -1872,10 +1872,10 @@ class AeroSculptApp {
       });
     });
 
-    // 4. Set initial active dataset metadata (NO model preload - user must click)
+    // 4. Auto-load PB2 (Svalbard) into dashboard 3D viewer on startup
     setTimeout(() => {
-      this.selectDatasetOnDashboard('02', false, true);
-    }, 100);
+      this.selectDatasetOnDashboard('02', false, false);
+    }, 300);
   }
 
   selectDatasetOnDashboard(demoId, showToast = true, metaOnlyNoModel = false) {
