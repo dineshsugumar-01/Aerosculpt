@@ -1,5 +1,5 @@
 // AeroSculpt Central Mission Store
-// Houses datasets and technical metrics aligned with NTRO Problem Statement 17
+// Houses datasets and technical photogrammetry metrics
 
 export const MISSIONS = {
   pb2: {

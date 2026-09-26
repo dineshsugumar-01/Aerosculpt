@@ -1,11 +1,11 @@
-// AeroSculpt NTRO Main Application Controller v4.0
+// AeroSculpt Main Application Controller v4.0
 // Exact Implementation of 6-Panel Design Reference:
 // Screen 01: Mission Home / Landing Page
 // Screen 02: Upload & Configuration
 // Screen 03: Input Validation (Dynamic Trajectory & Quality Checks)
 // Screen 04: Processing Pipeline (7 Stages, Differentiated Keyframes, SAM Tiles)
 // Screen 05: 3D Viewer & Analysis (Auto-Fit GLB, Flat on Y=0, Compass, Raycaster Measurement)
-// Screen 06: Validation & Export (NTRO Metric Table, SVG Donut Chart, Downloads)
+// Screen 06: Validation & Export (Metric Table, SVG Donut Chart, Downloads)
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
