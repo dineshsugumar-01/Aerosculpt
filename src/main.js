@@ -293,24 +293,118 @@ class AeroSculptApp {
   // ==========================================================================
   // 4. Screen 02: Upload & Configuration Events
   // ==========================================================================
+  // 4. Screen 02: Upload & Configuration Events
+  // ==========================================================================
   initScreen02Events() {
-    // Scene Type Buttons
-    const sceneTypes = ['urban', 'rural', 'mountain', 'coastal'];
-    sceneTypes.forEach(type => {
-      const btn = document.getElementById(`scene-type-${type}`);
-      btn?.addEventListener('click', () => {
-        sceneTypes.forEach(t => document.getElementById(`scene-type-${t}`)?.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-
-    // Reconstruction Mode Buttons
+    // Reconstruction Mode (Auto) Selection (Scene Type Removed as Requested)
     const modes = ['easy', 'medium', 'hard'];
     modes.forEach(mode => {
       const btn = document.getElementById(`mode-${mode}`);
       btn?.addEventListener('click', () => {
         modes.forEach(m => document.getElementById(`mode-${m}`)?.classList.remove('active'));
         btn.classList.add('active');
+      });
+    });
+
+    // File Input for UAV Video Ingestion
+    const fileInput = document.getElementById('uav-video-file-input');
+    const btnBrowse = document.getElementById('btn-browse-trigger');
+    const dropzone = document.getElementById('uav-upload-zone');
+    const videoPreview = document.getElementById('file-video-preview');
+    const btnReset = document.getElementById('btn-reset-video');
+
+    btnBrowse?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput?.click();
+    });
+
+    const handleVideoFile = (file) => {
+      if (!file || !file.type.startsWith('video/')) {
+        alert('Please select a valid UAV video file (MP4, MOV, MKV, AVI).');
+        return;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      if (videoPreview) {
+        videoPreview.src = objectUrl;
+        videoPreview.load();
+        videoPreview.play().catch(() => {});
+      }
+      const nameElem = document.getElementById('card-val-video-name');
+      if (nameElem) nameElem.textContent = file.name;
+
+      const sizeElem = document.getElementById('chip-size');
+      if (sizeElem) sizeElem.textContent = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+
+      if (btnReset) btnReset.style.display = 'inline-flex';
+
+      // Read metadata once video is loaded
+      videoPreview?.addEventListener('loadedmetadata', () => {
+        const durSec = Math.round(videoPreview.duration) || 300;
+        const m = Math.floor(durSec / 60);
+        const s = durSec % 60;
+        const durFormatted = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        
+        const durElem = document.getElementById('chip-dur');
+        if (durElem) durElem.textContent = durFormatted;
+
+        const resElem = document.getElementById('chip-res');
+        if (resElem) resElem.textContent = `${videoPreview.videoWidth}×${videoPreview.videoHeight} FHD`;
+
+        const statDur = document.getElementById('stat-duration');
+        if (statDur) statDur.textContent = `${durFormatted} (${durSec} s)`;
+
+        const statRes = document.getElementById('stat-res');
+        if (statRes) statRes.textContent = `${videoPreview.videoWidth} × ${videoPreview.videoHeight}`;
+
+        // Compute estimated processing time based on user rule:
+        // ~5 min video -> ~5 min process; ~10 min video -> ~15 min process
+        const estSec = durSec <= 360 ? Math.round(durSec * 0.98) : Math.round(durSec * 1.5);
+        const em = Math.floor(estSec / 60);
+        const es = estSec % 60;
+        const estStr = `${String(em).padStart(2, '0')}m ${String(es).padStart(2, '0')}s (GPU Accelerated)`;
+        const statProc = document.getElementById('stat-est-proc');
+        if (statProc) statProc.textContent = estStr;
+      }, { once: true });
+    };
+
+    fileInput?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) handleVideoFile(file);
+    });
+
+    // Drag and Drop
+    dropzone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+    dropzone?.addEventListener('dragleave', () => {
+      dropzone.classList.remove('drag-over');
+    });
+    dropzone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleVideoFile(file);
+    });
+
+    // Reset button
+    btnReset?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mission = this.store.getMission();
+      if (videoPreview) {
+        videoPreview.src = mission.videoUrl;
+        videoPreview.load();
+        videoPreview.play().catch(() => {});
+      }
+      btnReset.style.display = 'none';
+      this.hydrateMissionData(mission);
+    });
+
+    // Pre-built mission cards 1-click instant load
+    ['pb2', 'pb1', 'pb3'].forEach(id => {
+      const card = document.getElementById(`prebuilt-card-${id}`);
+      card?.addEventListener('click', () => {
+        this.switchMission(id);
       });
     });
 
@@ -424,82 +518,308 @@ class AeroSculptApp {
   }
 
   drawFlightPath(ctx, canvas, pts, progress) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
 
-    // 1. Background grid
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.08)';
+    // 1. Tactical dark radar grid & coordinates
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
     ctx.lineWidth = 1;
-    const gridSize = 35;
-    for (let x = 0; x < canvas.width; x += gridSize) {
+    ctx.setLineDash([]);
+    const gridSize = 40;
+    for (let x = 0; x < w; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
+      ctx.lineTo(x, h);
       ctx.stroke();
     }
-    for (let y = 0; y < canvas.height; y += gridSize) {
+    for (let y = 0; y < h; y += gridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
+      ctx.lineTo(w, y);
       ctx.stroke();
     }
 
-    // 2. Flight path spline
+    // 2. Polar Radar Range Rings & Crosshairs
+    const cx = w * 0.5;
+    const cy = h * 0.52;
+    ctx.setLineDash([3, 5]);
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.12)';
+    [60, 110, 160].forEach((r, idx) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
+      ctx.font = '8px JetBrains Mono';
+      ctx.fillText(`${(idx + 1) * 150}m`, cx + r - 22, cy - 4);
+    });
+
+    // Crosshair axes
+    ctx.beginPath();
+    ctx.moveTo(cx - 170, cy);
+    ctx.lineTo(cx + 170, cy);
+    ctx.moveTo(cx, cy - 120);
+    ctx.lineTo(cx, cy + 120);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Geodetic boundary annotations
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+    ctx.font = '8px JetBrains Mono';
+    ctx.fillText('78°13\'40"N', 8, 14);
+    ctx.fillText('15°38\'20"E', w - 55, h - 8);
+    ctx.fillText('N 000°', cx - 12, 14);
+
+    if (!pts || pts.length < 2) return;
+
+    // 3. Calculate interpolated points along the flight path up to progress
     const totalSegments = pts.length - 1;
     const currentSegmentIndex = Math.min(Math.floor(progress * totalSegments), totalSegments - 1);
     const segmentProgress = (progress * totalSegments) - currentSegmentIndex;
 
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-
-    for (let i = 1; i <= currentSegmentIndex; i++) {
-      ctx.lineTo(pts[i].x, pts[i].y);
+    const activePts = [];
+    for (let i = 0; i <= currentSegmentIndex; i++) {
+      activePts.push({ x: pts[i].x, y: pts[i].y });
     }
 
-    if (progress < 1.0 && currentSegmentIndex < totalSegments) {
+    let curX = pts[0].x;
+    let curY = pts[0].y;
+    let heading = 0;
+
+    if (currentSegmentIndex < totalSegments) {
       const pA = pts[currentSegmentIndex];
       const pB = pts[currentSegmentIndex + 1];
-      const curX = pA.x + (pB.x - pA.x) * segmentProgress;
-      const curY = pA.y + (pB.y - pA.y) * segmentProgress;
-      ctx.lineTo(curX, curY);
-    } else if (progress >= 1.0) {
-      ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+      curX = pA.x + (pB.x - pA.x) * segmentProgress;
+      curY = pA.y + (pB.y - pA.y) * segmentProgress;
+      activePts.push({ x: curX, y: curY });
+      heading = Math.atan2(pB.y - pA.y, pB.x - pA.x);
+    } else {
+      const pLast = pts[pts.length - 1];
+      const pPrev = pts[pts.length - 2];
+      curX = pLast.x;
+      curY = pLast.y;
+      heading = Math.atan2(pLast.y - pPrev.y, pLast.x - pPrev.x);
     }
 
+    // 4. Photogrammetric Swath Corridor (Camera Footprint Band)
+    const swathRadius = 22; // ~68m ground swath representation
+    if (activePts.length >= 2) {
+      const leftBoundary = [];
+      const rightBoundary = [];
+
+      for (let i = 0; i < activePts.length; i++) {
+        let dx, dy;
+        if (i === 0) {
+          dx = activePts[1].x - activePts[0].x;
+          dy = activePts[1].y - activePts[0].y;
+        } else if (i === activePts.length - 1) {
+          dx = activePts[i].x - activePts[i - 1].x;
+          dy = activePts[i].y - activePts[i - 1].y;
+        } else {
+          dx = activePts[i + 1].x - activePts[i - 1].x;
+          dy = activePts[i + 1].y - activePts[i - 1].y;
+        }
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+
+        leftBoundary.push({ x: activePts[i].x + nx * swathRadius, y: activePts[i].y + ny * swathRadius });
+        rightBoundary.push({ x: activePts[i].x - nx * swathRadius, y: activePts[i].y - ny * swathRadius });
+      }
+
+      // Draw Swath Corridor Fill
+      ctx.beginPath();
+      ctx.moveTo(leftBoundary[0].x, leftBoundary[0].y);
+      for (let i = 1; i < leftBoundary.length; i++) {
+        ctx.lineTo(leftBoundary[i].x, leftBoundary[i].y);
+      }
+      for (let i = rightBoundary.length - 1; i >= 0; i--) {
+        ctx.lineTo(rightBoundary[i].x, rightBoundary[i].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
+      ctx.fill();
+
+      // Draw Swath Outer Borders (Dashed)
+      ctx.setLineDash([3, 4]);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(leftBoundary[0].x, leftBoundary[0].y);
+      for (let i = 1; i < leftBoundary.length; i++) ctx.lineTo(leftBoundary[i].x, leftBoundary[i].y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(rightBoundary[0].x, rightBoundary[0].y);
+      for (let i = 1; i < rightBoundary.length; i++) ctx.lineTo(rightBoundary[i].x, rightBoundary[i].y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Overlap cross-hatch marks along the trajectory (80% forward overlap indication)
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.18)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < activePts.length; i += 2) {
+        ctx.beginPath();
+        ctx.moveTo(leftBoundary[i].x, leftBoundary[i].y);
+        ctx.lineTo(rightBoundary[i].x, rightBoundary[i].y);
+        ctx.stroke();
+      }
+    }
+
+    // 5. Waypoints along whole trajectory (with altitude pins)
+    const altitudes = [45, 52, 60, 68, 74, 82, 78, 70, 62, 58, 65, 72];
+    pts.forEach((wp, idx) => {
+      const isReached = idx <= currentSegmentIndex;
+      ctx.beginPath();
+      ctx.arc(wp.x, wp.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = isReached ? 'var(--as-cyan, #00f0ff)' : 'rgba(148, 163, 184, 0.3)';
+      ctx.fill();
+
+      // Waypoint Altitude Tag for every 3rd waypoint
+      if (idx % 3 === 0 || idx === pts.length - 1) {
+        const alt = altitudes[idx % altitudes.length];
+        ctx.fillStyle = isReached ? '#e2e8f0' : 'rgba(148, 163, 184, 0.4)';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(`WP-${String(idx + 1).padStart(2, '0')} [${alt}m]`, wp.x + 6, wp.y - 6);
+      }
+    });
+
+    // 6. Flight Path Glowing Trajectory Spline
+    ctx.beginPath();
+    ctx.moveTo(activePts[0].x, activePts[0].y);
+    for (let i = 1; i < activePts.length; i++) {
+      ctx.lineTo(activePts[i].x, activePts[i].y);
+    }
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 3;
-    ctx.shadowColor = 'rgba(0, 240, 255, 0.6)';
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.8)';
+    ctx.shadowBlur = 10;
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // 3. Start Point (Green dot)
+    // 7. Start Point Pin (Green)
     ctx.beginPath();
-    ctx.arc(pts[0].x, pts[0].y, 6, 0, Math.PI * 2);
+    ctx.arc(pts[0].x, pts[0].y, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#10b981';
     ctx.shadowColor = 'rgba(16, 185, 129, 0.8)';
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 8;
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Start text
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = '10px JetBrains Mono';
-    ctx.fillText('Start', pts[0].x - 12, pts[0].y - 10);
+    ctx.fillStyle = '#10b981';
+    ctx.font = 'bold 9px JetBrains Mono';
+    ctx.fillText('START', pts[0].x - 14, pts[0].y + 16);
 
-    // 4. End Point (Red dot) if reached
+    // 8. End Point Pin (Red)
     if (progress >= 0.98) {
       const last = pts[pts.length - 1];
       ctx.beginPath();
-      ctx.arc(last.x, last.y, 6, 0, Math.PI * 2);
+      ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
       ctx.fillStyle = '#ef4444';
       ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 8;
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '10px JetBrains Mono';
-      ctx.fillText('End', last.x - 10, last.y - 10);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.fillText('END', last.x - 8, last.y + 16);
+    }
+
+    // 9. Animated Drone Symbol & Camera Frustum Beam
+    if (progress < 1.0) {
+      // Camera FOV Ground Projection Cone
+      const coneLength = 32;
+      const coneWidth = 24;
+      const fovX1 = curX + Math.cos(heading) * coneLength - Math.sin(heading) * (coneWidth / 2);
+      const fovY1 = curY + Math.sin(heading) * coneLength + Math.cos(heading) * (coneWidth / 2);
+      const fovX2 = curX + Math.cos(heading) * coneLength + Math.sin(heading) * (coneWidth / 2);
+      const fovY2 = curY + Math.sin(heading) * coneLength - Math.cos(heading) * (coneWidth / 2);
+
+      ctx.beginPath();
+      ctx.moveTo(curX, curY);
+      ctx.lineTo(fovX1, fovY1);
+      ctx.lineTo(fovX2, fovY2);
+      ctx.closePath();
+      const coneGrad = ctx.createLinearGradient(curX, curY, curX + Math.cos(heading) * coneLength, curY + Math.sin(heading) * coneLength);
+      coneGrad.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+      coneGrad.addColorStop(1, 'rgba(0, 240, 255, 0.02)');
+      ctx.fillStyle = coneGrad;
+      ctx.fill();
+
+      // Pulse exhaust ripples behind drone
+      const pulsePhase = (Date.now() % 1000) / 1000;
+      ctx.beginPath();
+      ctx.arc(curX - Math.cos(heading) * 6, curY - Math.sin(heading) * 6, 8 + pulsePhase * 12, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0, 240, 255, ${0.6 - pulsePhase * 0.5})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Drone Airframe (Quadcopter profile)
+      ctx.save();
+      ctx.translate(curX, curY);
+      ctx.rotate(heading);
+
+      // Rotor arms
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-10, -10);
+      ctx.lineTo(10, 10);
+      ctx.moveTo(-10, 10);
+      ctx.lineTo(10, -10);
+      ctx.stroke();
+
+      // Propeller spinning discs
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.45)';
+      [[-10, -10], [10, -10], [-10, 10], [10, 10]].forEach(([px, py]) => {
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Central avionics pod with glowing cyan status LED
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Heading arrow pointer
+      ctx.beginPath();
+      ctx.moveTo(7, 0);
+      ctx.lineTo(12, 0);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Update Screen 03 HUD telemetry readout
+      const hudElem = document.getElementById('hud-flight-telemetry');
+      if (hudElem) {
+        const curAlt = (45 + progress * 37).toFixed(1);
+        const curSpd = (6.8 + Math.sin(progress * 8) * 0.6).toFixed(1);
+        hudElem.innerHTML = `
+          <span class="hud-item"><i class="fa-solid fa-satellite" style="color: var(--as-green);"></i> RTK FIXED (26 SVs)</span>
+          <span class="hud-item"><i class="fa-solid fa-arrows-up-down" style="color: var(--as-cyan);"></i> ${curAlt}m AGL</span>
+          <span class="hud-item"><i class="fa-solid fa-gauge" style="color: var(--as-amber);"></i> ${curSpd} m/s</span>
+        `;
+      }
     }
   }
 
@@ -522,6 +842,18 @@ class AeroSculptApp {
     const mission = this.store.getMission();
     this.populateKeyframesFilmstrip(mission);
     this.populateSemanticTiles(mission);
+
+    // Update Stage 3 description dynamically to match real terrain
+    const stage3Desc = document.querySelector('#stage-3 .stage-sub-desc');
+    if (stage3Desc) {
+      if (mission.id === 'pb2') {
+        stage3Desc.textContent = 'Terrain classification, snow albedo normalization, fjord water masking...';
+      } else if (mission.id === 'pb1') {
+        stage3Desc.textContent = 'Cadastral parcel segmentation, building footprint extraction & road corridors...';
+      } else {
+        stage3Desc.textContent = 'High-relief rock face geometry classification & alpine crevasse detection...';
+      }
+    }
 
     const stages = [
       { id: 'stage-1', name: 'Input Analysis', time: '00:05' },
@@ -549,13 +881,14 @@ class AeroSculptApp {
       });
       if (currentStageElem) currentStageElem.textContent = 'Generating Output (Complete)';
       if (progressFill) progressFill.style.width = '100%';
-      if (etaElem) etaElem.textContent = 'Ready';
+      if (etaElem) etaElem.textContent = '00m 00s (Ready)';
       return;
     }
 
     // Step-by-step timed execution: Exactly 5.0 seconds across 7 stages (~680ms each)
     let currentIdx = 0;
     const stageDuration = 680;
+    const totalSec = mission.videoDurationSec || 318;
 
     const advanceStage = () => {
       if (currentIdx >= stages.length) {
@@ -571,7 +904,7 @@ class AeroSculptApp {
 
         if (currentStageElem) currentStageElem.textContent = 'Generating Output (Complete)';
         if (progressFill) progressFill.style.width = '100%';
-        if (etaElem) etaElem.textContent = 'Ready';
+        if (etaElem) etaElem.textContent = '00m 00s (Ready)';
 
         this.hasRunSimulation = true;
 
@@ -587,7 +920,12 @@ class AeroSculptApp {
       if (currentStageElem) currentStageElem.textContent = st.name;
       const pct = Math.round(((currentIdx + 1) / stages.length) * 100);
       if (progressFill) progressFill.style.width = `${pct}%`;
-      if (etaElem) etaElem.textContent = `ETA: ~${Math.max(1, 7 - currentIdx)} min`;
+
+      // Realistic remaining ETA proportional to mission duration
+      const remainingSec = Math.max(15, Math.round(totalSec * (1 - (currentIdx / stages.length))));
+      const rm = Math.floor(remainingSec / 60);
+      const rs = remainingSec % 60;
+      if (etaElem) etaElem.textContent = `ETA: ~${String(rm).padStart(2, '0')}m ${String(rs).padStart(2, '0')}s`;
 
       // Set current stage to running
       const item = document.getElementById(st.id);
@@ -652,13 +990,13 @@ class AeroSculptApp {
 
     // Real scene features from mission (NO fake classes!)
     const features = mission.sceneFeatures || [
-      { id: 'mountain', name: 'Mountains & Bedrock', color: '#38bdf8', border: '#38bdf8', icon: 'fa-mountain' },
-      { id: 'snow', name: 'Snow & Permafrost', color: '#e2e8f0', border: '#cbd5e1', icon: 'fa-snowflake' },
-      { id: 'outpost', name: 'Arctic Outpost Buildings', color: '#f59e0b', border: '#f59e0b', icon: 'fa-building' },
-      { id: 'fjord', name: 'Coastal Fjord Water', color: '#06b6d4', border: '#06b6d4', icon: 'fa-water' }
+      { id: 'mountain', name: 'Mountains & Bedrock', color: '#38bdf8', border: '#38bdf8', icon: 'fa-mountain', frameIdx: 45, confidence: '98.8%' },
+      { id: 'snow', name: 'Snow & Permafrost', color: '#e2e8f0', border: '#cbd5e1', icon: 'fa-snowflake', frameIdx: 120, confidence: '97.4%' },
+      { id: 'outpost', name: 'Arctic Outpost Buildings', color: '#f59e0b', border: '#f59e0b', icon: 'fa-building', frameIdx: 240, confidence: '99.1%' },
+      { id: 'fjord', name: 'Coastal Fjord Water', color: '#06b6d4', border: '#06b6d4', icon: 'fa-water', frameIdx: 385, confidence: '96.5%' }
     ];
 
-    // Populate top semantic chips
+    // Populate top semantic chips with real category tags
     if (chipsContainer) {
       chipsContainer.innerHTML = features.map(feat => `
         <span style="color: ${feat.color}; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
@@ -670,7 +1008,8 @@ class AeroSculptApp {
     const frameIndices = mission.keyframeIndices || [1, 24, 68, 112, 185];
 
     features.forEach((feat, i) => {
-      const fIdx = frameIndices[i % frameIndices.length] || 1;
+      // Use authentic frameIdx specified in missionStore for this terrain feature
+      const fIdx = feat.frameIdx || frameIndices[i % frameIndices.length] || 1;
       const paddedNum = String(fIdx).padStart(4, '0');
       const imgPath = `${mission.framesDir}${mission.framePrefix}${paddedNum}${mission.frameExt}`;
 
@@ -678,10 +1017,13 @@ class AeroSculptApp {
       tile.className = 'semantic-tile';
       tile.innerHTML = `
         <img src="${imgPath}" alt="${feat.name}" onerror="this.src='datasets/frames_pb2/frame_0001.jpg'">
-        <div class="semantic-tile-overlay" style="background: ${feat.color}22; border-bottom: 2px solid ${feat.border};">
-          <span style="position: absolute; bottom: 4px; left: 4px; font-size: 0.65rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px;">
+        <div class="semantic-tile-overlay" style="background: ${feat.color}20; border-bottom: 2px solid ${feat.border};">
+          <span class="ai-seg-badge" style="color: ${feat.color}; border-color: ${feat.color}88;">
+            <i class="fa-solid fa-microchip"></i> ${feat.confidence || '98.5%'} Conf
+          </span>
+          <span style="position: absolute; bottom: 4px; left: 4px; font-size: 0.65rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.85); padding: 2px 6px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px;">
             <i class="fa-solid ${feat.icon || 'fa-tag'}" style="color: ${feat.color}; font-size: 0.6rem;"></i>
-            ${feat.name}
+            ${feat.name} · #${paddedNum}
           </span>
         </div>
       `;
@@ -1339,15 +1681,41 @@ class AeroSculptApp {
     const stepLabel = document.getElementById('stepper-mission-label');
     if (stepLabel) stepLabel.textContent = `${mission.code} · ${mission.name}`;
 
-    // Screen 02 Card Values
+    // Screen 02 Ingestion & Card Values
     const vThumb = document.getElementById('file-video-preview');
-    if (vThumb) vThumb.src = mission.videoUrl;
+    if (vThumb) {
+      vThumb.src = mission.videoUrl;
+      vThumb.load();
+      vThumb.play().catch(() => {});
+    }
 
     const vName = document.getElementById('card-val-video-name');
     if (vName) vName.textContent = mission.videoUrl.split('/').pop();
 
     const vSpecs = document.getElementById('card-val-video-specs');
     if (vSpecs) vSpecs.textContent = `${mission.videoDuration} | ${mission.videoResolution} | ${mission.frameRate} | ${mission.rawVideoSize}`;
+
+    // Screen 02 telemetry chips
+    const chipDur = document.getElementById('chip-dur');
+    if (chipDur) chipDur.textContent = mission.videoDuration;
+
+    const chipRes = document.getElementById('chip-res');
+    if (chipRes) chipRes.textContent = mission.videoResolution;
+
+    const chipFps = document.getElementById('chip-fps');
+    if (chipFps) chipFps.textContent = mission.frameRate;
+
+    const chipSize = document.getElementById('chip-size');
+    if (chipSize) chipSize.textContent = mission.rawVideoSize;
+
+    // Highlight active prebuilt video card
+    ['pb2', 'pb1', 'pb3'].forEach(id => {
+      const card = document.getElementById(`prebuilt-card-${id}`);
+      if (card) card.classList.toggle('active', id === mission.id);
+    });
+
+    const btnReset = document.getElementById('btn-reset-video');
+    if (btnReset) btnReset.style.display = 'none';
 
     const gpsName = document.getElementById('card-val-gps-name');
     if (gpsName) gpsName.textContent = mission.gpsFile;
@@ -1359,7 +1727,7 @@ class AeroSculptApp {
     if (metaName) metaName.textContent = mission.metaFile;
 
     const metaSpecs = document.getElementById('card-val-meta-specs');
-    if (metaSpecs) metaSpecs.textContent = `Platform: ${mission.uavPlatform.split(' ')[0]} | Area: ${mission.sceneCategory}`;
+    if (metaSpecs) metaSpecs.textContent = `Platform: ${mission.uavPlatform.split(' ')[0]} · Area: ${mission.sceneCategory}`;
 
     // Screen 03 Mission Summary Table
     const statDur = document.getElementById('stat-duration');
@@ -1389,12 +1757,20 @@ class AeroSculptApp {
     const crsUtm = document.getElementById('val-crs-utm');
     if (crsUtm) crsUtm.textContent = mission.crsName;
 
+    // Screen 04 initial ETA
+    const etaElem = document.getElementById('pipe-eta-val');
+    if (etaElem) etaElem.textContent = `ETA: ~${mission.reconstructionTime.split(' ')[0]}`;
+
     // Screen 05 HUD
     const hudThumb = document.getElementById('hud-point-thumb');
     if (hudThumb) hudThumb.src = `${mission.framesDir}${mission.framePrefix}0001${mission.frameExt}`;
 
     const hudCrs = document.getElementById('hud-point-crs');
     if (hudCrs) hudCrs.textContent = mission.crsDatum.split(' ')[0];
+
+    // Screen 06 Export Summary
+    const expProc = document.getElementById('exp-proc-time');
+    if (expProc) expProc.textContent = mission.reconstructionTime;
   }
 
   // ==========================================================================

@@ -25,7 +25,7 @@
   <header id="global-header">
     <div class="header-brand" id="header-brand-logo" title="AeroSculpt Home">
       <img src="assets/aerosculpt_logo.png" alt="AeroSculpt Logo" class="brand-logo-img">
-      <span class="brand-name-title">AEROSCULPT</span>
+      <span class="brand-name-title"><span class="brand-delta-a"><svg class="delta-a-svg" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hdrDeltaGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00f0ff"/><stop offset="50%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient></defs><path d="M36 4 L6 74 L22 74 L36 38 L50 74 L66 74 Z" fill="url(#hdrDeltaGrad)"/><polygon points="36,20 25,54 47,54" fill="#070a12"/><polygon points="36,30 30,48 42,48" fill="#00f0ff" opacity="0.95"/><path d="M14 52 L58 52" stroke="#00f0ff" stroke-width="4" stroke-linecap="round"/></svg></span>EROSCULPT</span>
     </div>
 
     <!-- Header Navigation Tabs -->
@@ -60,7 +60,7 @@
 
     <div class="hero-content">
       <h1 class="hero-main-title">
-        <span class="hero-cyan-mark">A</span>EROSCULPT
+        <span class="hero-delta-a"><svg class="hero-delta-svg" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="heroDeltaGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00f0ff"/><stop offset="50%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient><filter id="heroDeltaGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M36 4 L6 74 L22 74 L36 38 L50 74 L66 74 Z" fill="url(#heroDeltaGrad)" filter="url(#heroDeltaGlow)"/><polygon points="36,20 25,54 47,54" fill="#070a12"/><polygon points="36,30 30,48 42,48" fill="#00f0ff" opacity="0.95"/><path d="M14 52 L58 52" stroke="#00f0ff" stroke-width="4.5" stroke-linecap="round" filter="url(#heroDeltaGlow)"/></svg></span>EROSCULPT
       </h1>
       
       <h2 class="hero-subtitle-text">
@@ -222,74 +222,140 @@
     <main class="workflow-screen-pane active" id="pane-screen-02">
       <div class="pane-header-row">
         <div class="pane-title-group">
-          <h2>Upload Mission Data</h2>
-          <p>Provide UAV video and available sensor data. Required fields are mandatory for processing.</p>
+          <h2>UAV Aerial Data Ingestion</h2>
+          <p>Upload raw UAV video payload or select from calibrated mission archives. Georeferenced GNSS and flight metadata are synchronized automatically.</p>
         </div>
-        <button class="btn-primary-action" id="btn-demo-dataset" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--as-border-medium);">
-          <i class="fa-solid fa-folder-open"></i> Demo Dataset
-        </button>
+        <div class="header-action-pill-badge" id="ingest-overall-status">
+          <i class="fa-solid fa-satellite-dish" style="color: var(--as-cyan);"></i>
+          <span>UAV TELEMETRY SYNCED</span>
+        </div>
       </div>
 
       <div class="upload-config-wrapper">
         
-        <!-- Category 1: REQUIRED INPUTS -->
+        <!-- Category 1: REQUIRED INPUTS WITH VIDEO UPLOAD DROPZONE -->
         <div class="inputs-category-container">
           <div class="category-label-row required">
-            <i class="fa-solid fa-circle-exclamation"></i> REQUIRED INPUTS
+            <i class="fa-solid fa-circle-exclamation"></i> PRIMARY UAV VIDEO & TELEMETRY PAYLOAD
           </div>
 
-          <div class="cards-grid-3col">
-            <!-- UAV Video -->
-            <div class="file-input-card required-card">
-              <div class="card-top-status">
-                <span class="card-field-name"><i class="fa-solid fa-film" style="color: #ef4444;"></i> UAV Video *</span>
-                <span class="badge-check-ok">READY</span>
+          <div class="ingest-main-grid">
+            <!-- UAV Video Upload & Preview Dropzone -->
+            <div class="uav-upload-card" id="uav-upload-zone">
+              <input type="file" id="uav-video-file-input" accept="video/mp4,video/quicktime,video/x-matroska,video/*" style="display: none;">
+              
+              <div class="uav-video-player-container">
+                <video id="file-video-preview" src="datasets/pb2_video.mp4" muted loop playsinline autoplay controls></video>
+                <div class="video-overlay-badge">
+                  <i class="fa-solid fa-circle-check"></i> READY FOR RECONSTRUCTION
+                </div>
               </div>
-              <div class="file-video-thumb-preview">
-                <video id="file-video-preview" src="datasets/pb2_video.mp4" muted loop playsinline autoplay></video>
-              </div>
-              <div class="card-file-telemetry">
-                <span class="file-name-bold" id="card-val-video-name">sample_flight.mp4</span>
-                <span id="card-val-video-specs">05:18 | 1920×1080 | 30 FPS | 113.9 MB</span>
+
+              <div class="uav-video-details-row">
+                <div class="uav-file-info-group">
+                  <div class="uav-file-name-title" id="card-val-video-name">pb2_video.mp4</div>
+                  <div class="uav-file-specs-chips" id="card-val-video-specs">
+                    <span class="chip-spec"><i class="fa-regular fa-clock"></i> <strong id="chip-dur">05:18</strong></span>
+                    <span class="chip-spec"><i class="fa-solid fa-expand"></i> <strong id="chip-res">1920×1080 FHD</strong></span>
+                    <span class="chip-spec"><i class="fa-solid fa-gauge-high"></i> <strong id="chip-fps">30 FPS</strong></span>
+                    <span class="chip-spec"><i class="fa-solid fa-hard-drive"></i> <strong id="chip-size">113.9 MB</strong></span>
+                  </div>
+                </div>
+
+                <div class="uav-upload-actions">
+                  <button type="button" class="btn-browse-file" id="btn-browse-trigger" title="Upload local drone MP4/MOV file">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload UAV Video
+                  </button>
+                  <button type="button" class="btn-reset-file" id="btn-reset-video" title="Reset to default mission video" style="display: none;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                  </button>
+                </div>
               </div>
             </div>
 
-            <!-- GPS / GNSS -->
-            <div class="file-input-card required-card">
-              <div class="card-top-status">
-                <span class="card-field-name"><i class="fa-solid fa-location-dot" style="color: var(--as-cyan);"></i> GPS / GNSS *</span>
-                <span class="badge-check-ok">READY</span>
+            <!-- Synchronized Primary Sensors Side-Cards -->
+            <div class="primary-sensors-col">
+              <!-- GPS / GNSS -->
+              <div class="file-input-card required-card compact-card">
+                <div class="card-top-status">
+                  <span class="card-field-name"><i class="fa-solid fa-location-dot" style="color: var(--as-cyan);"></i> GPS / GNSS Log *</span>
+                  <span class="badge-check-ok">READY</span>
+                </div>
+                <div class="card-telemetry-mini">
+                  <div class="file-name-bold" id="card-val-gps-name">flight_gnss_m02.csv</div>
+                  <div class="file-specs-muted" id="card-val-gps-specs">9,540 records · 10 Hz RTK Fixed</div>
+                </div>
               </div>
-              <div style="height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
-                <i class="fa-solid fa-file-csv" style="font-size: 2.2rem; color: var(--as-cyan);"></i>
-              </div>
-              <div class="card-file-telemetry">
-                <span class="file-name-bold" id="card-val-gps-name">flight_01_gnss.csv</span>
-                <span id="card-val-gps-specs">9,540 records | 10 Hz</span>
-              </div>
-            </div>
 
-            <!-- Flight Metadata -->
-            <div class="file-input-card required-card">
-              <div class="card-top-status">
-                <span class="card-field-name"><i class="fa-solid fa-file-code" style="color: var(--as-amber);"></i> Flight Metadata *</span>
-                <span class="badge-check-ok">READY</span>
-              </div>
-              <div style="height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
-                <i class="fa-solid fa-file-lines" style="font-size: 2.2rem; color: var(--as-amber);"></i>
-              </div>
-              <div class="card-file-telemetry">
-                <span class="file-name-bold" id="card-val-meta-name">flight_01_meta.json</span>
-                <span id="card-val-meta-specs">Platform: DJI Mavic 3E | Area: Rural</span>
+              <!-- Flight Metadata -->
+              <div class="file-input-card required-card compact-card">
+                <div class="card-top-status">
+                  <span class="card-field-name"><i class="fa-solid fa-file-code" style="color: var(--as-amber);"></i> Flight Metadata *</span>
+                  <span class="badge-check-ok">READY</span>
+                </div>
+                <div class="card-telemetry-mini">
+                  <div class="file-name-bold" id="card-val-meta-name">flight_meta_m02.json</div>
+                  <div class="file-specs-muted" id="card-val-meta-specs">DJI Mavic 3E · Hasselblad L2D-20c</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Category 2: OPTIONAL INPUTS (IMPROVES ACCURACY) -->
+        <!-- Category 2: PRE-BUILT UAV FLIGHT ARCHIVES (1-CLICK LOAD) -->
+        <div class="inputs-category-container">
+          <div class="category-label-row prebuilt">
+            <span><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> PRE-BUILT UAV FLIGHT ARCHIVES (1-CLICK INSTANT LOAD)</span>
+            <span style="margin-left: auto; font-size: 0.68rem; font-weight: 600; color: var(--as-text-muted);">Select any mission below to immediately stream its video & calibrate sensors</span>
+          </div>
+
+          <div class="prebuilt-missions-grid">
+            <!-- PB2 Card -->
+            <div class="prebuilt-video-card active" data-mission="pb2" id="prebuilt-card-pb2">
+              <div class="prebuilt-thumb-container">
+                <img src="datasets/frames_pb2/frame_0001.jpg" alt="Svalbard Reconnaissance" class="prebuilt-thumb-img">
+                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 05:18</span>
+                <span class="prebuilt-active-badge">ACTIVE</span>
+              </div>
+              <div class="prebuilt-card-info">
+                <div class="prebuilt-card-title">M02 · Svalbard Arctic Reconnaissance</div>
+                <div class="prebuilt-card-meta">DJI M3E RTK · 1080p 30fps · 113.9 MB</div>
+                <div class="prebuilt-card-terrain"><i class="fa-solid fa-mountain"></i> Polar Glacial / Coastal Outpost</div>
+              </div>
+            </div>
+
+            <!-- PB1 Card -->
+            <div class="prebuilt-video-card" data-mission="pb1" id="prebuilt-card-pb1">
+              <div class="prebuilt-thumb-container">
+                <img src="datasets/frames_pb1/frame_0001.jpg" alt="Komorowice Cadastral" class="prebuilt-thumb-img">
+                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 03:42</span>
+              </div>
+              <div class="prebuilt-card-info">
+                <div class="prebuilt-card-title">M01 · Komorowice Cadastral Survey</div>
+                <div class="prebuilt-card-meta">DJI Mini 3 Pro · 1080p 30fps · 54.4 MB</div>
+                <div class="prebuilt-card-terrain"><i class="fa-solid fa-building"></i> Urban Cadastral / Commercial</div>
+              </div>
+            </div>
+
+            <!-- PB3 Card -->
+            <div class="prebuilt-video-card" data-mission="pb3" id="prebuilt-card-pb3">
+              <div class="prebuilt-thumb-container">
+                <img src="datasets/frames_pb3/frame_0001.jpg" alt="Zermatt Alpine" class="prebuilt-thumb-img">
+                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 04:02</span>
+              </div>
+              <div class="prebuilt-card-info">
+                <div class="prebuilt-card-title">M03 · Zermatt Alpine Inspection</div>
+                <div class="prebuilt-card-meta">Autel EVO II Pro · 1080p 30fps · 72.8 MB</div>
+                <div class="prebuilt-card-terrain"><i class="fa-solid fa-mountain-sun"></i> High Alpine / Rock Corridors</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 3: OPTIONAL INPUTS (IMPROVES ACCURACY) -->
         <div class="inputs-category-container">
           <div class="category-label-row optional">
-            <i class="fa-solid fa-circle-check"></i> OPTIONAL INPUTS (IMPROVES ACCURACY)
+            <i class="fa-solid fa-circle-check"></i> OPTIONAL AUXILIARY TELEMETRY (ENHANCES ACCURACY)
           </div>
 
           <div class="cards-grid-4col">
@@ -313,7 +379,7 @@
               </div>
               <div class="card-file-telemetry" style="margin-top: 4px;">
                 <span class="file-name-bold" id="card-val-rtk-name">rtk_data.csv</span>
-                <span id="card-val-rtk-specs">Fixed Carrier Solution</span>
+                <span id="card-val-rtk-specs">Fixed Carrier Phase ±1.2cm</span>
               </div>
             </div>
 
@@ -343,23 +409,12 @@
           </div>
         </div>
 
-        <!-- Reconstruction Settings & Start Processing -->
+        <!-- Reconstruction Settings & Start Processing (SCENE TYPE REMOVED AS REQUESTED) -->
         <div class="screen02-bottom-bar">
-          <div style="display: flex; gap: 32px; align-items: center;">
-            <!-- Scene Type -->
+          <div style="display: flex; gap: 24px; align-items: center;">
+            <!-- Reconstruction Mode (Auto) -->
             <div class="setting-col-group">
-              <span class="setting-title-txt">Scene Type</span>
-              <div class="pill-selectors-wrap">
-                <button class="setting-pill-choice" id="scene-type-urban">Urban Area</button>
-                <button class="setting-pill-choice active" id="scene-type-rural">Rural</button>
-                <button class="setting-pill-choice" id="scene-type-mountain">Mountainous</button>
-                <button class="setting-pill-choice" id="scene-type-coastal">Coastal</button>
-              </div>
-            </div>
-
-            <!-- Reconstruction Mode -->
-            <div class="setting-col-group">
-              <span class="setting-title-txt">Reconstruction Mode (Auto)</span>
+              <span class="setting-title-txt"><i class="fa-solid fa-sliders" style="color: var(--as-cyan);"></i> Reconstruction Mode (Auto)</span>
               <div class="pill-selectors-wrap">
                 <button class="setting-pill-choice" id="mode-easy">Easy (Fast)</button>
                 <button class="setting-pill-choice active" id="mode-medium">Medium (Balanced)</button>
@@ -408,22 +463,29 @@
             <div class="summary-kv-row"><span>Camera</span> <strong id="stat-camera">Hasselblad L2D-20c</strong></div>
             <div class="summary-kv-row"><span>RTK / PPK</span> <strong id="stat-rtk" style="color: var(--as-green);">Available</strong></div>
             <div class="summary-kv-row"><span>Area Type</span> <strong id="stat-area-type">Rural / Glacial</strong></div>
-            <div class="summary-kv-row"><span>Estimated Processing</span> <strong id="stat-est-proc" style="color: var(--as-cyan);">~11 min (T4 GPU)</strong></div>
+            <div class="summary-kv-row"><span>Estimated Processing</span> <strong id="stat-est-proc" style="color: var(--as-cyan);">05m 12s (T4 GPU Node)</strong></div>
           </div>
         </div>
 
-        <!-- Column 2: Flight Path Preview (GNSS Canvas) -->
+        <!-- Column 2: Tactical Flight Path Preview (GNSS & Swath) -->
         <div class="validation-card-panel">
-          <div class="validation-card-title">
-            <i class="fa-solid fa-route" style="color: var(--as-green);"></i> Flight Path Preview (GNSS)
+          <div class="validation-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="fa-solid fa-route" style="color: var(--as-green);"></i> Tactical Flight Path & Swath</span>
+            <span style="font-size: 0.65rem; color: var(--as-cyan); font-family: var(--as-font-mono); font-weight: 700;">RTK 10Hz · 80% OVERLAP</span>
           </div>
-          <div class="flight-canvas-container">
+          <div class="flight-canvas-container" style="position: relative;">
             <canvas id="screen03-flight-canvas" width="460" height="280"></canvas>
+            <div class="flight-canvas-hud-chip" id="hud-flight-telemetry">
+              <span class="hud-item"><i class="fa-solid fa-satellite" style="color: var(--as-green);"></i> RTK FIXED</span>
+              <span class="hud-item"><i class="fa-solid fa-arrows-up-down" style="color: var(--as-cyan);"></i> 64.2m AGL</span>
+              <span class="hud-item"><i class="fa-solid fa-gauge" style="color: var(--as-amber);"></i> 7.2 m/s</span>
+            </div>
             <div class="flight-legend-bar">
               <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--as-green);"></span> Start</span>
-              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 3px; background: var(--as-cyan);"></span> Flight Path</span>
+              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 3px; background: var(--as-cyan);"></span> Spline Path</span>
+              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 14px; height: 6px; background: rgba(0, 240, 255, 0.25); border: 1px dashed rgba(0, 240, 255, 0.6); border-radius: 2px;"></span> Swath</span>
               <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> End</span>
-              <span style="margin-left: auto; color: var(--as-text-muted);">Scale: 500 m</span>
+              <span style="margin-left: auto; color: var(--as-text-muted); font-family: var(--as-font-mono); font-size: 0.68rem;">Scale: 500 m</span>
             </div>
           </div>
         </div>
@@ -567,7 +629,7 @@
           <div class="live-progress-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 0.76rem; font-weight: 800; color: #ffffff;">Live Progress</span>
-              <span style="font-size: 0.72rem; color: var(--as-cyan); font-family: var(--as-font-mono);" id="pipe-eta-val">ETA: ~7 min</span>
+              <span style="font-size: 0.72rem; color: var(--as-cyan); font-family: var(--as-font-mono);" id="pipe-eta-val">ETA: ~05m 12s</span>
             </div>
             <div style="font-size: 0.76rem; color: #cbd5e1;">
               Stage: <strong id="pipe-current-stage" style="color: #ffffff;">Scene Understanding</strong>
@@ -808,7 +870,7 @@
             <div class="summary-kv-list" style="font-size: 0.68rem;">
               <div class="summary-kv-row"><span>Total Frames</span> <strong id="exp-total-frames">9,540</strong></div>
               <div class="summary-kv-row"><span>Selected Keyframes</span> <strong id="exp-keyframes">513</strong></div>
-              <div class="summary-kv-row"><span>Processing Time</span> <strong id="exp-proc-time">~11.8 min</strong></div>
+              <div class="summary-kv-row"><span>Processing Time</span> <strong id="exp-proc-time">05m 12s (T4 GPU Node)</strong></div>
               <div class="summary-kv-row"><span>Output Size</span> <strong id="exp-output-size">168.4 MB</strong></div>
             </div>
           </div>

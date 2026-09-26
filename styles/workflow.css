@@ -97,6 +97,24 @@ html, body {
   font-weight: 900;
   color: #ffffff;
   letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.brand-delta-a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.1em;
+  margin-right: -0.02em;
+}
+
+.brand-delta-a svg {
+  height: 1.1em;
+  width: auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.75));
 }
 
 .header-nav-tabs {
@@ -210,7 +228,8 @@ html, body {
   background-size: cover;
   background-position: center;
   z-index: 0;
-  filter: brightness(0.55) contrast(1.15);
+  filter: brightness(0.72) contrast(1.1);
+  opacity: 0.88;
 }
 
 .hero-overlay {
@@ -219,8 +238,8 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(11, 17, 30, 0.3) 0%, rgba(7, 10, 18, 0.92) 80%),
-              linear-gradient(to bottom, rgba(11, 17, 30, 0.5) 0%, rgba(7, 10, 18, 0.98) 100%);
+  background: radial-gradient(circle at center, rgba(11, 17, 30, 0.35) 0%, rgba(7, 10, 18, 0.72) 70%, rgba(7, 10, 18, 0.82) 100%),
+              linear-gradient(to bottom, rgba(11, 17, 30, 0.35) 0%, rgba(7, 10, 18, 0.78) 100%);
   z-index: 1;
 }
 
@@ -254,9 +273,37 @@ html, body {
   line-height: 1.1;
   color: #ffffff;
   margin-bottom: 12px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 2px;
+}
+
+.hero-delta-a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 0.96em;
+  margin-right: -0.02em;
+}
+
+.hero-delta-a svg {
+  height: 0.96em;
+  width: auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.85));
+  animation: deltaAeroGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes deltaAeroGlow {
+  0% {
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.75));
+    transform: translateY(0);
+  }
+  100% {
+    filter: drop-shadow(0 0 24px rgba(0, 240, 255, 1)) drop-shadow(0 0 35px rgba(37, 99, 235, 0.6));
+    transform: translateY(-1px);
+  }
 }
 
 .hero-cyan-mark {
@@ -518,6 +565,319 @@ html, body {
   color: var(--as-cyan);
 }
 
+.category-label-row.prebuilt {
+  color: var(--as-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header-action-pill-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  font-family: var(--as-font-mono);
+}
+
+.ingest-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.uav-upload-card {
+  background: rgba(14, 22, 38, 0.75);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.uav-upload-card.drag-over {
+  border-color: var(--as-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+}
+
+.uav-video-player-container {
+  position: relative;
+  width: 100%;
+  height: 98px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000000;
+  border: 1px solid var(--as-border-subtle);
+}
+
+.uav-video-player-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-overlay-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: rgba(16, 185, 129, 0.9);
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.uav-video-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.uav-file-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.uav-file-name-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: var(--as-font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uav-file-specs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-spec {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: var(--as-font-mono);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chip-spec strong {
+  color: #ffffff;
+}
+
+.uav-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-browse-file {
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 6px;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid var(--as-cyan);
+  color: var(--as-cyan);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-browse-file:hover {
+  background: var(--as-cyan);
+  color: #070a12;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.btn-reset-file {
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--as-border-medium);
+  color: #cbd5e1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-reset-file:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.primary-sensors-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compact-card {
+  padding: 8px 12px;
+  gap: 4px;
+}
+
+.card-telemetry-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.file-specs-muted {
+  font-size: 0.68rem;
+  color: var(--as-text-muted);
+  font-family: var(--as-font-mono);
+}
+
+/* Pre-built Mission Cards Grid */
+.prebuilt-missions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.prebuilt-video-card {
+  background: var(--as-bg-surface-elevated);
+  border: 1px solid var(--as-border-subtle);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.prebuilt-video-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(0, 240, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.prebuilt-video-card.active {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: var(--as-cyan);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.18);
+}
+
+.prebuilt-thumb-container {
+  position: relative;
+  width: 76px;
+  height: 52px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #000000;
+  flex-shrink: 0;
+  border: 1px solid var(--as-border-subtle);
+}
+
+.prebuilt-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.prebuilt-dur-tag {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.58rem;
+  font-family: var(--as-font-mono);
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 1px 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.prebuilt-active-badge {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 0.54rem;
+  font-weight: 800;
+  background: var(--as-cyan);
+  color: #070a12;
+  padding: 1px 4px;
+  border-radius: 3px;
+  display: none;
+}
+
+.prebuilt-video-card.active .prebuilt-active-badge {
+  display: block;
+}
+
+.prebuilt-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.prebuilt-card-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prebuilt-card-meta {
+  font-size: 0.66rem;
+  color: var(--as-text-muted);
+  font-family: var(--as-font-mono);
+}
+
+.prebuilt-card-terrain {
+  font-size: 0.65rem;
+  color: var(--as-cyan);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .cards-grid-3col {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -597,6 +957,33 @@ html, body {
 .file-name-bold {
   color: #e2e8f0;
   font-weight: 700;
+}
+
+/* Flight Canvas HUD chip */
+.flight-canvas-hud-chip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(7, 10, 18, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+  padding: 4px 8px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.flight-canvas-hud-chip .hud-item {
+  font-size: 0.62rem;
+  font-family: var(--as-font-mono);
+  font-weight: 700;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* Bottom Settings in Screen 02 */
@@ -932,8 +1319,8 @@ html, body {
 
 .semantic-grid-tiles {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
   flex-grow: 1;
   overflow: hidden;
 }
@@ -944,6 +1331,12 @@ html, body {
   border-radius: 6px;
   overflow: hidden;
   position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.semantic-tile:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 240, 255, 0.4);
 }
 
 .semantic-tile img {
@@ -959,8 +1352,27 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 240, 255, 0.16);
+  background: rgba(0, 240, 255, 0.12);
   border-bottom: 2px solid var(--as-cyan);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.ai-seg-badge {
+  align-self: flex-end;
+  font-size: 0.58rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: var(--as-cyan);
+  padding: 1px 6px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--as-font-mono);
 }
 
 /* ==========================================================================
