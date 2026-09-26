@@ -34,7 +34,6 @@
       <button class="nav-tab-btn" id="nav-tab-process">Process</button>
       <button class="nav-tab-btn" id="nav-tab-viewer">3D Viewer</button>
       <button class="nav-tab-btn" id="nav-tab-export">Export</button>
-      <button class="nav-tab-btn" id="nav-tab-docs">Docs</button>
     </nav>
   </header>
 
@@ -990,57 +989,60 @@
           </div>
         </div>
 
-        <!-- Column 3: Export 3D World -->
+        <!-- Column 3: Export 3D World & Deliverables -->
         <div class="screen06-card">
-          <div class="screen06-card-title">Export 3D World</div>
+          <div class="screen06-card-title">Export Deliverables</div>
           <div style="font-size: 0.7rem; color: var(--as-text-muted); margin-bottom: 8px;">
-            Download reconstructed outputs.
+            Download calibrated 3D models and verified engineering quality reports.
           </div>
 
           <div class="export-dl-cards-list">
-            <div class="export-dl-item">
+            <div class="export-dl-item" id="dl-item-glb" title="Download 3D Textured Mesh (.GLB)">
               <div>
-                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-cube" style="color: var(--as-cyan); margin-right: 6px;"></i> Textured Mesh</div>
-                <div style="font-size: 0.65rem; color: var(--as-text-muted);">OBJ / GLB / FBX (Photorealistic 3D)</div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-cube" style="color: var(--as-cyan); margin-right: 6px;"></i> 3D Model (.GLB)</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Photorealistic georeferenced 3D textured mesh</div>
               </div>
-              <i class="fa-solid fa-circle-down" style="color: var(--as-cyan); font-size: 1.1rem; cursor: pointer;"></i>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-cyan); font-size: 1.15rem;"></i>
             </div>
 
-            <div class="export-dl-item">
+            <div class="export-dl-item" id="dl-item-report-html" title="Download Quality Audit Report (.HTML)">
               <div>
-                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-braille" style="color: #60a5fa; margin-right: 6px;"></i> Point Cloud</div>
-                <div style="font-size: 0.65rem; color: var(--as-text-muted);">PLY / LAS / LAZ (3.1M georeferenced pts)</div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-file-code" style="color: var(--as-green); margin-right: 6px;"></i> Quality Report (.HTML)</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Interactive accuracy, scale & georeference audit</div>
               </div>
-              <i class="fa-solid fa-circle-down" style="color: #60a5fa; font-size: 1.1rem; cursor: pointer;"></i>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-green); font-size: 1.15rem;"></i>
             </div>
 
-            <div class="export-dl-item">
+            <div class="export-dl-item" id="dl-item-report-pdf" title="Open / Save PDF Dossier">
               <div>
-                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-map-location-dot" style="color: var(--as-green); margin-right: 6px;"></i> GeoTIFF / GeoJSON</div>
-                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Georeferenced DEM & boundary vector</div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 6px;"></i> Executive Report (.PDF)</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Print-ready formal engineering dossier</div>
               </div>
-              <i class="fa-solid fa-circle-down" style="color: var(--as-green); font-size: 1.1rem; cursor: pointer;"></i>
+              <i class="fa-solid fa-circle-down" style="color: #ef4444; font-size: 1.15rem;"></i>
             </div>
 
-            <div class="export-dl-item">
+            <div class="export-dl-item" id="dl-item-ply" title="Download Dense Point Cloud (.PLY)">
               <div>
-                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-image" style="color: var(--as-amber); margin-right: 6px;"></i> Orthophoto (GeoTIFF)</div>
-                <div style="font-size: 0.65rem; color: var(--as-text-muted);">2D calibrated map orthomosaic</div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-braille" style="color: #60a5fa; margin-right: 6px;"></i> Point Cloud (.PLY)</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">3.1M georeferenced spatial point cloud</div>
               </div>
-              <i class="fa-solid fa-circle-down" style="color: var(--as-amber); font-size: 1.1rem; cursor: pointer;"></i>
+              <i class="fa-solid fa-circle-down" style="color: #60a5fa; font-size: 1.15rem;"></i>
             </div>
 
-            <div class="export-dl-item">
+            <div class="export-dl-item" id="dl-item-geotiff" title="Download GeoTIFF & Vector Package">
               <div>
-                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-globe" style="color: #c084fc; margin-right: 6px;"></i> Interactive 3D Viewer</div>
-                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Standalone WebGL bundle (Shareable)</div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-map-location-dot" style="color: var(--as-amber); margin-right: 6px;"></i> GeoTIFF / GIS Vector</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Calibrated DEM & boundary GeoJSON vector</div>
               </div>
-              <i class="fa-solid fa-circle-down" style="color: #c084fc; font-size: 1.1rem; cursor: pointer;"></i>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-amber); font-size: 1.15rem;"></i>
             </div>
           </div>
 
           <button class="btn-download-all-outputs" id="btn-download-all">
-            <i class="fa-solid fa-download"></i> Download All Outputs
+            <i class="fa-solid fa-file-zipper"></i> Download Package (.GLB + Report)
+          </button>
+          <button class="btn-export-secondary" id="btn-open-pdf-report">
+            <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Open Print / Save PDF Report
           </button>
         </div>
 

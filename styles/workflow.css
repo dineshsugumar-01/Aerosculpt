@@ -484,13 +484,13 @@ html, body {
 }
 
 .stepper-nav-item.active .stepper-circle-num {
-  background: var(--as-blue);
-  border-color: var(--as-cyan);
-  color: #ffffff;
+  background: var(--as-blue) !important;
+  border-color: var(--as-cyan) !important;
+  color: #ffffff !important;
   box-shadow: 0 0 10px var(--as-blue-glow);
 }
 
-.stepper-nav-item.completed .stepper-circle-num {
+.stepper-nav-item.completed:not(.active) .stepper-circle-num {
   background: var(--as-green);
   border-color: var(--as-green);
   color: #ffffff;
@@ -1716,6 +1716,14 @@ html, body {
   justify-content: space-between;
   font-size: 0.76rem;
   color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.export-dl-item:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.35);
+  transform: translateX(2px);
 }
 
 .btn-download-all-outputs {
@@ -1739,6 +1747,30 @@ html, body {
 .btn-download-all-outputs:hover {
   background: linear-gradient(135deg, #1d4ed8, #2563eb);
   transform: translateY(-1px);
+}
+
+.btn-export-secondary {
+  width: 100%;
+  padding: 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--as-border-medium);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-export-secondary:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
 }
 
 /* ==========================================================================

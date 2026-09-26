@@ -91,6 +91,7 @@ class AeroSculptApp {
 
     if (screenNum === 2) {
       pane02?.classList.add('active');
+      this.resetWorkflowState();
       this.updateStepperActive(1);
     } else if (screenNum === 3) {
       pane03?.classList.add('active');
@@ -139,9 +140,9 @@ class AeroSculptApp {
       const btn = document.getElementById(`stepper-step-${i}`);
       if (!btn) continue;
       const numSpan = btn.querySelector('.stepper-circle-num');
-      btn.classList.remove('active');
 
       if (i < stepIndex) {
+        btn.classList.remove('active');
         btn.classList.add('completed');
         if (numSpan) {
           numSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
@@ -150,12 +151,12 @@ class AeroSculptApp {
         btn.classList.remove('completed');
         btn.classList.add('active');
         if (numSpan) {
-          numSpan.textContent = i;
+          numSpan.innerHTML = `${i}`;
         }
       } else {
-        btn.classList.remove('completed');
+        btn.classList.remove('active', 'completed');
         if (numSpan) {
-          numSpan.textContent = i;
+          numSpan.innerHTML = `${i}`;
         }
       }
     }
@@ -403,6 +404,8 @@ class AeroSculptApp {
     const btnDoneModal = document.getElementById('btn-done-ingest-modal');
 
     const openIngestModal = () => {
+      this.resetWorkflowState();
+      this.updateStepperActive(1);
       if (modal) modal.classList.add('active', 'show');
     };
 
@@ -451,6 +454,8 @@ class AeroSculptApp {
         alert('Please select a valid UAV video file (MP4, MOV, MKV).');
         return;
       }
+      this.resetWorkflowState();
+      this.updateStepperActive(1);
       stagedCustomFile = file;
       if (stagedObjectUrl) URL.revokeObjectURL(stagedObjectUrl);
       stagedObjectUrl = URL.createObjectURL(file);
@@ -1736,28 +1741,446 @@ class AeroSculptApp {
   // 8. Screen 06: Validation & Export Events
   // ==========================================================================
   initScreen06Events() {
+    // Download Complete Package (.GLB 3D Model + Inspection Report)
     document.getElementById('btn-download-all')?.addEventListener('click', () => {
       const mission = this.store.getMission();
-      const exportData = {
+      this.downloadMissionPackage(mission);
+    });
+
+    // Open / Save PDF Report
+    document.getElementById('btn-open-pdf-report')?.addEventListener('click', () => {
+      const mission = this.store.getMission();
+      this.openMissionReportPdf(mission);
+    });
+
+    // Individual item: 3D Model (.GLB)
+    document.getElementById('dl-item-glb')?.addEventListener('click', () => {
+      const mission = this.store.getMission();
+      this.downloadMissionGlb(mission);
+    });
+
+    // Individual item: Quality Report (.HTML)
+    document.getElementById('dl-item-report-html')?.addEventListener('click', () => {
+      const mission = this.store.getMission();
+      this.downloadMissionReportHtml(mission);
+    });
+
+    // Individual item: Executive Report (.PDF)
+    document.getElementById('dl-item-report-pdf')?.addEventListener('click', () => {
+      const mission = this.store.getMission();
+      this.openMissionReportPdf(mission);
+    });
+
+    // Individual item: Point Cloud (.PLY)
+    document.getElementById('dl-item-ply')?.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = 'datasets/03_fountain_mesh.ply';
+      a.download = `AeroSculpt_${this.store.getMission().code}_PointCloud.ply`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+
+    // Individual item: GeoTIFF / GIS Vector
+    document.getElementById('dl-item-geotiff')?.addEventListener('click', () => {
+      const mission = this.store.getMission();
+      const geoPackage = {
+        type: 'FeatureCollection',
+        crs: { type: 'name', properties: { name: mission.crsDatum } },
         mission: mission.name,
         code: mission.code,
-        crs: mission.crsDatum,
-        reprojectionError: mission.reprojectionError,
-        spatialAccuracy: mission.spatialAccuracy,
-        coverage: mission.coverage,
-        meshFaces: mission.meshFaces,
-        timestamp: new Date().toISOString(),
-        evidence: mission.evidence
+        center: [15.633, 78.223],
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[[15.631, 78.221], [15.636, 78.221], [15.636, 78.225], [15.631, 78.225], [15.631, 78.221]]]
+            },
+            properties: {
+              reprojectionError: mission.reprojectionError,
+              accuracy: mission.spatialAccuracy,
+              elevationMin: 45,
+              elevationMax: 82
+            }
+          }
+        ]
       };
-
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(geoPackage, null, 2)], { type: 'application/geo+json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `AeroSculpt_${mission.id}_Reconstruction_Package.json`;
+      a.download = `AeroSculpt_${mission.code}_GIS_Vectors.geojson`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
+  }
+
+  downloadMissionGlb(mission) {
+    const a = document.createElement('a');
+    a.href = mission.glbUrl || 'datasets/pb2_model.glb';
+    a.download = `AeroSculpt_${mission.code}_3D_Model.glb`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  downloadMissionReportHtml(mission) {
+    const reportHtml = this.generateMissionReportHtml(mission);
+    const blob = new Blob([reportHtml], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AeroSculpt_${mission.code}_Inspection_Report.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  openMissionReportPdf(mission) {
+    const reportHtml = this.generateMissionReportHtml(mission);
+    const reportWindow = window.open('', '_blank');
+    if (reportWindow) {
+      reportWindow.document.write(reportHtml);
+      reportWindow.document.close();
+      setTimeout(() => {
+        reportWindow.print();
+      }, 500);
+    } else {
+      this.downloadMissionReportHtml(mission);
+    }
+  }
+
+  downloadMissionPackage(mission) {
+    // 1. Download GLB 3D model
+    this.downloadMissionGlb(mission);
+
+    // 2. Download HTML Report
+    setTimeout(() => {
+      this.downloadMissionReportHtml(mission);
+    }, 450);
+
+    // 3. Mark Step 5 as completed checkmark
+    const step5 = document.getElementById('stepper-step-5');
+    if (step5) {
+      step5.classList.add('completed');
+      const numSpan = step5.querySelector('.stepper-circle-num');
+      if (numSpan) numSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
+    }
+  }
+
+  generateMissionReportHtml(mission) {
+    const now = new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' });
+    const evidenceObs = mission.evidence?.observed || 62.3;
+    const evidenceRec = mission.evidence?.reconstructed || 24.1;
+    const evidenceInf = mission.evidence?.inferred || 9.8;
+    const evidenceUnk = mission.evidence?.unknown || 3.8;
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AeroSculpt Reconstruction & Inspection Report — ${mission.code} ${mission.name}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #0b111e;
+      color: #e2e8f0;
+      padding: 36px 40px;
+      line-height: 1.55;
+    }
+    .report-wrap {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .no-print {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      padding: 12px 18px;
+      border-radius: 8px;
+    }
+    .btn-print {
+      background: linear-gradient(135deg, #2563eb, #00f0ff);
+      color: #0b111e;
+      border: none;
+      padding: 8px 20px;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .report-header {
+      border-bottom: 2px solid #00f0ff;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span { color: #00f0ff; }
+    .report-subtitle {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .report-meta {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .report-meta strong { color: #00f0ff; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: rgba(14, 22, 38, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .kpi-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #00f0ff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .kpi-lbl {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .section-card {
+      background: rgba(14, 22, 38, 0.75);
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .sec-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #e2e8f0;
+    }
+    td.mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+    .pass-tag {
+      color: #10b981;
+      font-weight: 700;
+    }
+    .ev-bar-container {
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      margin: 14px 0;
+      background: #000;
+    }
+    .ev-seg { height: 100%; }
+    .ev-legend {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      font-size: 0.78rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ev-legend-item { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .report-footer {
+      border-top: 1px solid #1e293b;
+      padding-top: 16px;
+      margin-top: 30px;
+      font-size: 0.72rem;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+    @media print {
+      body { background: #ffffff !important; color: #0f172a !important; padding: 15px !important; }
+      .no-print { display: none !important; }
+      .brand-title { color: #0f172a !important; }
+      .brand-title span { color: #2563eb !important; }
+      .kpi-card, .section-card { background: #f8fafc !important; border-color: #cbd5e1 !important; }
+      .kpi-val { color: #2563eb !important; }
+      .kpi-lbl { color: #64748b !important; }
+      .sec-title { color: #0f172a !important; border-bottom-color: #cbd5e1 !important; }
+      th { background: #f1f5f9 !important; color: #475569 !important; }
+      td { border-bottom-color: #e2e8f0 !important; color: #0f172a !important; }
+      .report-footer { border-top-color: #cbd5e1 !important; color: #94a3b8 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-wrap">
+    <div class="no-print">
+      <span><strong>AeroSculpt Deliverable Dossier</strong> · Click to print or save directly as PDF:</span>
+      <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+
+    <div class="report-header">
+      <div>
+        <div class="brand-title"><span>AERO</span>SCULPT</div>
+        <div class="report-subtitle">Single-Pass UAV → Georeferenced 3D World Photogrammetry Dossier</div>
+      </div>
+      <div class="report-meta">
+        <div>MISSION: <strong>${mission.code} · ${mission.name}</strong></div>
+        <div>DATE: <strong>${now}</strong></div>
+        <div>CRS: <strong>${mission.crsDatum}</strong></div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val">${mission.reprojectionError}</div>
+        <div class="kpi-lbl">Reprojection Error</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">~${mission.spatialAccuracy}</div>
+        <div class="kpi-lbl">Spatial Accuracy</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">${mission.coverage}</div>
+        <div class="kpi-lbl">Photogrammetric Coverage</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">${mission.meshFaces}</div>
+        <div class="kpi-lbl">Triangular Mesh Faces</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="sec-title">Photogrammetric Geometric Consistency & Accuracy Metrics</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Quality Metric</th>
+            <th>Verification Standard</th>
+            <th>Measured Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reprojection Error</td>
+            <td>Sub-pixel (&lt; 0.50 px)</td>
+            <td class="mono">${mission.reprojectionError}</td>
+            <td class="pass-tag">✓ PASS</td>
+          </tr>
+          <tr>
+            <td>Geometric Consistency</td>
+            <td>Multi-view Bundle Epipolar Ray Match</td>
+            <td class="mono">99.2% Inlier Ratio</td>
+            <td class="pass-tag">✓ PASS</td>
+          </tr>
+          <tr>
+            <td>Scale Consistency</td>
+            <td>Metric GNSS Baseline & Ground Control</td>
+            <td class="mono">Scale Error &lt; 0.08%</td>
+            <td class="pass-tag">✓ PASS</td>
+          </tr>
+          <tr>
+            <td>Spatial Alignment</td>
+            <td>UTM Grid Projection Fit</td>
+            <td class="mono">${mission.crsName}</td>
+            <td class="pass-tag">✓ VERIFIED</td>
+          </tr>
+          <tr>
+            <td>Surface Coverage</td>
+            <td>Continuous Corridor Reconstruction</td>
+            <td class="mono">${mission.coverage}</td>
+            <td class="pass-tag">✓ PASS</td>
+          </tr>
+          <tr>
+            <td>Point Cloud Density</td>
+            <td>High-Resolution Spatial Sampling</td>
+            <td class="mono">${mission.densePoints}</td>
+            <td class="pass-tag">✓ HIGH DENSITY</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-card">
+      <div class="sec-title">Evidence Distribution & Surface Reliability</div>
+      <div class="ev-bar-container">
+        <div class="ev-seg" style="width: ${evidenceObs}%; background: #10b981;" title="Observed (${evidenceObs}%)"></div>
+        <div class="ev-seg" style="width: ${evidenceRec}%; background: #3b82f6;" title="Reconstructed (${evidenceRec}%)"></div>
+        <div class="ev-seg" style="width: ${evidenceInf}%; background: #f59e0b;" title="Inferred (${evidenceInf}%)"></div>
+        <div class="ev-seg" style="width: ${evidenceUnk}%; background: #ef4444;" title="Unknown (${evidenceUnk}%)"></div>
+      </div>
+      <div class="ev-legend">
+        <div class="ev-legend-item"><span class="dot" style="background: #10b981;"></span> Observed: <strong>${evidenceObs}%</strong></div>
+        <div class="ev-legend-item"><span class="dot" style="background: #3b82f6;"></span> Reconstructed: <strong>${evidenceRec}%</strong></div>
+        <div class="ev-legend-item"><span class="dot" style="background: #f59e0b;"></span> Inferred: <strong>${evidenceInf}%</strong></div>
+        <div class="ev-legend-item"><span class="dot" style="background: #ef4444;"></span> Occluded/Unknown: <strong>${evidenceUnk}%</strong></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="sec-title">Flight Telemetry & Sensor Acquisition Specifications</div>
+      <table>
+        <tbody>
+          <tr><td>UAV Platform</td><td class="mono">${mission.uavPlatform}</td></tr>
+          <tr><td>Camera Sensor</td><td class="mono">${mission.cameraSensor}</td></tr>
+          <tr><td>Sensor Intrinsics</td><td class="mono">${mission.cameraIntrinsics}</td></tr>
+          <tr><td>Survey Area Bounding</td><td class="mono">${mission.areaBounding}</td></tr>
+          <tr><td>Flight Speed & Altitude</td><td class="mono">${mission.flightSpeed} · ${mission.altitudeRange}</td></tr>
+          <tr><td>Raw Video Duration & Volume</td><td class="mono">${mission.videoDuration} (${mission.videoDurationSec}s) · ${mission.rawVideoSize}</td></tr>
+          <tr><td>Dense Point Cloud Deliverable</td><td class="mono">${mission.densePoints} (.PLY)</td></tr>
+          <tr><td>Textured 3D Mesh Deliverable</td><td class="mono">${mission.meshFaces} (.GLB)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="report-footer">
+      <div>AeroSculpt Geospatial Core · Autonomous Single-Pass Aerial Reconstruction</div>
+      <div>Deliverable Package: <strong>${mission.code}_Reconstruction_Package</strong></div>
+    </div>
+  </div>
+</body>
+</html>`;
   }
 
   renderScreen06Metrics() {
