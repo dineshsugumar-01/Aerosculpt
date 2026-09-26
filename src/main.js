@@ -146,7 +146,7 @@ class AeroSculptApp {
     const dataset = DEMO_DATASETS[demoId] || DEMO_DATASETS['01'];
     const max = dataset.maxFrames || 50;
     const clamped = Math.max(1, Math.min(max, frameNum));
-    const padNum = String(clamped).padStart(3, '0');
+    const padNum = String(clamped).padStart(4, '0');
     return formatUrl(`${dataset.framesDir}/${dataset.framePrefix || 'frame_'}${padNum}${dataset.frameExt || '.jpg'}`);
   }
 

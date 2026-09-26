@@ -114,12 +114,7 @@ export class AeroSculptStudioViewer {
     // 10. Ground Control Point 3D Target Pins
     this.createGcpMarkers();
 
-    // 11. Load Reconstructed GLB Mesh
-    const baseUrl = import.meta.env.BASE_URL || './';
-    const modelPath = baseUrl.endsWith('/')
-      ? `${baseUrl}Task-of-2026-09-10T143406911Z-textured_model.glb`
-      : `${baseUrl}/Task-of-2026-09-10T143406911Z-textured_model.glb`;
-    this.loadModel(modelPath);
+    // 11. Studio model loaded externally via loadDemoDataset — no auto-load here
 
     // 12. Listeners
     window.addEventListener('resize', () => this.onWindowResize());
@@ -384,11 +379,20 @@ export class AeroSculptStudioViewer {
       this.model.updateMatrixWorld(true);
 
       const rawBox = new THREE.Box3().setFromObject(this.model);
-      const rawCenter = rawBox.getCenter(new THREE.Vector3());
-      this.model.position.set(-rawCenter.x, -rawCenter.y, -rawCenter.z);
-      if (scaleFactor && scaleFactor !== 1) {
-        this.model.scale.setScalar(scaleFactor);
-      }
+      const rawSize = rawBox.getSize(new THREE.Vector3());
+      const rawMaxDim = Math.max(rawSize.x, rawSize.y, rawSize.z);
+
+      // Auto-normalize scale to ~60-unit viewing box
+      const targetSize = 60;
+      const autoScale = (rawMaxDim > 0.001) ? (targetSize / rawMaxDim) : 1;
+      const finalScale = (scaleFactor && scaleFactor !== 1) ? scaleFactor : autoScale;
+      this.model.scale.setScalar(finalScale);
+      this.model.updateMatrixWorld(true);
+
+      // Center AFTER scaling
+      const scaledBox = new THREE.Box3().setFromObject(this.model);
+      const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+      this.model.position.set(-scaledCenter.x, -scaledCenter.y, -scaledCenter.z);
       this.model.updateMatrixWorld(true);
 
       // 4. World orientation (azimuth/heading rotation around vertical Y)
@@ -397,10 +401,10 @@ export class AeroSculptStudioViewer {
       this.scene.add(this.modelContainer);
       this.modelContainer.updateMatrixWorld(true);
 
-      // 5. Offset container so terrain base sits flat at ground grid (Y=0) and centered at target (2, 0)
+      // 5. Place model base exactly on ground grid (Y=0)
       const worldBox = new THREE.Box3().setFromObject(this.modelContainer);
       const worldCenter = worldBox.getCenter(new THREE.Vector3());
-      this.modelContainer.position.set(2 - worldCenter.x, -worldBox.min.y, 0 - worldCenter.z);
+      this.modelContainer.position.set(-worldCenter.x, -worldBox.min.y, -worldCenter.z);
       this.modelContainer.updateMatrixWorld(true);
 
       // Hide loading indicator if present
