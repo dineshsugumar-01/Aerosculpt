@@ -20,8 +20,9 @@ class AeroSculptApp {
     this.viewer = null;
     this.hasRunSimulation = false;
 
-    // Automated Tour State
+    // Automated Pipeline Progression State
     this.isTourRunning = false;
+    this.isAutoAdvancing = false;
     this.tourTimer = null;
 
     // 3D Measurement & Inspection State
@@ -64,11 +65,11 @@ class AeroSculptApp {
 
     const screen01 = document.getElementById('screen-01-landing');
     const workflowContainer = document.getElementById('workflow-app-container');
-    const screen05Viewer = document.getElementById('screen-05-viewer');
 
     const pane02 = document.getElementById('pane-screen-02');
     const pane03 = document.getElementById('pane-screen-03');
     const pane04 = document.getElementById('pane-screen-04');
+    const pane05 = document.getElementById('pane-screen-05');
     const pane06 = document.getElementById('pane-screen-06');
 
     // Update Top Header Tabs active state
@@ -78,37 +79,15 @@ class AeroSculptApp {
     if (screenNum === 1) {
       screen01?.classList.add('active');
       workflowContainer?.classList.remove('active');
-      screen05Viewer?.classList.remove('active');
       return;
     }
 
-    // Screen 05: 3D Viewer & Analysis (Full-screen viewport)
-    if (screenNum === 5) {
-      screen01?.classList.remove('active');
-      workflowContainer?.classList.remove('active');
-      screen05Viewer?.classList.add('active');
-      
-      // Update left stepper active indicator
-      this.updateStepperActive(4);
-
-      // Render / resize 3D viewer
-      setTimeout(() => {
-        if (this.viewer) {
-          this.viewer.onResize();
-        } else {
-          this.setupThreeScene();
-        }
-      }, 50);
-      return;
-    }
-
-    // Screens 02, 03, 04, 06: Managed inside workflowContainer
+    // Screens 02, 03, 04, 05, 06: Managed inside workflowContainer with persistent left sidebar
     screen01?.classList.remove('active');
-    screen05Viewer?.classList.remove('active');
     workflowContainer?.classList.add('active');
 
     // Hide all panes
-    [pane02, pane03, pane04, pane06].forEach(p => p?.classList.remove('active'));
+    [pane02, pane03, pane04, pane05, pane06].forEach(p => p?.classList.remove('active'));
 
     if (screenNum === 2) {
       pane02?.classList.add('active');
@@ -121,6 +100,18 @@ class AeroSculptApp {
       pane04?.classList.add('active');
       this.updateStepperActive(3);
       this.runPipelineProcessing(triggerSimulation);
+    } else if (screenNum === 5) {
+      pane05?.classList.add('active');
+      this.updateStepperActive(4);
+      
+      // Render / resize 3D viewer
+      setTimeout(() => {
+        if (this.viewer) {
+          this.viewer.onResize();
+        } else {
+          this.setupThreeScene();
+        }
+      }, 60);
     } else if (screenNum === 6) {
       pane06?.classList.add('active');
       this.updateStepperActive(5);
@@ -326,6 +317,8 @@ class AeroSculptApp {
     // Start Processing CTA -> Transitions to Screen 03 with dynamic animation
     document.getElementById('btn-start-processing')?.addEventListener('click', () => {
       this.stopTour();
+      this.isAutoAdvancing = true;
+      this.hasRunSimulation = false;
       this.showScreen(3, true);
     });
   }
@@ -391,9 +384,9 @@ class AeroSculptApp {
       badge.innerHTML = '<span class="check-spinner" style="width: 10px; height: 10px; margin-right: 6px;"></span> Verifying Feasibility...';
     }
 
-    // 2. Animate flight path spline over ~2.0 seconds
+    // 2. Animate flight path spline over ~1.8 seconds
     const startTime = performance.now();
-    const duration = 2000;
+    const duration = 1800;
 
     const animateTrajectory = (now) => {
       const elapsed = now - startTime;
@@ -410,7 +403,7 @@ class AeroSculptApp {
     if (this.flightAnimFrame) cancelAnimationFrame(this.flightAnimFrame);
     this.flightAnimFrame = requestAnimationFrame(animateTrajectory);
 
-    // 3. Sequentially resolve quality checks every ~300ms
+    // 3. Sequentially resolve quality checks every ~280ms
     qcChecks.forEach((qc, idx) => {
       setTimeout(() => {
         const row = document.getElementById(qc.id);
@@ -421,14 +414,14 @@ class AeroSculptApp {
           if (badge) {
             badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> All Inputs Valid';
           }
-          // If in automated tour, proceed to processing in 1.8s
-          if (this.isTourRunning) {
+          // Hands-free auto-advancement: automatically proceeds to processing!
+          if (this.isAutoAdvancing) {
             this.tourTimer = setTimeout(() => {
               this.showScreen(4, true);
-            }, 1800);
+            }, 600);
           }
         }
-      }, 350 * (idx + 1));
+      }, 280 * (idx + 1));
     });
   }
 
@@ -566,16 +559,27 @@ class AeroSculptApp {
     let currentIdx = 0;
     const advanceStage = () => {
       if (currentIdx >= stages.length) {
-        if (currentStageElem) currentStageElem.textContent = 'Reconstruction Complete';
+        // Ensure all 7 stages are explicitly marked completed
+        stages.forEach(s => {
+          const item = document.getElementById(s.id);
+          if (item) {
+            item.className = 'pipeline-stage-item completed';
+            const icon = item.querySelector('.stage-status-icon');
+            if (icon) icon.className = 'fa-solid fa-circle-check stage-status-icon';
+          }
+        });
+
+        if (currentStageElem) currentStageElem.textContent = 'Generating Output (Complete)';
         if (progressFill) progressFill.style.width = '100%';
-        if (etaElem) etaElem.textContent = 'Finished';
+        if (etaElem) etaElem.textContent = 'Ready';
 
         this.hasRunSimulation = true;
 
-        if (this.isTourRunning) {
+        if (this.isAutoAdvancing) {
           this.tourTimer = setTimeout(() => {
             this.showScreen(5);
-          }, 1500);
+            this.isAutoAdvancing = false; // Stops at Screen 05 as requested by user!
+          }, 800);
         }
         return;
       }
@@ -594,7 +598,7 @@ class AeroSculptApp {
         if (icon) icon.className = 'fa-solid fa-circle-notch fa-spin stage-status-icon';
       }
 
-      // After 450ms, mark completed and move next
+      // After 380ms, mark completed and move next
       setTimeout(() => {
         if (item) {
           item.className = 'pipeline-stage-item completed';
@@ -603,7 +607,7 @@ class AeroSculptApp {
         }
         currentIdx++;
         advanceStage();
-      }, 450);
+      }, 380);
     };
 
     advanceStage();
@@ -650,10 +654,11 @@ class AeroSculptApp {
       { name: 'Buildings', color: 'rgba(0, 240, 255, 0.25)', border: 'var(--as-cyan)' },
       { name: 'Roads', color: 'rgba(96, 165, 250, 0.25)', border: '#60a5fa' },
       { name: 'Vegetation', color: 'rgba(16, 185, 129, 0.25)', border: 'var(--as-green)' },
-      { name: 'Vehicles', color: 'rgba(192, 132, 252, 0.25)', border: '#c084fc' }
+      { name: 'Vehicles', color: 'rgba(192, 132, 252, 0.25)', border: '#c084fc' },
+      { name: 'People (Masked)', color: 'rgba(239, 68, 68, 0.25)', border: '#ef4444' }
     ];
 
-    const frameIndices = mission.keyframeIndices || [1, 24, 68, 112];
+    const frameIndices = mission.keyframeIndices || [1, 24, 68, 112, 185];
 
     labels.forEach((lbl, i) => {
       const fIdx = frameIndices[i] || 1;

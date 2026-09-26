@@ -932,8 +932,8 @@ html, body {
 
 .semantic-grid-tiles {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
   flex-grow: 1;
   overflow: hidden;
 }
@@ -964,31 +964,33 @@ html, body {
 }
 
 /* ==========================================================================
-   Screen 05: 3D Viewer & Analysis
+   Screen 05: 3D Viewer & Analysis (Inside Workflow Container with Sidebar)
    ========================================================================== */
+#pane-screen-05,
 #screen-05-viewer {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  flex-grow: 1;
+  height: calc(100vh - var(--header-height));
   display: none;
+  flex-direction: row;
+  padding: 0;
   background: #090e1a;
   overflow: hidden;
+  position: relative;
 }
 
+#pane-screen-05.active,
 #screen-05-viewer.active {
   display: flex;
 }
 
 .viewer05-left-toolbar {
-  width: 180px;
-  background: rgba(11, 17, 30, 0.92);
+  width: 170px;
+  background: rgba(11, 17, 30, 0.95);
   border-right: 1px solid var(--as-border-subtle);
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   z-index: 10;
   flex-shrink: 0;
 }

@@ -621,6 +621,137 @@
     </main>
 
     <!-- ==========================================================================
+         Screen 05: 3D Viewer & Analysis (Inside Workflow Container with Left Stepper)
+         ========================================================================== -->
+    <main class="workflow-screen-pane" id="pane-screen-05">
+      
+      <!-- Left Toolbar: Layers & Measurement Tools -->
+      <div class="viewer05-left-toolbar">
+        <div class="toolbar-header-txt">Layers</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-mesh" checked style="accent-color: var(--as-cyan);"> Textured Mesh</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-points" style="accent-color: var(--as-cyan);"> Point Cloud</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-bldgs" checked style="accent-color: var(--as-cyan);"> Buildings</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-roads" checked style="accent-color: #60a5fa;"> Roads</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-veg" checked style="accent-color: var(--as-green);"> Vegetation</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-veh" checked style="accent-color: #c084fc;"> Vehicles</label>
+          <label class="layer-toggle-btn"><input type="checkbox" id="layer-ppl" checked style="accent-color: #f87171;"> People (Masked)</label>
+        </div>
+
+        <div class="toolbar-header-txt" style="margin-top: 10px;">Tools</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <button class="layer-toggle-btn active" id="tool-measure" style="background: rgba(37,99,235,0.2); padding: 4px 8px; border-radius: 4px; color: #ffffff;">
+            <i class="fa-solid fa-ruler-combined" style="color: var(--as-cyan);"></i> Measure
+          </button>
+          <button class="layer-toggle-btn" id="tool-area" style="padding: 4px 8px; border-radius: 4px;">
+            <i class="fa-solid fa-draw-polygon" style="color: #60a5fa;"></i> Area
+          </button>
+          <button class="layer-toggle-btn" id="tool-coord" style="padding: 4px 8px; border-radius: 4px;">
+            <i class="fa-solid fa-location-crosshairs" style="color: var(--as-green);"></i> Coordinate Pick
+          </button>
+        </div>
+
+        <!-- Quick Stepper Navigation Links -->
+        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px;">
+          <button id="btn-viewer-back-process" style="padding: 6px; font-size: 0.72rem; background: rgba(255,255,255,0.06); border: 1px solid var(--as-border-subtle); border-radius: 6px; color: #cbd5e1; cursor: pointer;">
+            <i class="fa-solid fa-arrow-left"></i> Process Pipeline
+          </button>
+          <button id="btn-viewer-go-export" style="padding: 6px; font-size: 0.72rem; background: var(--as-blue); border: none; border-radius: 6px; color: #ffffff; font-weight: 700; cursor: pointer;">
+            Validation & Export <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Center Viewport: Three.js Canvas & Subnav -->
+      <div class="viewer05-center-canvas">
+        <canvas id="screen05-webgl-canvas"></canvas>
+
+        <!-- Subnav Tabs -->
+        <div class="viewer05-top-tabs">
+          <button class="v-tab-btn active" id="vtab-3d">3D View</button>
+          <button class="v-tab-btn" id="vtab-ortho">Ortho</button>
+          <button class="v-tab-btn" id="vtab-points">Point Cloud</button>
+          <button class="v-tab-btn" id="vtab-evidence">Evidence</button>
+        </div>
+
+        <!-- 3D Compass Rose Gizmo -->
+        <div class="compass-rose-gizmo" title="North Orientation">
+          <span class="compass-arrow-n">N</span>
+          <div class="compass-center-dot"></div>
+        </div>
+
+        <!-- Viewport Zoom Controls -->
+        <div class="viewer-canvas-tools">
+          <button class="canvas-tool-btn" id="btn-zoom-in" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+          <button class="canvas-tool-btn" id="btn-zoom-out" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+          <button class="canvas-tool-btn" id="btn-reset-cam" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="canvas-tool-btn" id="btn-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+        </div>
+
+        <!-- Bottom Scene Evidence Legend -->
+        <div class="viewer05-bottom-evidence">
+          <span style="font-size: 0.72rem; font-weight: 800; color: #ffffff;">Scene Evidence</span>
+          <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Observed
+          </span>
+          <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Reconstructed
+          </span>
+          <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span> Inferred
+          </span>
+          <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> Unknown
+          </span>
+        </div>
+      </div>
+
+      <!-- Right HUD: Point Information & Measurement -->
+      <div class="viewer05-right-hud">
+        <div class="toolbar-header-txt">Point Information</div>
+        <div class="point-thumb-preview">
+          <img id="hud-point-thumb" src="datasets/frames_pb2/frame_0001.jpg" alt="Point Landmark">
+        </div>
+        <div class="summary-kv-list" style="font-size: 0.68rem;">
+          <div class="summary-kv-row"><span>Latitude</span> <strong id="hud-point-lat">78.2232° N</strong></div>
+          <div class="summary-kv-row"><span>Longitude</span> <strong id="hud-point-lon">15.6267° E</strong></div>
+          <div class="summary-kv-row"><span>Elevation</span> <strong id="hud-point-elev">42.4 m MSL</strong></div>
+          <div class="summary-kv-row"><span>CRS</span> <strong id="hud-point-crs">EPSG:32633 UTM</strong></div>
+        </div>
+
+        <div class="toolbar-header-txt" style="margin-top: 14px;">Measurement</div>
+        <div class="measurement-mode-tabs">
+          <button class="measure-tab-btn active" id="mtab-dist">Distance</button>
+          <button class="measure-tab-btn" id="mtab-area">Area</button>
+          <button class="measure-tab-btn" id="mtab-elev">Elevation</button>
+        </div>
+
+        <div class="measure-readout-box">
+          <div style="font-size: 0.65rem; color: var(--as-text-muted); text-transform: uppercase;">Real-world Distance</div>
+          <div class="measure-val-text" id="hud-measure-dist-val">142.7 m</div>
+        </div>
+
+        <div class="measure-points-list">
+          <div class="measure-pt-item">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-green);"></span>
+            <span>Point A:</span>
+            <strong style="color: #cbd5e1;" id="hud-point-a-coords">78.2232° N, 15.6267° E</strong>
+          </div>
+          <div class="measure-pt-item">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-cyan);"></span>
+            <span>Point B:</span>
+            <strong style="color: #cbd5e1;" id="hud-point-b-coords">78.2241° N, 15.6284° E</strong>
+          </div>
+        </div>
+
+        <div style="margin-top: auto; font-size: 0.68rem; color: var(--as-text-dim); text-align: center;">
+          <i class="fa-solid fa-hand-pointer"></i> Click anywhere on 3D terrain to measure or inspect coordinates.
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ==========================================================================
          Screen 06: Validation & Export
          ========================================================================== -->
     <main class="workflow-screen-pane" id="pane-screen-06">
@@ -756,136 +887,6 @@
 
   </div>
 
-  <!-- ==========================================================================
-       Screen 05: 3D Viewer & Analysis
-       ========================================================================== -->
-  <section id="screen-05-viewer">
-    
-    <!-- Left Toolbar: Layers & Measurement Tools -->
-    <div class="viewer05-left-toolbar">
-      <div class="toolbar-header-txt">Layers</div>
-      <div style="display: flex; flex-direction: column; gap: 4px;">
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-mesh" checked style="accent-color: var(--as-cyan);"> Textured Mesh</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-points" style="accent-color: var(--as-cyan);"> Point Cloud</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-bldgs" checked style="accent-color: var(--as-cyan);"> Buildings</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-roads" checked style="accent-color: #60a5fa;"> Roads</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-veg" checked style="accent-color: var(--as-green);"> Vegetation</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-veh" checked style="accent-color: #c084fc;"> Vehicles</label>
-        <label class="layer-toggle-btn"><input type="checkbox" id="layer-ppl" checked style="accent-color: #f87171;"> People (Masked)</label>
-      </div>
-
-      <div class="toolbar-header-txt" style="margin-top: 10px;">Tools</div>
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <button class="layer-toggle-btn active" id="tool-measure" style="background: rgba(37,99,235,0.2); padding: 4px 8px; border-radius: 4px; color: #ffffff;">
-          <i class="fa-solid fa-ruler-combined" style="color: var(--as-cyan);"></i> Measure
-        </button>
-        <button class="layer-toggle-btn" id="tool-area" style="padding: 4px 8px; border-radius: 4px;">
-          <i class="fa-solid fa-draw-polygon" style="color: #60a5fa;"></i> Area
-        </button>
-        <button class="layer-toggle-btn" id="tool-coord" style="padding: 4px 8px; border-radius: 4px;">
-          <i class="fa-solid fa-location-crosshairs" style="color: var(--as-green);"></i> Coordinate Pick
-        </button>
-      </div>
-
-      <!-- Quick Stepper Navigation Links -->
-      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px;">
-        <button id="btn-viewer-back-process" style="padding: 6px; font-size: 0.72rem; background: rgba(255,255,255,0.06); border: 1px solid var(--as-border-subtle); border-radius: 6px; color: #cbd5e1; cursor: pointer;">
-          <i class="fa-solid fa-arrow-left"></i> Process Pipeline
-        </button>
-        <button id="btn-viewer-go-export" style="padding: 6px; font-size: 0.72rem; background: var(--as-blue); border: none; border-radius: 6px; color: #ffffff; font-weight: 700; cursor: pointer;">
-          Validation & Export <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Center Viewport: Three.js Canvas & Subnav -->
-    <div class="viewer05-center-canvas">
-      <canvas id="screen05-webgl-canvas"></canvas>
-
-      <!-- Subnav Tabs -->
-      <div class="viewer05-top-tabs">
-        <button class="v-tab-btn active" id="vtab-3d">3D View</button>
-        <button class="v-tab-btn" id="vtab-ortho">Ortho</button>
-        <button class="v-tab-btn" id="vtab-points">Point Cloud</button>
-        <button class="v-tab-btn" id="vtab-evidence">Evidence</button>
-      </div>
-
-      <!-- 3D Compass Rose Gizmo -->
-      <div class="compass-rose-gizmo" title="North Orientation">
-        <span class="compass-arrow-n">N</span>
-        <div class="compass-center-dot"></div>
-      </div>
-
-      <!-- Viewport Zoom Controls -->
-      <div class="viewer-canvas-tools">
-        <button class="canvas-tool-btn" id="btn-zoom-in" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
-        <button class="canvas-tool-btn" id="btn-zoom-out" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
-        <button class="canvas-tool-btn" id="btn-reset-cam" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
-        <button class="canvas-tool-btn" id="btn-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
-      </div>
-
-      <!-- Bottom Scene Evidence Legend -->
-      <div class="viewer05-bottom-evidence">
-        <span style="font-size: 0.72rem; font-weight: 800; color: #ffffff;">Scene Evidence</span>
-        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Observed
-        </span>
-        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Reconstructed
-        </span>
-        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span> Inferred
-        </span>
-        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> Unknown
-        </span>
-      </div>
-    </div>
-
-    <!-- Right HUD: Point Information & Measurement -->
-    <div class="viewer05-right-hud">
-      <div class="toolbar-header-txt">Point Information</div>
-      <div class="point-thumb-preview">
-        <img id="hud-point-thumb" src="datasets/frames_pb2/frame_0001.jpg" alt="Point Landmark">
-      </div>
-      <div class="summary-kv-list" style="font-size: 0.68rem;">
-        <div class="summary-kv-row"><span>Latitude</span> <strong id="hud-point-lat">78.2232° N</strong></div>
-        <div class="summary-kv-row"><span>Longitude</span> <strong id="hud-point-lon">15.6267° E</strong></div>
-        <div class="summary-kv-row"><span>Elevation</span> <strong id="hud-point-elev">42.4 m MSL</strong></div>
-        <div class="summary-kv-row"><span>CRS</span> <strong id="hud-point-crs">EPSG:32633 UTM</strong></div>
-      </div>
-
-      <div class="toolbar-header-txt" style="margin-top: 14px;">Measurement</div>
-      <div class="measurement-mode-tabs">
-        <button class="measure-tab-btn active" id="mtab-dist">Distance</button>
-        <button class="measure-tab-btn" id="mtab-area">Area</button>
-        <button class="measure-tab-btn" id="mtab-elev">Elevation</button>
-      </div>
-
-      <div class="measure-readout-box">
-        <div style="font-size: 0.65rem; color: var(--as-text-muted); text-transform: uppercase;">Real-world Distance</div>
-        <div class="measure-val-text" id="hud-measure-dist-val">142.7 m</div>
-      </div>
-
-      <div class="measure-points-list">
-        <div class="measure-pt-item">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-green);"></span>
-          <span>Point A:</span>
-          <strong style="color: #cbd5e1;" id="hud-point-a-coords">78.2232° N, 15.6267° E</strong>
-        </div>
-        <div class="measure-pt-item">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-cyan);"></span>
-          <span>Point B:</span>
-          <strong style="color: #cbd5e1;" id="hud-point-b-coords">78.2241° N, 15.6284° E</strong>
-        </div>
-      </div>
-
-      <div style="margin-top: auto; font-size: 0.68rem; color: var(--as-text-dim); text-align: center;">
-        <i class="fa-solid fa-hand-pointer"></i> Click anywhere on 3D terrain to measure or inspect coordinates.
-      </div>
-    </div>
-
-  </section>
 
   <!-- ==========================================================================
        NTRO PS-17 Documentation Modal
