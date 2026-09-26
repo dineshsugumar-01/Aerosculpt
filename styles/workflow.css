@@ -149,55 +149,7 @@ html, body {
   box-shadow: 0 2px 10px var(--as-blue-glow);
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 
-.ntro-header-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ntro-emblem-icon {
-  height: 28px;
-  width: auto;
-  object-fit: contain;
-}
-
-.ntro-badge-text {
-  display: flex;
-  flex-direction: column;
-  text-align: right;
-}
-
-.ntro-title {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.ntro-code {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--as-cyan);
-  font-family: var(--as-font-mono);
-}
-
-.user-avatar-badge {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #00f0ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #ffffff;
-}
 
 /* ==========================================================================
    Screen 01: Mission Home / Landing Page
