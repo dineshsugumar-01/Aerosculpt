@@ -48,7 +48,6 @@ class AeroSculptApp {
     this.initScreen04Events();
     this.initScreen05Viewer();
     this.initScreen06Events();
-    this.initDocsModal();
 
     // Hydrate initial data for default mission (PB2)
     this.hydrateMissionData(this.store.getMission());
@@ -261,10 +260,6 @@ class AeroSculptApp {
     document.getElementById('nav-tab-export')?.addEventListener('click', () => {
       this.stopTour();
       this.showScreen(6);
-    });
-
-    document.getElementById('nav-tab-docs')?.addEventListener('click', () => {
-      this.openDocsModal();
     });
   }
 
@@ -2348,26 +2343,6 @@ class AeroSculptApp {
     // Screen 06 Export Summary
     const expProc = document.getElementById('exp-proc-time');
     if (expProc) expProc.textContent = mission.reconstructionTime;
-  }
-
-  // ==========================================================================
-  // 11. Documentation Modal
-  // ==========================================================================
-  initDocsModal() {
-    const modal = document.getElementById('modal-docs');
-    const btnClose = document.getElementById('btn-close-docs-modal');
-    const btnFooterClose = document.getElementById('btn-close-docs-footer');
-
-    btnClose?.addEventListener('click', () => modal?.classList.remove('active'));
-    btnFooterClose?.addEventListener('click', () => modal?.classList.remove('active'));
-
-    modal?.addEventListener('click', (e) => {
-      if (e.target === modal) modal.classList.remove('active');
-    });
-  }
-
-  openDocsModal() {
-    document.getElementById('modal-docs')?.classList.add('active');
   }
 }
 

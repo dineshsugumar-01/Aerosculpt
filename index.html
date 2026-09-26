@@ -1052,56 +1052,6 @@
   </div>
 
 
-  <!-- ==========================================================================
-       NTRO PS-17 Documentation Modal
-       ========================================================================== -->
-  <div class="as-modal-backdrop" id="modal-docs">
-    <div class="as-modal-window" style="max-width: 860px;">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <h2><i class="fa-solid fa-book-bookmark" style="color: var(--as-cyan);"></i> NTRO Problem Statement 17 Documentation</h2>
-          <p>Single-pass UAV photogrammetry, real-time georeferencing and evidence-aware 3D reconstruction.</p>
-        </div>
-        <button class="modal-close-btn" id="btn-close-docs-modal" title="Close Modal">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="modal-body" style="line-height: 1.6; color: #cbd5e1; font-size: 0.82rem;">
-        <h3 style="color: #ffffff; margin-bottom: 8px;">1. Operational Overview</h3>
-        <p style="margin-bottom: 14px;">
-          AeroSculpt addresses the core challenge of NTRO Problem Statement 17 (SH/26158): converting raw, single-pass continuous aerial video collected by UAVs into accurate, georeferenced, metric 3D digital surfaces and point clouds without requiring multi-pass crisscross flights.
-        </p>
-
-        <h3 style="color: #ffffff; margin-bottom: 8px;">2. Sensor Synchronization & Trajectory Verification</h3>
-        <p style="margin-bottom: 14px;">
-          The system synchronizes video frames with asynchronous 10 Hz GNSS records and 100 Hz IMU telemetry. The flight path validation verifies that spatial coverage satisfies stereoscopic parallax requirements (overlap &gt; 65%) while rejecting high-blur or turn-induced degraded keyframes.
-        </p>
-
-        <h3 style="color: #ffffff; margin-bottom: 8px;">3. Evidence-Aware 3D Representation</h3>
-        <p style="margin-bottom: 14px;">
-          Unlike conventional black-box photogrammetry, AeroSculpt categorizes every triangle and vertex into 4 strict confidence tiers:
-          <strong style="color: #10b981;">Observed (Direct Optical Multi-view rays)</strong>,
-          <strong style="color: #3b82f6;">Reconstructed (Stereo Match)</strong>,
-          <strong style="color: #f59e0b;">Inferred (Occluded / Interpolated)</strong>, and
-          <strong style="color: #ef4444;">Unknown (Unsurveyed Blindspots)</strong>.
-        </p>
-
-        <h3 style="color: #ffffff; margin-bottom: 8px;">4. Verified Standards Compliance</h3>
-        <p>
-          Meets ASPRS Positional Accuracy Standards for Digital Geospatial Data (Class 1, RMSE &lt; 0.05m with RTK fixed telemetry). Output formats include textured GLB/OBJ meshes, georeferenced LAS/PLY point clouds, and orthorectified GeoTIFF rasters.
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <span style="font-size: 0.72rem; color: var(--as-text-muted);">NTRO SH/26158 · Ministry of Electronics & IT · Smart India Hackathon 2026</span>
-        <button class="btn-primary-action" id="btn-close-docs-footer" style="padding: 6px 14px; font-size: 0.78rem;">
-          Close Documentation
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Application Entry Point -->
   <script type="module" src="src/main.js"></script>
 </body>
