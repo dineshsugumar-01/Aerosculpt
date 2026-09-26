@@ -114,7 +114,7 @@ class AeroSculptApp {
     this.viewer3d = null;
     this.studioViewer = null;
     this.currentView = 'dashboard';
-    this.currentDemoId = '01';
+    this.currentDemoId = '02';
     this.activeLayers = {
       ortho: true,
       cameras: true,

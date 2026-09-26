@@ -207,7 +207,7 @@
               <div class="hero-single-mission-tag">
                 <span class="live-dot pulse"></span>
                 <span class="mission-tag-label">ACTIVE MISSION</span>
-                <strong class="mission-tag-name">Dumbarton Castle Survey</strong>
+                <strong class="mission-tag-name">Svalbard Arctic 3D Scan</strong>
                 <span class="mission-tag-badge">NTRO · GLB · EPSG:32630</span>
               </div>
             </div>
@@ -269,7 +269,7 @@
               <div class="command-card-header">
                 <div class="card-header-left">
                   <span class="nextgen-pill-badge red"><i class="fa-solid fa-cube"></i> 3D MODEL (GLB)</span>
-                  <h3 class="command-card-title" id="model-card-title">Dumbarton Castle Survey</h3>
+                  <h3 class="command-card-title" id="model-card-title">Longyearbyen Svalbard — Arctic 3D Scan</h3>
                 </div>
 
                 <!-- 3D Toolbar Controls -->
@@ -478,12 +478,12 @@
                       <span class="tag-badge">Single-Pass UAV</span>
                       <span class="tag-badge">3D Mesh / Point Cloud</span>
                       <span class="tag-badge">GLB · OBJ · LAS · GeoTIFF</span>
-                      <span class="tag-badge">EPSG:32630</span>
+                      <span class="tag-badge">EPSG:32633</span>
                       <span class="tag-badge">Geofenced Zone</span>
                     </div>
                   </div>
                   <p class="project-description" id="project-description-text">
-                    AI-enabled single-pass drone video to 3D reconstruction of Dumbarton Castle — generating georeferenced 3D terrain, building facades, rooftops, roads, and vegetation from one UAV flight path. Processes 1080p/4K video frames with SLAM visual odometry, dense multi-view stereo, and Poisson watertight mesh reconstruction. Meets NTRO targets: &lt;15 min processing, ≤ 1 m spatial accuracy, full scene coverage. Geofenced survey boundary: 55°56'14&quot;N 4°33'48&quot;W · 210m × 195m perimeter.
+                    High-resolution drone 3D scan of the Arctic settlement of Longyearbyen, Svalbard at 78°N — capturing town infrastructure, glacial terrain, and permafrost geology. DJI Mavic 3 Enterprise Wide survey covering 65,000 m² at 2.1 cm/px GSD. EPSG:32633 UTM 33N georeferenced mesh with H: 0.031m · V: 0.048m RMSE accuracy.
                   </p>
                 </div>
 
@@ -1037,9 +1037,9 @@
                 <i class="fa fa-layer-group text-primary"></i>
                 <label for="studio-dataset-selector" class="hidden-xs">Dataset:</label>
                 <select id="studio-dataset-selector" class="studio-dataset-select" title="Switch Survey Dataset">
-                  <option value="01">01 · AeroSculpt Aerial Survey (30.1 MB)</option>
-                  <option value="02" selected>02 · AeroSculpt SLAM Trajectory (9.6 MB)</option>
-                  <option value="03">03 · 360° Circular Orbit (19.8 MB PLY)</option>
+                  <option value="01">01 · Komorowice Cadastral Survey (26.2 MB)</option>
+                  <option value="02" selected>02 · Svalbard Arctic 3D Scan (34.7 MB)</option>
+                  <option value="03">03 · Zermatt Alpine Survey (31.7 MB)</option>
                 </select>
               </div>
 
@@ -1633,41 +1633,6 @@
               <div class="demo-card-row-action">
                 <button type="button" class="btn btn-sm btn-primary btn-load-demo-action" data-demo="01">
                   <i class="fa fa-play"></i> Ingest & Load Prebuilt 01
-                </button>
-              </div>
-            </div>
-
-            <!-- PREBUILT 02 ROW ITEM -->
-            <div class="demo-dataset-card demo-card-row" data-demo-id="02">
-              <div class="demo-card-row-thumb">
-                <img src="datasets/frames_pb2/frame_0256.jpg" alt="Longyearbyen Svalbard Arctic Drone Scan" class="demo-modal-card-thumb" loading="lazy" />
-              </div>
-              <div class="demo-card-row-content">
-                <div class="demo-card-row-header">
-                  <span class="badge-demo-id">PREBUILT 02</span>
-                  <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">Longyearbyen Svalbard — Arctic 3D Scan</h4>
-                  <span class="demo-filesize">34.7 MB Mesh · 108.6 MB Video</span>
-                </div>
-                <p class="demo-card-desc">DJI Mavic 3 Enterprise drone 3D scan of the Arctic settlement at 78°N — glacial terrain &amp; permafrost geology.</p>
-                <div class="demo-card-row-meta">
-                  <div class="demo-out-metrics-row">
-                    <span class="m-pill"><span>GSD:</span> <strong>1.82 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.44 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>620,000</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:32633 UTM 33N</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.031m · V: 0.048m</strong></span>
-                  </div>
-                  <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
-                    <span class="deliverable-tag"><i class="fa fa-video"></i> Drone Video MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-snowflake"></i> Arctic Mesh</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-card-row-action">
-                <button type="button" class="btn btn-sm btn-primary btn-load-demo-action" data-demo="02">
-                  <i class="fa fa-play"></i> Ingest & Load Prebuilt 02
                 </button>
               </div>
             </div>
