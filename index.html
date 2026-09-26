@@ -382,7 +382,7 @@
                 <div class="command-card-header">
                   <div class="card-header-left">
                     <span class="nextgen-pill-badge red pulse"><i class="fa-solid fa-video"></i> VIDEO FEEDS</span>
-                    <h4 class="command-card-subtitle" id="video-breadcrumb-feed-name">Dumbarton Castle UAV Survey</h4>
+                    <h4 class="command-card-subtitle" id="video-breadcrumb-feed-name">Longyearbyen Svalbard Arctic Scan</h4>
                   </div>
                 </div>
 
@@ -397,14 +397,14 @@
                         <span class="hud-mono" id="meta-video-res">HD · LOCKED</span>
                       </div>
                     </div>
-                    <video id="drone-inspection-video" controls autoplay loop muted preload="auto" playsinline src="datasets/01_odm_survey.mp4">
+                    <video id="drone-inspection-video" controls autoplay loop muted preload="auto" playsinline src="datasets/pb2_video.mp4">
                       Your browser does not support HTML5 video playback.
                     </video>
                   </div>
                   <div class="video-meta-strip">
-                    <div class="meta-item"><i class="fa-solid fa-file-video text-muted"></i> <span id="meta-video-name">datasets/01_odm_survey.mp4</span></div>
-                    <div class="meta-item"><i class="fa-solid fa-hard-drive text-muted"></i> <span id="meta-video-size">11.6 MB</span></div>
-                    <div class="meta-item"><i class="fa-solid fa-camera text-muted"></i> <span id="meta-video-type">Sony 1-inch Exmor 4K Stream</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-file-video text-muted"></i> <span id="meta-video-name">datasets/pb2_video.mp4</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-hard-drive text-muted"></i> <span id="meta-video-size">108.6 MB</span></div>
+                    <div class="meta-item"><i class="fa-solid fa-camera text-muted"></i> <span id="meta-video-type">DJI Mavic 3 Enterprise Wide</span></div>
                   </div>
                 </div>
               </div>
@@ -620,20 +620,20 @@
                         </div>
                       </div>
 
-                      <!-- AeroSculpt SLAM Tracking Card -->
+                      <!-- PB2 Svalbard Arctic Drone Feed -->
                       <div class="task-thumbnail-wrapper" id="dash-slam-video-card" title="Click to open Full Video Feed View" style="cursor: pointer;">
                         <div class="thumb-canvas-container" style="height: calc(100% - 60px); position: relative; background: #000;">
-                          <video id="dash-slam-video" autoplay loop muted playsinline src="assets/aerosculpt_slam_tracking.mp4" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                          <video id="dash-slam-video" autoplay loop muted playsinline src="datasets/pb2_video.mp4" style="width: 100%; height: 100%; object-fit: cover;"></video>
                           <div class="slam-feed-corner-tag top-left">
-                            <i class="fa fa-crosshairs"></i> Visual Odometry Tracking
+                            <i class="fa fa-snowflake"></i> Longyearbyen · 78°N Arctic
                           </div>
                           <div class="slam-feed-corner-tag bottom-right">
-                            EPSG:32630 · RTK Fixed
+                            EPSG:32633 · UTM 33N
                           </div>
                         </div>
                         <div class="thumb-caption">
-                          <strong>AeroSculpt SLAM Tracking Feed</strong>
-                          <span>Continuous feature landmark detection and real-time visual odometry</span>
+                          <strong>Svalbard Arctic Drone 3D Scan</strong>
+                          <span>DJI Mavic 3 Enterprise — Arctic settlement terrain &amp; infrastructure</span>
                         </div>
                       </div>
                     </div>
@@ -1605,28 +1605,28 @@
             <!-- PREBUILT 01 ROW ITEM -->
             <div class="demo-dataset-card demo-card-row" data-demo-id="01">
               <div class="demo-card-row-thumb">
-                <img src="datasets/frames_01/frame_024.jpg" alt="AeroSculpt Aerial Survey Frame" class="demo-modal-card-thumb" loading="lazy" />
+                <img src="datasets/frames_pb1/frame_0047.jpg" alt="Komorowice Cadastral Survey Frame" class="demo-modal-card-thumb" loading="lazy" />
               </div>
               <div class="demo-card-row-content">
                 <div class="demo-card-row-header">
                   <span class="badge-demo-id">PREBUILT 01</span>
                   <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">AeroSculpt Aerial Survey</h4>
-                  <span class="demo-filesize">30.1 MB Mesh · 11.6 MB Video</span>
+                  <h4 class="demo-card-title">Komorowice Cadastral Land Survey</h4>
+                  <span class="demo-filesize">26.2 MB Mesh · 51.8 MB Video</span>
                 </div>
                 <p class="demo-card-desc">Dumbarton Fortress & terrain survey flown with Sony 20MP sensor at 48.5m AGL.</p>
                 <div class="demo-card-row-meta">
                   <div class="demo-out-metrics-row">
                     <span class="m-pill"><span>GSD:</span> <strong>1.42 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.42 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>524,288</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>WGS 84 / UTM 10N</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.024m · V: 0.038m</strong></span>
+                    <span class="m-pill"><span>Reproj:</span> <strong>0.38 px</strong></span>
+                    <span class="m-pill"><span>Triangles:</span> <strong>480,000</strong></span>
+                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:2180 PUWG 1992</strong></span>
+                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.021m · V: 0.034m</strong></span>
                   </div>
                   <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Watertight GLB</span>
+                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
                     <span class="deliverable-tag"><i class="fa fa-video"></i> Survey Video MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-map"></i> GeoTIFF</span>
+                    <span class="deliverable-tag"><i class="fa fa-map"></i> Cadastral GeoTIFF</span>
                   </div>
                 </div>
               </div>
@@ -1640,28 +1640,28 @@
             <!-- PREBUILT 02 ROW ITEM -->
             <div class="demo-dataset-card demo-card-row" data-demo-id="02">
               <div class="demo-card-row-thumb">
-                <img src="datasets/frames_02/frame_024.jpg" alt="AeroSculpt SLAM Trajectory Frame" class="demo-modal-card-thumb" loading="lazy" />
+                <img src="datasets/frames_pb2/frame_0256.jpg" alt="Longyearbyen Svalbard Arctic Drone Scan" class="demo-modal-card-thumb" loading="lazy" />
               </div>
               <div class="demo-card-row-content">
                 <div class="demo-card-row-header">
                   <span class="badge-demo-id">PREBUILT 02</span>
                   <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">AeroSculpt SLAM Trajectory</h4>
-                  <span class="demo-filesize">9.6 MB Mesh · 5.7 MB Video</span>
+                  <h4 class="demo-card-title">Longyearbyen Svalbard — Arctic 3D Scan</h4>
+                  <span class="demo-filesize">34.7 MB Mesh · 108.6 MB Video</span>
                 </div>
-                <p class="demo-card-desc">Urban architecture and courtyard odometry tracking dynamic visual consensus.</p>
+                <p class="demo-card-desc">DJI Mavic 3 Enterprise drone 3D scan of the Arctic settlement at 78°N — glacial terrain &amp; permafrost geology.</p>
                 <div class="demo-card-row-meta">
                   <div class="demo-out-metrics-row">
                     <span class="m-pill"><span>GSD:</span> <strong>1.82 cm/px</strong></span>
-                    <span class="m-pill"><span>Reproj:</span> <strong>0.48 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>384,192</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>WGS 84 / Geodetic</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.028m · V: 0.041m</strong></span>
+                    <span class="m-pill"><span>Reproj:</span> <strong>0.44 px</strong></span>
+                    <span class="m-pill"><span>Triangles:</span> <strong>620,000</strong></span>
+                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:32633 UTM 33N</strong></span>
+                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.031m · V: 0.048m</strong></span>
                   </div>
                   <div class="demo-deliverables-pill-row">
                     <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
-                    <span class="deliverable-tag"><i class="fa fa-video"></i> SLAM Video MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-cloud"></i> Dense PLY</span>
+                    <span class="deliverable-tag"><i class="fa fa-video"></i> Drone Video MP4</span>
+                    <span class="deliverable-tag"><i class="fa fa-snowflake"></i> Arctic Mesh</span>
                   </div>
                 </div>
               </div>
@@ -1672,31 +1672,31 @@
               </div>
             </div>
 
-            <!-- PREBUILT 03 ROW ITEM (360° Circular Orbit) -->
+            <!-- PREBUILT 03 ROW ITEM -->
             <div class="demo-dataset-card demo-card-row" data-demo-id="03">
               <div class="demo-card-row-thumb">
-                <img src="datasets/frames_03/frame_015.jpg" alt="AeroSculpt 360° Circular Orbit Benchmark Frame" class="demo-modal-card-thumb" loading="lazy" />
+                <img src="datasets/frames_pb3/frame_0090.jpg" alt="Hotel Gornergrat Kulm Zermatt Alpine Survey" class="demo-modal-card-thumb" loading="lazy" />
               </div>
               <div class="demo-card-row-content">
                 <div class="demo-card-row-header">
                   <span class="badge-demo-id">PREBUILT 03</span>
                   <span class="badge-demo-status">READY</span>
-                  <h4 class="demo-card-title">AeroSculpt 360° Circular Orbit</h4>
-                  <span class="demo-filesize">19.8 MB Mesh · 1.7 MB Video</span>
+                  <h4 class="demo-card-title">Hotel Gornergrat Kulm — Zermatt Alpine</h4>
+                  <span class="demo-filesize">31.7 MB Mesh · 36.4 MB Video</span>
                 </div>
-                <p class="demo-card-desc">EPFL photogrammetry benchmark with 33 calibrated circular stations and 16-bit depth consensus.</p>
+                <p class="demo-card-desc">DJI Mini 3 Pro survey of the iconic alpine hotel at 3089m ASL in Zermatt — snow &amp; rocky terrain geometry.</p>
                 <div class="demo-card-row-meta">
                   <div class="demo-out-metrics-row">
                     <span class="m-pill"><span>GSD:</span> <strong>0.18 cm/px</strong></span>
                     <span class="m-pill"><span>Reproj:</span> <strong>0.29 px</strong></span>
-                    <span class="m-pill"><span>Triangles:</span> <strong>1,033,745</strong></span>
-                    <span class="m-pill"><span>Datum:</span> <strong>Swiss LV95 / Local</strong></span>
-                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.008m · V: 0.012m</strong></span>
+                    <span class="m-pill"><span>Triangles:</span> <strong>560,000</strong></span>
+                    <span class="m-pill"><span>Datum:</span> <strong>EPSG:2056 Swiss LV95</strong></span>
+                    <span class="m-pill"><span>Accuracy:</span> <strong>H: 0.011m · V: 0.018m</strong></span>
                   </div>
                   <div class="demo-deliverables-pill-row">
-                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Calibrated PLY</span>
-                    <span class="deliverable-tag"><i class="fa fa-arrows-rotate"></i> 360° Orbit MP4</span>
-                    <span class="deliverable-tag"><i class="fa fa-layer-group"></i> 16-bit Depth</span>
+                    <span class="deliverable-tag"><i class="fa fa-cube"></i> Textured GLB</span>
+                    <span class="deliverable-tag"><i class="fa fa-mountain"></i> Alpine Survey MP4</span>
+                    <span class="deliverable-tag"><i class="fa fa-layer-group"></i> Dense Mesh</span>
                   </div>
                 </div>
               </div>
