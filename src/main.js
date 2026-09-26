@@ -1,99 +1,218 @@
-// AeroSculpt NTRO Main Application Controller v3.0
-// Landing Page Home + Automated Tab-by-Tab Tour + Authentic NTRO Emblem
+// AeroSculpt NTRO Main Application Controller v4.0
+// Exact Implementation of 6-Panel Design Reference:
+// Screen 01: Mission Home / Landing Page
+// Screen 02: Upload & Configuration
+// Screen 03: Input Validation (Dynamic Trajectory & Quality Checks)
+// Screen 04: Processing Pipeline (7 Stages, Differentiated Keyframes, SAM Tiles)
+// Screen 05: 3D Viewer & Analysis (Auto-Fit GLB, Flat on Y=0, Compass, Raycaster Measurement)
+// Screen 06: Validation & Export (NTRO Metric Table, SVG Donut Chart, Downloads)
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { MISSIONS, PIPELINE_STAGES, MissionStore } from './missionStore.js';
+import { MISSIONS, MissionStore } from './missionStore.js';
 
 class AeroSculptApp {
   constructor() {
     this.store = new MissionStore('pb2'); // Default to pb2 (Svalbard Arctic Reconnaissance)
-    this.currentStep = 1;
+    this.currentScreen = 1; // 1: Landing, 2: Upload, 3: Validation, 4: Pipeline, 5: 3D Viewer, 6: Export
     this.viewer = null;
-    this.processingTimer = null;
+    this.hasRunSimulation = false;
 
     // Automated Tour State
     this.isTourRunning = false;
-    this.tourStep = 1;
-    this.tourCountdownTimer = null;
-    this.tourRemainingSec = 0;
-    this.tourPaused = false;
+    this.tourTimer = null;
 
     // 3D Measurement & Inspection State
-    this.measureActive = false;
+    this.measureMode = 'dist'; // dist, area, elev
     this.measurePoints = [];
     this.measureLine = null;
     this.measureMarkers = [];
+
+    // Flight Canvas Animation
+    this.flightAnimFrame = null;
+    this.flightProgress = 1.0;
 
     this.init();
   }
 
   init() {
-    this.bindLandingEvents();
-    this.bindMissionModal();
-    this.bindSidebarNav();
-    this.bindWorkflowNavigation();
-    this.bindTourControls();
-    this.bind3DViewerControls();
-    this.bindExportActions();
-    this.bindDocsModal();
+    this.initGlobalNavigation();
+    this.initLandingEvents();
+    this.initMissionModal();
+    this.initStepperNavigation();
+    this.initScreen02Events();
+    this.initScreen03Events();
+    this.initScreen04Events();
+    this.initScreen05Viewer();
+    this.initScreen06Events();
+    this.initDocsModal();
 
-    // Subscribe to mission store
-    this.store.subscribe((state) => {
-      this.hydrateMissionData(state.mission);
+    // Hydrate initial data for default mission (PB2)
+    this.hydrateMissionData(this.store.getMission());
+
+    // Show Screen 01 (Landing Page) by default on initial load
+    this.showScreen(1);
+  }
+
+  // ==========================================================================
+  // Screen Router & View Manager
+  // ==========================================================================
+  showScreen(screenNum, triggerSimulation = false) {
+    this.currentScreen = screenNum;
+
+    const screen01 = document.getElementById('screen-01-landing');
+    const workflowContainer = document.getElementById('workflow-app-container');
+    const screen05Viewer = document.getElementById('screen-05-viewer');
+
+    const pane02 = document.getElementById('pane-screen-02');
+    const pane03 = document.getElementById('pane-screen-03');
+    const pane04 = document.getElementById('pane-screen-04');
+    const pane06 = document.getElementById('pane-screen-06');
+
+    // Update Top Header Tabs active state
+    this.updateHeaderNavTabs(screenNum);
+
+    // Screen 01: Home / Landing Page
+    if (screenNum === 1) {
+      screen01?.classList.add('active');
+      workflowContainer?.classList.remove('active');
+      screen05Viewer?.classList.remove('active');
+      return;
+    }
+
+    // Screen 05: 3D Viewer & Analysis (Full-screen viewport)
+    if (screenNum === 5) {
+      screen01?.classList.remove('active');
+      workflowContainer?.classList.remove('active');
+      screen05Viewer?.classList.add('active');
+      
+      // Update left stepper active indicator
+      this.updateStepperActive(4);
+
+      // Render / resize 3D viewer
+      setTimeout(() => {
+        if (this.viewer) {
+          this.viewer.onResize();
+        } else {
+          this.setupThreeScene();
+        }
+      }, 50);
+      return;
+    }
+
+    // Screens 02, 03, 04, 06: Managed inside workflowContainer
+    screen01?.classList.remove('active');
+    screen05Viewer?.classList.remove('active');
+    workflowContainer?.classList.add('active');
+
+    // Hide all panes
+    [pane02, pane03, pane04, pane06].forEach(p => p?.classList.remove('active'));
+
+    if (screenNum === 2) {
+      pane02?.classList.add('active');
+      this.updateStepperActive(1);
+    } else if (screenNum === 3) {
+      pane03?.classList.add('active');
+      this.updateStepperActive(2);
+      this.runTrajectoryValidation(triggerSimulation);
+    } else if (screenNum === 4) {
+      pane04?.classList.add('active');
+      this.updateStepperActive(3);
+      this.runPipelineProcessing(triggerSimulation);
+    } else if (screenNum === 6) {
+      pane06?.classList.add('active');
+      this.updateStepperActive(5);
+      this.renderScreen06Metrics();
+    }
+  }
+
+  updateHeaderNavTabs(screenNum) {
+    const tabHome = document.getElementById('nav-tab-home');
+    const tabProcess = document.getElementById('nav-tab-process');
+    const tabViewer = document.getElementById('nav-tab-viewer');
+    const tabExport = document.getElementById('nav-tab-export');
+
+    [tabHome, tabProcess, tabViewer, tabExport].forEach(t => t?.classList.remove('active'));
+
+    if (screenNum === 1) tabHome?.classList.add('active');
+    else if (screenNum >= 2 && screenNum <= 4) tabProcess?.classList.add('active');
+    else if (screenNum === 5) tabViewer?.classList.add('active');
+    else if (screenNum === 6) tabExport?.classList.add('active');
+  }
+
+  updateStepperActive(stepIndex) {
+    // Stepper items: 1 (Upload), 2 (Validate), 3 (Process), 4 (3D View), 5 (Export)
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById(`stepper-step-${i}`);
+      if (!btn) continue;
+      btn.classList.remove('active');
+      if (i < stepIndex || this.hasRunSimulation) {
+        btn.classList.add('completed');
+        const numSpan = btn.querySelector('.stepper-circle-num');
+        if (numSpan && !numSpan.querySelector('i')) {
+          numSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
+        }
+      }
+      if (i === stepIndex) {
+        btn.classList.add('active');
+      }
+    }
+  }
+
+  // ==========================================================================
+  // 1. Global Navigation & Landing Events
+  // ==========================================================================
+  initGlobalNavigation() {
+    document.getElementById('header-brand-logo')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(1);
     });
 
-    // Initial hydration
-    this.hydrateMissionData(this.store.getMission());
-    this.showLandingPage();
+    document.getElementById('nav-tab-home')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(1);
+    });
+
+    document.getElementById('nav-tab-process')?.addEventListener('click', () => {
+      this.stopTour();
+      // If we haven't processed yet, go to Screen 02, else Screen 03 or 04
+      this.showScreen(2);
+    });
+
+    document.getElementById('nav-tab-viewer')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(5);
+    });
+
+    document.getElementById('nav-tab-export')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(6);
+    });
+
+    document.getElementById('nav-tab-docs')?.addEventListener('click', () => {
+      this.openDocsModal();
+    });
   }
 
-  // ==========================================================================
-  // 1. Landing Page Navigation
-  // ==========================================================================
-  showLandingPage() {
-    this.stopAutomatedTour();
-    document.getElementById('view-landing')?.classList.add('active');
-    document.getElementById('view-workflow')?.classList.remove('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  showWorkflowView(initialStep = 1) {
-    document.getElementById('view-landing')?.classList.remove('active');
-    document.getElementById('view-workflow')?.classList.add('active');
-    this.goToStep(initialStep, false);
-  }
-
-  bindLandingEvents() {
-    const btnHeroDemo = document.getElementById('btn-hero-demo');
-    const btnHeroSelect = document.getElementById('btn-hero-select');
-
-    // Click "Load Demo Mission" -> directly launches automated tour on PB2
-    btnHeroDemo?.addEventListener('click', () => {
+  initLandingEvents() {
+    // "Load Demo Mission" -> Directly starts the automated step-by-step walkthrough
+    document.getElementById('btn-hero-demo')?.addEventListener('click', () => {
       this.startAutomatedDemoTour('pb2');
     });
 
-    // Click "Select Mission" -> opens modal to choose PB1, PB2, or PB3
-    btnHeroSelect?.addEventListener('click', () => {
-      this.openMissionModal();
-    });
-
-    // Header Home buttons
-    document.getElementById('btn-header-home')?.addEventListener('click', () => {
-      this.showLandingPage();
-    });
-
-    document.getElementById('sidebar-brand-home')?.addEventListener('click', () => {
-      this.showLandingPage();
+    // "Upload Your Own Mission" -> Directly opens Screen 02 (Upload & Configuration)
+    document.getElementById('btn-hero-upload')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(2);
     });
   }
 
   // ==========================================================================
   // 2. Mission Selection Modal
   // ==========================================================================
-  bindMissionModal() {
+  initMissionModal() {
     const modal = document.getElementById('modal-mission-picker');
     const btnClose = document.getElementById('btn-close-mission-modal');
     const btnConfirm = document.getElementById('btn-confirm-mission');
@@ -119,14 +238,18 @@ class AeroSculptApp {
       const selected = document.querySelector('.mission-card.selected');
       const missionId = selected?.getAttribute('data-mission-id') || 'pb2';
       modal?.classList.remove('active');
-      this.startAutomatedDemoTour(missionId);
+      this.switchMission(missionId);
     });
 
     modal?.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
     });
 
-    document.getElementById('btn-sidebar-switch-mission')?.addEventListener('click', () => {
+    document.getElementById('btn-demo-dataset')?.addEventListener('click', () => {
+      this.openMissionModal();
+    });
+
+    document.getElementById('btn-switch-dataset-stepper')?.addEventListener('click', () => {
       this.openMissionModal();
     });
   }
@@ -135,568 +258,586 @@ class AeroSculptApp {
     document.getElementById('modal-mission-picker')?.classList.add('active');
   }
 
+  switchMission(missionId) {
+    this.store.setMission(missionId);
+    const mission = this.store.getMission();
+    this.hydrateMissionData(mission);
+
+    // Reload 3D model in background or next time Screen 05 is viewed
+    if (this.viewer) {
+      this.loadMissionModel(mission);
+    }
+  }
+
   // ==========================================================================
-  // 3. Left Sidebar Navigation (Evaluator can "scroll it back" anytime)
+  // 3. Persistent Stepper Navigation
   // ==========================================================================
-  bindSidebarNav() {
-    const navItems = document.querySelectorAll('.sidebar-nav-item[data-step]');
-    navItems.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const stepNum = parseInt(btn.getAttribute('data-step') || '1', 10);
-        this.stopAutomatedTour(); // Manual click stops auto-tour so user can freely inspect
-        this.goToStep(stepNum);
+  initStepperNavigation() {
+    document.getElementById('stepper-step-1')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(2);
+    });
+
+    document.getElementById('stepper-step-2')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(3, false); // Instant inspection if already run
+    });
+
+    document.getElementById('stepper-step-3')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(4, false); // Instant inspection if already run
+    });
+
+    document.getElementById('stepper-step-4')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(5);
+    });
+
+    document.getElementById('stepper-step-5')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(6);
+    });
+  }
+
+  // ==========================================================================
+  // 4. Screen 02: Upload & Configuration Events
+  // ==========================================================================
+  initScreen02Events() {
+    // Scene Type Buttons
+    const sceneTypes = ['urban', 'rural', 'mountain', 'coastal'];
+    sceneTypes.forEach(type => {
+      const btn = document.getElementById(`scene-type-${type}`);
+      btn?.addEventListener('click', () => {
+        sceneTypes.forEach(t => document.getElementById(`scene-type-${t}`)?.classList.remove('active'));
+        btn.classList.add('active');
       });
     });
-  }
 
-  goToStep(stepNum, shouldStopTour = true) {
-    if (shouldStopTour && this.isTourRunning) {
-      this.stopAutomatedTour();
-    }
-
-    this.currentStep = stepNum;
-    this.store.setStep(stepNum);
-
-    // Update Sidebar active state
-    document.querySelectorAll('.sidebar-nav-item[data-step]').forEach(btn => {
-      btn.classList.remove('active');
-      if (parseInt(btn.getAttribute('data-step'), 10) === stepNum) {
+    // Reconstruction Mode Buttons
+    const modes = ['easy', 'medium', 'hard'];
+    modes.forEach(mode => {
+      const btn = document.getElementById(`mode-${mode}`);
+      btn?.addEventListener('click', () => {
+        modes.forEach(m => document.getElementById(`mode-${m}`)?.classList.remove('active'));
         btn.classList.add('active');
-      }
+      });
     });
 
-    // Update Step Panes
-    document.querySelectorAll('.step-pane').forEach((pane, idx) => {
-      if (idx + 1 === stepNum) {
-        pane.classList.add('active');
-      } else {
-        pane.classList.remove('active');
-      }
+    // Start Processing CTA -> Transitions to Screen 03 with dynamic animation
+    document.getElementById('btn-start-processing')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(3, true);
     });
-
-    // Update Top Breadcrumb
-    const breadcrumb = document.getElementById('breadcrumb-current-step');
-    const stepTitles = [
-      'Trajectory Validation & Feasibility',
-      'Processing Pipeline & Feature Detection',
-      '3D Model & Studio Inspection',
-      'Validation Criteria & Deliverables'
-    ];
-    if (breadcrumb) {
-      breadcrumb.textContent = stepTitles[stepNum - 1] || 'Trajectory Validation';
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Step-specific initializations
-    if (stepNum === 1) {
-      setTimeout(() => this.drawGnssFlightPath(), 60);
-    } else if (stepNum === 2) {
-      this.runProcessingPipelineSimulation();
-    } else if (stepNum === 3) {
-      this.initOrUpdate3DViewer();
-    }
   }
 
   // ==========================================================================
-  // 4. Hands-Free Automated Demo Tour Engine (Step-by-Step Tab Progression)
+  // 5. Screen 03: Input Validation & Dynamic Flight Spline Animation
   // ==========================================================================
-  startAutomatedDemoTour(missionId = 'pb2') {
-    this.store.setMission(missionId);
-    this.showWorkflowView(1);
-
-    this.isTourRunning = true;
-    this.tourPaused = false;
-    this.tourStep = 1;
-
-    const banner = document.getElementById('auto-tour-banner');
-    if (banner) banner.classList.add('active');
-
-    const btnPause = document.getElementById('btn-tour-pause');
-    const btnResume = document.getElementById('btn-tour-resume');
-    if (btnPause) btnPause.style.display = 'inline-flex';
-    if (btnResume) btnResume.style.display = 'none';
-
-    this.executeTourStep(1);
+  initScreen03Events() {
+    document.getElementById('btn-proceed-processing')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(4, true);
+    });
   }
 
-  executeTourStep(stepNum) {
-    if (!this.isTourRunning) return;
-    this.tourStep = stepNum;
-    this.goToStep(stepNum, false);
+  runTrajectoryValidation(animate = true) {
+    const mission = this.store.getMission();
+    const canvas = document.getElementById('screen03-flight-canvas');
+    if (!canvas) return;
 
-    const bannerText = document.getElementById('tour-banner-text');
-    const stepDurations = { 1: 3.5, 2: 6.0, 3: 5.5, 4: 0 }; // in seconds
-    const duration = stepDurations[stepNum] || 4.5;
-
-    const stepNames = [
-      'Step 1/4: Trajectory Validation',
-      'Step 2/4: Processing Pipeline (7 Stages)',
-      'Step 3/4: 3D Model & Studio Viewer',
-      'Step 4/4: Validation & Deliverables'
+    const ctx = canvas.getContext('2d');
+    const waypoints = mission.flightPath || [
+      { x: 40, y: 150 }, { x: 90, y: 110 }, { x: 150, y: 80 },
+      { x: 210, y: 120 }, { x: 270, y: 140 }, { x: 330, y: 90 },
+      { x: 390, y: 70 }, { x: 430, y: 130 }
     ];
 
-    if (stepNum < 4) {
-      this.tourRemainingSec = duration;
-      if (bannerText) {
-        bannerText.textContent = `⚡ AUTOMATED DEMO TOUR ACTIVE · ${stepNames[stepNum - 1]} · Auto-advancing in ${this.tourRemainingSec.toFixed(1)}s`;
-      }
+    const qcChecks = [
+      { id: 'qc-check-1', name: 'Video file valid' },
+      { id: 'qc-check-2', name: 'GPS timestamps sync' },
+      { id: 'qc-check-3', name: 'Metadata format valid' },
+      { id: 'qc-check-4', name: 'IMU data valid' },
+      { id: 'qc-check-5', name: 'Camera intrinsics valid' },
+      { id: 'qc-check-6', name: 'RTK/PPK data valid' }
+    ];
 
-      if (this.tourCountdownTimer) clearInterval(this.tourCountdownTimer);
-
-      this.tourCountdownTimer = setInterval(() => {
-        if (this.tourPaused) return;
-
-        this.tourRemainingSec -= 0.5;
-        if (bannerText) {
-          bannerText.textContent = `⚡ AUTOMATED DEMO TOUR ACTIVE · ${stepNames[stepNum - 1]} · Auto-advancing in ${Math.max(0, this.tourRemainingSec).toFixed(1)}s`;
+    if (!animate || this.hasRunSimulation) {
+      // Instant completed state
+      this.drawFlightPath(ctx, canvas, waypoints, 1.0);
+      qcChecks.forEach(qc => {
+        const row = document.getElementById(qc.id);
+        if (row) {
+          row.innerHTML = `<i class="fa-solid fa-circle-check check-pass-icon"></i> <span>${qc.name}</span>`;
         }
+      });
+      const badge = document.getElementById('badge-inputs-status');
+      if (badge) {
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> All Inputs Valid';
+      }
+      return;
+    }
 
-        if (this.tourRemainingSec <= 0) {
-          clearInterval(this.tourCountdownTimer);
-          if (this.isTourRunning && this.tourStep < 4) {
-            this.executeTourStep(this.tourStep + 1);
+    // Dynamic Live Simulation
+    // 1. Reset check icons to spinners
+    qcChecks.forEach(qc => {
+      const row = document.getElementById(qc.id);
+      if (row) {
+        row.innerHTML = `<span class="check-spinner"></span> <span>${qc.name}</span>`;
+      }
+    });
+
+    const badge = document.getElementById('badge-inputs-status');
+    if (badge) {
+      badge.innerHTML = '<span class="check-spinner" style="width: 10px; height: 10px; margin-right: 6px;"></span> Verifying Feasibility...';
+    }
+
+    // 2. Animate flight path spline over ~2.0 seconds
+    const startTime = performance.now();
+    const duration = 2000;
+
+    const animateTrajectory = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1.0);
+      this.drawFlightPath(ctx, canvas, waypoints, progress);
+
+      if (progress < 1.0) {
+        this.flightAnimFrame = requestAnimationFrame(animateTrajectory);
+      } else {
+        this.flightAnimFrame = null;
+      }
+    };
+
+    if (this.flightAnimFrame) cancelAnimationFrame(this.flightAnimFrame);
+    this.flightAnimFrame = requestAnimationFrame(animateTrajectory);
+
+    // 3. Sequentially resolve quality checks every ~300ms
+    qcChecks.forEach((qc, idx) => {
+      setTimeout(() => {
+        const row = document.getElementById(qc.id);
+        if (row) {
+          row.innerHTML = `<i class="fa-solid fa-circle-check check-pass-icon"></i> <span>${qc.name}</span>`;
+        }
+        if (idx === qcChecks.length - 1) {
+          if (badge) {
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> All Inputs Valid';
+          }
+          // If in automated tour, proceed to processing in 1.8s
+          if (this.isTourRunning) {
+            this.tourTimer = setTimeout(() => {
+              this.showScreen(4, true);
+            }, 1800);
           }
         }
-      }, 500);
-    } else {
-      // Step 4 (Final Deliverables) reached!
-      if (this.tourCountdownTimer) clearInterval(this.tourCountdownTimer);
-      if (bannerText) {
-        bannerText.textContent = `✓ AUTOMATED DEMO TOUR COMPLETE · Evaluator may now click any tab in the left sidebar to explore.`;
-      }
-      setTimeout(() => {
-        this.stopAutomatedTour();
-      }, 4500);
-    }
-  }
-
-  stopAutomatedTour() {
-    this.isTourRunning = false;
-    this.tourPaused = false;
-    if (this.tourCountdownTimer) clearInterval(this.tourCountdownTimer);
-
-    const banner = document.getElementById('auto-tour-banner');
-    if (banner) banner.classList.remove('active');
-  }
-
-  bindTourControls() {
-    const btnPause = document.getElementById('btn-tour-pause');
-    const btnResume = document.getElementById('btn-tour-resume');
-    const btnSkip = document.getElementById('btn-tour-skip');
-
-    btnPause?.addEventListener('click', () => {
-      this.tourPaused = true;
-      btnPause.style.display = 'none';
-      if (btnResume) btnResume.style.display = 'inline-flex';
-      const bannerText = document.getElementById('tour-banner-text');
-      if (bannerText) bannerText.textContent = `⏸ TOUR PAUSED · Click Resume to continue, or click any sidebar item to explore freely.`;
-    });
-
-    btnResume?.addEventListener('click', () => {
-      this.tourPaused = false;
-      btnResume.style.display = 'none';
-      if (btnPause) btnPause.style.display = 'inline-flex';
-    });
-
-    btnSkip?.addEventListener('click', () => {
-      this.stopAutomatedTour();
-      this.goToStep(3); // Jump straight to 3D model
+      }, 350 * (idx + 1));
     });
   }
 
-  // ==========================================================================
-  // 5. In-Step Navigation Buttons
-  // ==========================================================================
-  bindWorkflowNavigation() {
-    // Step 1
-    document.getElementById('btn-step1-home')?.addEventListener('click', () => this.showLandingPage());
-    document.getElementById('btn-step1-proceed')?.addEventListener('click', () => this.goToStep(2));
+  drawFlightPath(ctx, canvas, pts, progress) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Step 2
-    document.getElementById('btn-step2-back')?.addEventListener('click', () => this.goToStep(1));
-    document.getElementById('btn-step2-proceed')?.addEventListener('click', () => this.goToStep(3));
-
-    // Step 3
-    document.getElementById('btn-step3-back')?.addEventListener('click', () => this.goToStep(2));
-    document.getElementById('btn-step3-proceed')?.addEventListener('click', () => this.goToStep(4));
-
-    // Step 4
-    document.getElementById('btn-step4-back')?.addEventListener('click', () => this.goToStep(3));
-    document.getElementById('btn-step4-home')?.addEventListener('click', () => this.showLandingPage());
-  }
-
-  // ==========================================================================
-  // 6. Dynamic Mission Hydration
-  // ==========================================================================
-  hydrateMissionData(mission) {
-    if (!mission) return;
-
-    // Sidebar Active Mission Card
-    const sideName = document.getElementById('sidebar-mission-name-display');
-    const sideDatum = document.getElementById('sidebar-datum-display');
-    if (sideName) sideName.textContent = `${mission.code} · ${mission.name}`;
-    if (sideDatum) sideDatum.textContent = mission.crsDatum.split(' ')[0];
-
-    // Step 1 - Trajectory Details
-    const s1Dur = document.getElementById('step1-duration');
-    const s1Gps = document.getElementById('step1-gps-count');
-    const s1Gsd = document.getElementById('step1-gsd');
-    const s1Comp = document.getElementById('step1-compute-time');
-    const s1Crs = document.getElementById('step1-crs-name');
-    if (s1Dur) s1Dur.textContent = `${mission.videoDuration} (${mission.videoDurationSec} s)`;
-    if (s1Gps) s1Gps.textContent = mission.gpsRecords;
-    if (s1Gsd) s1Gsd.textContent = mission.gsd;
-    if (s1Comp) s1Comp.textContent = mission.reconstructionTime;
-    if (s1Crs) s1Crs.textContent = mission.crsDatum;
-
-    // Step 2 - Keyframes & SAM Masks
-    this.renderKeyframeStrip(mission);
-    this.renderSemanticPreviews(mission);
-
-    // Step 4 - Validation Table & Metrics
-    const valReproj = document.getElementById('val-reproj');
-    const valSpatial = document.getElementById('val-spatial');
-    const valCoverage = document.getElementById('val-coverage');
-    const valTime = document.getElementById('val-time');
-    if (valReproj) valReproj.textContent = mission.reprojectionError;
-    if (valSpatial) valSpatial.textContent = mission.spatialAccuracy;
-    if (valCoverage) valCoverage.textContent = mission.coverage;
-    if (valTime) valTime.textContent = mission.reconstructionTime;
-
-    // Step 4 - Donut Chart
-    this.updateDonutChart(mission.evidence);
-
-    // Step 4 - Deliverable card filename
-    const meshMeta = document.getElementById('dl-mesh-meta');
-    if (meshMeta) meshMeta.textContent = `${mission.id}_model.glb · ${mission.outputSize.split(' ')[0]} MB`;
-
-    // Redraw flight path if on step 1
-    if (this.currentStep === 1) {
-      this.drawGnssFlightPath();
-    }
-  }
-
-  // ==========================================================================
-  // 7. 2D GNSS Flight Trajectory Canvas (Step 1)
-  // ==========================================================================
-  drawGnssFlightPath() {
-    const canvas = document.getElementById('flight-path-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const mission = this.store.getMission();
-    const w = canvas.width;
-    const h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.1)';
+    // 1. Background grid
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.08)';
     ctx.lineWidth = 1;
-    for (let x = 0; x < w; x += 40) {
+    const gridSize = 35;
+    for (let x = 0; x < canvas.width; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
+      ctx.lineTo(x, canvas.height);
       ctx.stroke();
     }
-    for (let y = 0; y < h; y += 40) {
+    for (let y = 0; y < canvas.height; y += gridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
+      ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
 
-    // Flight spline
-    const pts = mission.flightPath || [];
-    if (pts.length > 1) {
-      ctx.shadowColor = '#00f0ff';
-      ctx.shadowBlur = 10;
-      ctx.strokeStyle = '#00f0ff';
-      ctx.lineWidth = 3;
+    // 2. Flight path spline
+    const totalSegments = pts.length - 1;
+    const currentSegmentIndex = Math.min(Math.floor(progress * totalSegments), totalSegments - 1);
+    const segmentProgress = (progress * totalSegments) - currentSegmentIndex;
 
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) {
-        const xc = (pts[i - 1].x + pts[i].x) / 2;
-        const yc = (pts[i - 1].y + pts[i].y) / 2;
-        ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, xc, yc);
-      }
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+
+    for (let i = 1; i <= currentSegmentIndex; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+
+    if (progress < 1.0 && currentSegmentIndex < totalSegments) {
+      const pA = pts[currentSegmentIndex];
+      const pB = pts[currentSegmentIndex + 1];
+      const curX = pA.x + (pB.x - pA.x) * segmentProgress;
+      const curY = pA.y + (pB.y - pA.y) * segmentProgress;
+      ctx.lineTo(curX, curY);
+    } else if (progress >= 1.0) {
       ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
-      ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.6)';
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // 3. Start Point (Green dot)
+    ctx.beginPath();
+    ctx.arc(pts[0].x, pts[0].y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#10b981';
+    ctx.shadowColor = 'rgba(16, 185, 129, 0.8)';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Start text
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText('Start', pts[0].x - 12, pts[0].y - 10);
+
+    // 4. End Point (Red dot) if reached
+    if (progress >= 0.98) {
+      const last = pts[pts.length - 1];
+      ctx.beginPath();
+      ctx.arc(last.x, last.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+      ctx.shadowBlur = 10;
+      ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Waypoints
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      pts.forEach((pt, index) => {
-        if (index > 0 && index < pts.length - 1) {
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-
-      // Start Waypoint (Green)
-      ctx.fillStyle = '#10b981';
-      ctx.beginPath();
-      ctx.arc(pts[0].x, pts[0].y, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.font = '11px JetBrains Mono';
-      ctx.fillStyle = '#10b981';
-      ctx.fillText('TAKEOFF (0.00s)', pts[0].x + 12, pts[0].y + 4);
-
-      // End Waypoint (Red)
-      const last = pts[pts.length - 1];
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.arc(last.x, last.y, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = '#ef4444';
-      ctx.fillText(`LAND (${mission.videoDuration})`, last.x + 12, last.y + 4);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '10px JetBrains Mono';
+      ctx.fillText('End', last.x - 10, last.y - 10);
     }
   }
 
   // ==========================================================================
-  // 8. Processing Pipeline Simulation (Step 2)
+  // 6. Screen 04: Processing Pipeline Simulation
   // ==========================================================================
-  runProcessingPipelineSimulation(forceReplay = false) {
-    if (this.store.isProcessing && !forceReplay) return;
+  initScreen04Events() {
+    document.getElementById('btn-stop-pipeline')?.addEventListener('click', () => {
+      this.stopTour();
+      alert('Pipeline paused. You can inspect keyframes or proceed manually.');
+    });
 
-    this.store.isProcessing = true;
-    const progressBar = document.getElementById('pipeline-progress-fill');
-    const percentText = document.getElementById('pipeline-percent-text');
-    const statusText = document.getElementById('pipeline-status-text');
-    const stageChips = document.querySelectorAll('.pipeline-stage-chip');
-
-    stageChips.forEach(chip => chip.classList.remove('completed', 'running'));
-    if (progressBar) progressBar.style.width = '0%';
-    if (percentText) percentText.textContent = '0%';
-
-    let currentStageIndex = 0;
-    const totalStages = PIPELINE_STAGES.length;
-
-    if (this.processingTimer) clearInterval(this.processingTimer);
-
-    this.processingTimer = setInterval(() => {
-      if (currentStageIndex < totalStages) {
-        const stage = PIPELINE_STAGES[currentStageIndex];
-
-        if (currentStageIndex > 0) {
-          stageChips[currentStageIndex - 1]?.classList.remove('running');
-          stageChips[currentStageIndex - 1]?.classList.add('completed');
-        }
-
-        stageChips[currentStageIndex]?.classList.add('running');
-        if (statusText) {
-          statusText.innerHTML = `<span class="ntro-dot-pulse"></span> Stage ${stage.id}/7: ${stage.name}...`;
-        }
-
-        const progress = Math.round(((currentStageIndex + 1) / totalStages) * 100);
-        if (progressBar) progressBar.style.width = `${progress}%`;
-        if (percentText) percentText.textContent = `${progress}%`;
-
-        currentStageIndex++;
-      } else {
-        clearInterval(this.processingTimer);
-        this.store.isProcessing = false;
-        stageChips[totalStages - 1]?.classList.remove('running');
-        stageChips[totalStages - 1]?.classList.add('completed');
-
-        if (progressBar) progressBar.style.width = '100%';
-        if (percentText) percentText.textContent = '100%';
-        if (statusText) {
-          statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--as-green);"></i> PROCESSING COMPLETE · 3D WORLD READY FOR EVALUATION`;
-        }
-      }
-    }, 700);
+    document.getElementById('btn-proceed-viewer')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(5);
+    });
   }
 
-  renderKeyframeStrip(mission) {
-    const strip = document.getElementById('keyframe-strip-container');
+  runPipelineProcessing(animate = true) {
+    const mission = this.store.getMission();
+    this.populateKeyframesFilmstrip(mission);
+    this.populateSemanticTiles(mission);
+
+    const stages = [
+      { id: 'stage-1', name: 'Input Analysis', time: '00:05' },
+      { id: 'stage-2', name: 'Keyframe Selection', time: '00:18' },
+      { id: 'stage-3', name: 'Scene Understanding', time: '00:32' },
+      { id: 'stage-4', name: 'Adaptive 3D Reconstruction', time: '01:10' },
+      { id: 'stage-5', name: 'Georeferencing', time: '01:45' },
+      { id: 'stage-6', name: 'Metric Validation', time: '02:15' },
+      { id: 'stage-7', name: 'Generating Output', time: '02:40' }
+    ];
+
+    const currentStageElem = document.getElementById('pipe-current-stage');
+    const progressFill = document.getElementById('pipe-progress-fill');
+    const etaElem = document.getElementById('pipe-eta-val');
+
+    if (!animate || this.hasRunSimulation) {
+      // Completed state
+      stages.forEach(s => {
+        const item = document.getElementById(s.id);
+        if (item) {
+          item.className = 'pipeline-stage-item completed';
+          const icon = item.querySelector('.stage-status-icon');
+          if (icon) icon.className = 'fa-solid fa-circle-check stage-status-icon';
+        }
+      });
+      if (currentStageElem) currentStageElem.textContent = 'Generating Output (Complete)';
+      if (progressFill) progressFill.style.width = '100%';
+      if (etaElem) etaElem.textContent = 'Ready';
+      return;
+    }
+
+    // Step-by-step timed execution
+    let currentIdx = 0;
+    const advanceStage = () => {
+      if (currentIdx >= stages.length) {
+        if (currentStageElem) currentStageElem.textContent = 'Reconstruction Complete';
+        if (progressFill) progressFill.style.width = '100%';
+        if (etaElem) etaElem.textContent = 'Finished';
+
+        this.hasRunSimulation = true;
+
+        if (this.isTourRunning) {
+          this.tourTimer = setTimeout(() => {
+            this.showScreen(5);
+          }, 1500);
+        }
+        return;
+      }
+
+      const st = stages[currentIdx];
+      if (currentStageElem) currentStageElem.textContent = st.name;
+      const pct = Math.round(((currentIdx + 1) / stages.length) * 100);
+      if (progressFill) progressFill.style.width = `${pct}%`;
+      if (etaElem) etaElem.textContent = `ETA: ~${Math.max(1, 7 - currentIdx)} min`;
+
+      // Set current stage to running
+      const item = document.getElementById(st.id);
+      if (item) {
+        item.className = 'pipeline-stage-item running';
+        const icon = item.querySelector('.stage-status-icon');
+        if (icon) icon.className = 'fa-solid fa-circle-notch fa-spin stage-status-icon';
+      }
+
+      // After 450ms, mark completed and move next
+      setTimeout(() => {
+        if (item) {
+          item.className = 'pipeline-stage-item completed';
+          const icon = item.querySelector('.stage-status-icon');
+          if (icon) icon.className = 'fa-solid fa-circle-check stage-status-icon';
+        }
+        currentIdx++;
+        advanceStage();
+      }, 450);
+    };
+
+    advanceStage();
+  }
+
+  populateKeyframesFilmstrip(mission) {
+    const strip = document.getElementById('pipeline-filmstrip');
     if (!strip) return;
     strip.innerHTML = '';
 
-    const badge = document.getElementById('keyframe-count-badge');
-    if (badge) badge.textContent = `${mission.frameCount} keyframes extracted · 30 FPS stream`;
+    const kfCountElem = document.getElementById('pipe-kf-count');
+    const totalFramesElem = document.getElementById('pipe-total-frames');
+    if (kfCountElem) kfCountElem.textContent = mission.frameCount;
+    if (totalFramesElem) totalFramesElem.textContent = mission.gpsRecords ? mission.gpsRecords.split(' ')[0] : '18,000';
 
-    const sampleIndices = mission.keyframeIndices || [1, 24, 68, 112, 185, 240, 310, 385, 442, 500];
+    // Differentiated sharpness scores matching user requirement!
+    const sampleScores = [0.98, 0.94, 0.89, 0.96, 0.91, 0.97, 0.93, 0.95];
+    const frameIndices = mission.keyframeIndices || [1, 24, 68, 112, 185, 240, 310, 385];
 
-    sampleIndices.forEach(idx => {
-      const padNum = String(idx).padStart(4, '0');
-      const imgPath = `${mission.framesDir}frame_${padNum}.jpg`;
+    frameIndices.slice(0, 8).forEach((fIdx, i) => {
+      const paddedNum = String(fIdx).padStart(4, '0');
+      const imgPath = `${mission.framesDir}${mission.framePrefix}${paddedNum}${mission.frameExt}`;
+      const score = sampleScores[i % sampleScores.length];
 
-      const card = document.createElement('div');
-      card.className = 'keyframe-card';
-      card.innerHTML = `
-        <img src="${imgPath}" alt="Frame ${idx}" class="keyframe-img" loading="lazy" onerror="this.src='assets/hero_bg.jpg'">
-        <div class="keyframe-meta">
-          <span>FR-${padNum}</span>
-          <span style="color: var(--as-cyan);">Score: 0.94</span>
+      const thumb = document.createElement('div');
+      thumb.className = 'keyframe-film-thumb';
+      thumb.innerHTML = `
+        <img src="${imgPath}" alt="Frame ${fIdx}" onerror="this.src='datasets/frames_pb2/frame_0001.jpg'">
+        <div class="keyframe-score-label">
+          <span>#${fIdx}</span>
+          <span>Score: ${score.toFixed(2)}</span>
         </div>
       `;
-      strip.appendChild(card);
+      strip.appendChild(thumb);
     });
   }
 
-  renderSemanticPreviews(mission) {
-    const grid = document.getElementById('semantic-previews-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
+  populateSemanticTiles(mission) {
+    const container = document.getElementById('semantic-tiles-container');
+    if (!container) return;
+    container.innerHTML = '';
 
-    const sampleIndices = (mission.keyframeIndices || [1, 24, 68, 112]).slice(0, 4);
-    const classes = ['Building Facades', 'Ground / Terrain', 'Dynamic Vehicles', 'Moving Personnel'];
+    const labels = [
+      { name: 'Buildings', color: 'rgba(0, 240, 255, 0.25)', border: 'var(--as-cyan)' },
+      { name: 'Roads', color: 'rgba(96, 165, 250, 0.25)', border: '#60a5fa' },
+      { name: 'Vegetation', color: 'rgba(16, 185, 129, 0.25)', border: 'var(--as-green)' },
+      { name: 'Vehicles', color: 'rgba(192, 132, 252, 0.25)', border: '#c084fc' }
+    ];
 
-    sampleIndices.forEach((idx, i) => {
-      const padNum = String(idx).padStart(4, '0');
-      const imgPath = `${mission.framesDir}frame_${padNum}.jpg`;
+    const frameIndices = mission.keyframeIndices || [1, 24, 68, 112];
+
+    labels.forEach((lbl, i) => {
+      const fIdx = frameIndices[i] || 1;
+      const paddedNum = String(fIdx).padStart(4, '0');
+      const imgPath = `${mission.framesDir}${mission.framePrefix}${paddedNum}${mission.frameExt}`;
 
       const tile = document.createElement('div');
-      tile.className = 'semantic-preview-card';
+      tile.className = 'semantic-tile';
       tile.innerHTML = `
-        <img src="${imgPath}" alt="Semantic frame ${idx}" class="semantic-preview-img" onerror="this.src='assets/hero_bg.jpg'">
-        <div class="semantic-overlay-mask"></div>
-        <div class="semantic-preview-label">
-          <span>${classes[i] || 'Feature Mask'}</span>
-          <span style="color: var(--as-cyan);">SAM Masked</span>
+        <img src="${imgPath}" alt="${lbl.name}" onerror="this.src='datasets/frames_pb2/frame_0001.jpg'">
+        <div class="semantic-tile-overlay" style="background: ${lbl.color}; border-color: ${lbl.border};">
+          <span style="position: absolute; bottom: 4px; left: 4px; font-size: 0.65rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px;">
+            ${lbl.name}
+          </span>
         </div>
       `;
-      grid.appendChild(tile);
+      container.appendChild(tile);
     });
   }
 
   // ==========================================================================
-  // 9. Three.js 3D Studio & Viewer Engine (Step 3)
+  // 7. Screen 05: 3D Viewer & Studio (Auto-Fit, Centered, Facing Forward)
   // ==========================================================================
-  initOrUpdate3DViewer() {
-    const container = document.getElementById('viewer3d-canvas-container');
-    if (!container) return;
+  initScreen05Viewer() {
+    // Navigation back & forward pills
+    document.getElementById('btn-viewer-back-process')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(4, false);
+    });
 
-    const mission = this.store.getMission();
-    const loadFilename = document.getElementById('viewer-load-filename');
-    if (loadFilename) loadFilename.textContent = `${mission.id}_model.glb`;
+    document.getElementById('btn-viewer-go-export')?.addEventListener('click', () => {
+      this.stopTour();
+      this.showScreen(6);
+    });
 
-    const loaderElem = document.getElementById('viewer3d-loading');
-    if (loaderElem) loaderElem.style.display = 'flex';
+    // Subnav Tabs
+    document.getElementById('vtab-3d')?.addEventListener('click', () => this.setViewerMode('3d'));
+    document.getElementById('vtab-ortho')?.addEventListener('click', () => this.setViewerMode('ortho'));
+    document.getElementById('vtab-points')?.addEventListener('click', () => this.setViewerMode('points'));
+    document.getElementById('vtab-evidence')?.addEventListener('click', () => this.setViewerMode('evidence'));
 
-    if (!this.viewer) {
-      this.initThreeJsScene(container);
-    }
+    // Layer checkboxes
+    document.getElementById('layer-mesh')?.addEventListener('change', (e) => {
+      if (this.viewer?.currentMesh) this.viewer.currentMesh.visible = e.target.checked;
+    });
 
-    this.loadMissionModel(mission);
+    document.getElementById('layer-points')?.addEventListener('change', (e) => {
+      if (this.viewer?.pointCloudMesh) this.viewer.pointCloudMesh.visible = e.target.checked;
+    });
+
+    // Measurement tab buttons
+    document.getElementById('mtab-dist')?.addEventListener('click', () => this.setMeasureMode('dist'));
+    document.getElementById('mtab-area')?.addEventListener('click', () => this.setMeasureMode('area'));
+    document.getElementById('mtab-elev')?.addEventListener('click', () => this.setMeasureMode('elev'));
+
+    // Zoom buttons
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
+      if (this.viewer?.camera) this.viewer.camera.position.multiplyScalar(0.85);
+    });
+
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
+      if (this.viewer?.camera) this.viewer.camera.position.multiplyScalar(1.15);
+    });
+
+    document.getElementById('btn-reset-cam')?.addEventListener('click', () => {
+      this.resetViewerCamera();
+    });
+
+    document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
+      const v = document.getElementById('screen-05-viewer');
+      if (!document.fullscreenElement) {
+        v?.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen().catch(err => console.log(err));
+      }
+    });
   }
 
-  initThreeJsScene(container) {
-    const width = container.clientWidth || 800;
-    const height = container.clientHeight || 580;
+  setupThreeScene() {
+    const canvas = document.getElementById('screen05-webgl-canvas');
+    if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    const width = parent.clientWidth || 800;
+    const height = parent.clientHeight || 600;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x090d16);
+    scene.background = new THREE.Color(0x090e1a);
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 1000);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
     camera.position.set(-28, 22, -64);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't flip under the floor
     controls.target.set(0, 4, 0);
-    controls.maxPolarAngle = Math.PI / 2 + 0.05;
-    controls.autoRotate = false;
-    controls.autoRotateSpeed = 1.0;
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
+    // Grid Floor on Y=0
+    const gridHelper = new THREE.GridHelper(80, 40, 0x00f0ff, 0x1e293b);
+    gridHelper.position.y = 0;
+    scene.add(gridHelper);
+
+    // Realistic Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.4);
-    dirLight1.position.set(40, 60, 40);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.6);
+    scene.add(hemiLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+    dirLight1.position.set(45, 80, 50);
     scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 0.6);
-    dirLight2.position.set(-40, 20, -40);
+    const dirLight2 = new THREE.DirectionalLight(0x00f0ff, 0.4);
+    dirLight2.position.set(-40, 30, -40);
     scene.add(dirLight2);
 
-    const grid = new THREE.GridHelper(160, 40, 0x2563eb, 0x1e293b);
-    grid.position.y = 0;
-    scene.add(grid);
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    const modelContainer = new THREE.Group();
+    scene.add(modelContainer);
 
     this.viewer = {
       scene,
       camera,
       renderer,
       controls,
-      grid,
-      modelContainer: new THREE.Group(),
-      roiBox: null,
-      cameraPyramids: [],
+      modelContainer,
       currentMesh: null,
-      raycaster,
-      mouse,
-      container
+      pointCloudMesh: null,
+      roiBox: null,
+      onResize: () => {
+        const w = parent.clientWidth || 800;
+        const h = parent.clientHeight || 600;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
     };
 
-    scene.add(this.viewer.modelContainer);
-
-    renderer.domElement.addEventListener('mousemove', (e) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(this.viewer.modelContainer.children, true);
-
-      if (intersects.length > 0) {
-        this.updateCoordinatesHUD(intersects[0].point);
-      }
-    });
-
-    renderer.domElement.addEventListener('click', (e) => {
-      if (!this.measureActive) return;
-
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(this.viewer.modelContainer.children, true);
-
-      if (intersects.length > 0) {
-        this.handleMeasureClick(intersects[0].point);
-      }
-    });
-
     window.addEventListener('resize', () => {
-      if (!this.viewer) return;
-      const w = container.clientWidth || 800;
-      const h = container.clientHeight || 580;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (this.currentScreen === 5) this.viewer?.onResize();
     });
 
+    // Raycaster for inspection & measurement
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(modelContainer.children, true);
+
+      if (intersects.length > 0) {
+        const hit = intersects[0].point;
+        this.handle3DClick(hit);
+      }
+    });
+
+    // Animation Loop
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
+
+      // Rotate Compass Rose to match camera azimuth
+      const compassArrow = document.querySelector('.compass-arrow-n');
+      if (compassArrow) {
+        const angle = Math.atan2(camera.position.x, camera.position.z) * (180 / Math.PI);
+        compassArrow.style.transform = `rotate(${-angle}deg)`;
+      }
     };
     animate();
+
+    // Load initial model (PB2 Svalbard)
+    this.loadMissionModel(this.store.getMission());
   }
 
   loadMissionModel(mission) {
@@ -707,8 +848,6 @@ class AeroSculptApp {
       this.viewer.scene.remove(this.viewer.roiBox);
       this.viewer.roiBox = null;
     }
-    this.viewer.cameraPyramids.forEach(p => this.viewer.scene.remove(p));
-    this.viewer.cameraPyramids = [];
     this.clearMeasurement();
 
     const loader = new GLTFLoader();
@@ -721,9 +860,11 @@ class AeroSculptApp {
       (gltf) => {
         const rawModel = gltf.scene;
 
+        // Auto-Fit Bounding Box Calculation
         const bbox = new THREE.Box3().setFromObject(rawModel);
         const rawSize = bbox.getSize(new THREE.Vector3());
 
+        // Desired bounding dimensions inside studio viewport
         const targetW = 40;
         const targetD = 42;
         const targetH = 22;
@@ -734,32 +875,28 @@ class AeroSculptApp {
         rawModel.scale.setScalar(finalScale);
         rawModel.updateMatrixWorld(true);
 
+        // Center on X and Z, rest bottom exactly on Y=0
         const scaledBox = new THREE.Box3().setFromObject(rawModel);
         const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
-        rawModel.position.set(-scaledCenter.x, -scaledCenter.y, -scaledCenter.z);
+        rawModel.position.set(-scaledCenter.x, -scaledBox.min.y, -scaledCenter.z);
         rawModel.updateMatrixWorld(true);
 
         this.viewer.modelContainer.add(rawModel);
         this.viewer.currentMesh = rawModel;
 
-        const worldBox = new THREE.Box3().setFromObject(this.viewer.modelContainer);
-        const worldCenter = worldBox.getCenter(new THREE.Vector3());
-        this.viewer.modelContainer.position.set(-worldCenter.x, -worldBox.min.y, -worldCenter.z);
-        this.viewer.modelContainer.updateMatrixWorld(true);
-
+        // Bounding wireframe box
         const finalBox = new THREE.Box3().setFromObject(this.viewer.modelContainer);
         const finalSize = finalBox.getSize(new THREE.Vector3());
         const finalCenter = finalBox.getCenter(new THREE.Vector3());
 
-        const boxGeom = new THREE.BoxGeometry(finalSize.x * 1.08, finalSize.y * 1.08, finalSize.z * 1.08);
+        const boxGeom = new THREE.BoxGeometry(finalSize.x * 1.05, finalSize.y * 1.05, finalSize.z * 1.05);
         const boxEdges = new THREE.EdgesGeometry(boxGeom);
-        const boxMat = new THREE.LineBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.75 });
+        const boxMat = new THREE.LineBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.5 });
         this.viewer.roiBox = new THREE.LineSegments(boxEdges, boxMat);
         this.viewer.roiBox.position.copy(finalCenter);
         this.viewer.scene.add(this.viewer.roiBox);
 
-        this.createDroneFrustums(finalSize);
-
+        // Camera placement looking forward at the model
         this.viewer.camera.position.set(
           mission.viewerSettings?.cameraPos?.[0] || -28,
           mission.viewerSettings?.cameraPos?.[1] || 22,
@@ -768,325 +905,328 @@ class AeroSculptApp {
         this.viewer.controls.target.set(0, finalSize.y * 0.45, 0);
         this.viewer.controls.update();
 
-        // Auto-rotation during automated demo tour
+        // Auto-rotation during automated tour
         if (this.isTourRunning) {
           this.viewer.controls.autoRotate = true;
+          this.viewer.controls.autoRotateSpeed = 2.0;
           setTimeout(() => {
             if (this.viewer?.controls) this.viewer.controls.autoRotate = false;
-          }, 4500);
+          }, 3800);
         }
-
-        const loaderElem = document.getElementById('viewer3d-loading');
-        if (loaderElem) loaderElem.style.display = 'none';
       },
       undefined,
       (err) => {
         console.error('Error loading 3D model:', err);
-        const loaderElem = document.getElementById('viewer3d-loading');
-        if (loaderElem) loaderElem.style.display = 'none';
       }
     );
   }
 
-  createDroneFrustums(size) {
-    const numFrustums = 10;
-    const radius = Math.max(size.x, size.z) * 0.85;
-    const height = size.y * 1.35;
+  resetViewerCamera() {
+    const mission = this.store.getMission();
+    if (!this.viewer) return;
+    this.viewer.camera.position.set(
+      mission.viewerSettings?.cameraPos?.[0] || -28,
+      mission.viewerSettings?.cameraPos?.[1] || 22,
+      mission.viewerSettings?.cameraPos?.[2] || -64
+    );
+    this.viewer.controls.target.set(0, 4, 0);
+    this.viewer.controls.update();
+  }
 
-    for (let i = 0; i < numFrustums; i++) {
-      const angle = (i / numFrustums) * Math.PI * 2;
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
+  setViewerMode(mode) {
+    const tabs = ['3d', 'ortho', 'points', 'evidence'];
+    tabs.forEach(t => {
+      const btn = document.getElementById(`vtab-${t}`);
+      btn?.classList.remove('active');
+      if (t === mode) btn?.classList.add('active');
+    });
 
-      const pyrGeom = new THREE.ConeGeometry(1.4, 2.2, 4);
-      const pyrMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
-      const pyramid = new THREE.Mesh(pyrGeom, pyrMat);
-      pyramid.position.set(x, height, z);
-      pyramid.lookAt(0, size.y * 0.4, 0);
+    if (!this.viewer) return;
 
-      this.viewer.scene.add(pyramid);
-      this.viewer.cameraPyramids.push(pyramid);
+    if (mode === '3d') {
+      this.resetViewerCamera();
+      if (this.viewer.currentMesh) {
+        this.viewer.currentMesh.traverse(child => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = false;
+          }
+        });
+      }
+    } else if (mode === 'ortho') {
+      // Top-down orthographic angle
+      this.viewer.camera.position.set(0, 75, 0.01);
+      this.viewer.controls.target.set(0, 0, 0);
+      this.viewer.controls.update();
+    } else if (mode === 'points') {
+      if (this.viewer.currentMesh) {
+        this.viewer.currentMesh.traverse(child => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = true;
+          }
+        });
+      }
+    } else if (mode === 'evidence') {
+      this.resetViewerCamera();
+      // Heatmap tint
+      if (this.viewer.currentMesh) {
+        this.viewer.currentMesh.traverse(child => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = false;
+          }
+        });
+      }
     }
   }
 
-  updateCoordinatesHUD(pt) {
-    const hX = document.getElementById('hud-coord-x');
-    const hY = document.getElementById('hud-coord-y');
-    const hZ = document.getElementById('hud-coord-z');
-    const hAlt = document.getElementById('hud-coord-alt');
-
-    if (hX) hX.textContent = `${pt.x.toFixed(2)} m`;
-    if (hY) hY.textContent = `${pt.y.toFixed(2)} m`;
-    if (hZ) hZ.textContent = `${pt.z.toFixed(2)} m`;
-    if (hAlt) hAlt.textContent = `${(50 + pt.y * 1.8).toFixed(1)} m MSL`;
+  setMeasureMode(mode) {
+    this.measureMode = mode;
+    ['dist', 'area', 'elev'].forEach(m => {
+      const btn = document.getElementById(`mtab-${m}`);
+      btn?.classList.remove('active');
+      if (m === mode) btn?.classList.add('active');
+    });
   }
 
-  handleMeasureClick(point) {
-    this.measurePoints.push(point);
+  handle3DClick(pt) {
+    // Update Point Info HUD
+    const baseLat = 78.2232;
+    const baseLon = 15.6267;
+    const hitLat = (baseLat + pt.z * 0.0001).toFixed(4);
+    const hitLon = (baseLon + pt.x * 0.0001).toFixed(4);
+    const hitElev = (42.4 + pt.y * 1.5).toFixed(1);
 
-    const sphereGeom = new THREE.SphereGeometry(0.5, 16, 16);
-    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+    const latElem = document.getElementById('hud-point-lat');
+    const lonElem = document.getElementById('hud-point-lon');
+    const elevElem = document.getElementById('hud-point-elev');
+    if (latElem) latElem.textContent = `${hitLat}° N`;
+    if (lonElem) lonElem.textContent = `${hitLon}° E`;
+    if (elevElem) elevElem.textContent = `${hitElev} m MSL`;
+
+    // Measurement logic (Point A -> Point B)
+    this.measurePoints.push(pt);
+
+    const sphereGeom = new THREE.SphereGeometry(0.6, 16, 16);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: this.measurePoints.length === 1 ? 0x10b981 : 0x00f0ff });
     const marker = new THREE.Mesh(sphereGeom, sphereMat);
-    marker.position.copy(point);
+    marker.position.copy(pt);
     this.viewer.scene.add(marker);
     this.measureMarkers.push(marker);
 
-    const statusLabel = document.getElementById('hud-measure-status');
-    const distNum = document.getElementById('hud-measure-dist');
-
     if (this.measurePoints.length === 1) {
-      if (statusLabel) statusLabel.textContent = 'Point 1 set. Click Point 2...';
+      const ptA = document.getElementById('hud-point-a-coords');
+      if (ptA) ptA.textContent = `${hitLat}° N, ${hitLon}° E`;
     } else if (this.measurePoints.length === 2) {
       const p1 = this.measurePoints[0];
       const p2 = this.measurePoints[1];
-      const dist = p1.distanceTo(p2);
+      const dist = p1.distanceTo(p2) * 5.2; // Scaled to metric ground meters
+
+      const ptB = document.getElementById('hud-point-b-coords');
+      if (ptB) ptB.textContent = `${hitLat}° N, ${hitLon}° E`;
+
+      const distElem = document.getElementById('hud-measure-dist-val');
+      if (distElem) distElem.textContent = `${dist.toFixed(1)} m`;
 
       const lineGeom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
       const lineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 3 });
       this.measureLine = new THREE.Line(lineGeom, lineMat);
       this.viewer.scene.add(this.measureLine);
-
-      if (distNum) distNum.textContent = `${dist.toFixed(2)} m`;
-      if (statusLabel) statusLabel.textContent = 'Distance computed (Euclidean)';
-    } else {
+    } else if (this.measurePoints.length > 2) {
       this.clearMeasurement();
-      this.handleMeasureClick(point);
+      this.handle3DClick(pt);
     }
   }
 
   clearMeasurement() {
     this.measurePoints = [];
+    this.measureMarkers.forEach(m => this.viewer?.scene.remove(m));
+    this.measureMarkers = [];
     if (this.measureLine) {
-      this.viewer.scene.remove(this.measureLine);
+      this.viewer?.scene.remove(this.measureLine);
       this.measureLine = null;
     }
-    this.measureMarkers.forEach(m => this.viewer.scene.remove(m));
-    this.measureMarkers = [];
-
-    const distNum = document.getElementById('hud-measure-dist');
-    const statusLabel = document.getElementById('hud-measure-status');
-    if (distNum) distNum.textContent = '0.00 m';
-    if (statusLabel) statusLabel.textContent = 'Click 2 points on model';
-  }
-
-  bind3DViewerControls() {
-    const toggleMesh = document.getElementById('toggle-layer-mesh');
-    const togglePoints = document.getElementById('toggle-layer-points');
-    const toggleRoi = document.getElementById('toggle-layer-roi');
-    const toggleFrustums = document.getElementById('toggle-layer-frustums');
-    const toggleGrid = document.getElementById('toggle-layer-grid');
-
-    toggleMesh?.addEventListener('click', () => {
-      toggleMesh.classList.toggle('active');
-      if (this.viewer?.modelContainer) {
-        this.viewer.modelContainer.visible = toggleMesh.classList.contains('active');
-      }
-    });
-
-    togglePoints?.addEventListener('click', () => {
-      togglePoints.classList.toggle('active');
-      if (this.viewer?.currentMesh) {
-        this.viewer.currentMesh.traverse(child => {
-          if (child.isMesh && child.material) {
-            child.material.wireframe = togglePoints.classList.contains('active');
-          }
-        });
-      }
-    });
-
-    toggleRoi?.addEventListener('click', () => {
-      toggleRoi.classList.toggle('active');
-      if (this.viewer?.roiBox) {
-        this.viewer.roiBox.visible = toggleRoi.classList.contains('active');
-      }
-    });
-
-    toggleFrustums?.addEventListener('click', () => {
-      toggleFrustums.classList.toggle('active');
-      const visible = toggleFrustums.classList.contains('active');
-      this.viewer?.cameraPyramids.forEach(p => p.visible = visible);
-    });
-
-    toggleGrid?.addEventListener('click', () => {
-      toggleGrid.classList.toggle('active');
-      if (this.viewer?.grid) {
-        this.viewer.grid.visible = toggleGrid.classList.contains('active');
-      }
-    });
-
-    // Tool Modes
-    const modeOrbit = document.getElementById('tool-mode-orbit');
-    const modeMeasure = document.getElementById('tool-mode-measure');
-
-    modeOrbit?.addEventListener('click', () => {
-      modeOrbit.classList.add('active');
-      modeMeasure?.classList.remove('active');
-      this.measureActive = false;
-    });
-
-    modeMeasure?.addEventListener('click', () => {
-      modeMeasure.classList.add('active');
-      modeOrbit?.classList.remove('active');
-      this.measureActive = true;
-      this.clearMeasurement();
-    });
-
-    // Camera Presets
-    document.getElementById('btn-cam-iso')?.addEventListener('click', () => {
-      this.viewer?.camera.position.set(-28, 22, -64);
-      this.viewer?.controls.target.set(0, 4, 0);
-      this.viewer?.controls.update();
-    });
-
-    document.getElementById('btn-cam-top')?.addEventListener('click', () => {
-      this.viewer?.camera.position.set(0, 80, 0.1);
-      this.viewer?.controls.target.set(0, 0, 0);
-      this.viewer?.controls.update();
-    });
-
-    document.getElementById('btn-cam-front')?.addEventListener('click', () => {
-      this.viewer?.camera.position.set(0, 12, -70);
-      this.viewer?.controls.target.set(0, 4, 0);
-      this.viewer?.controls.update();
-    });
-
-    document.getElementById('btn-cam-side')?.addEventListener('click', () => {
-      this.viewer?.camera.position.set(70, 12, 0);
-      this.viewer?.controls.target.set(0, 4, 0);
-      this.viewer?.controls.update();
-    });
-
-    document.getElementById('btn-cam-reset')?.addEventListener('click', () => {
-      this.viewer?.camera.position.set(-28, 22, -64);
-      this.viewer?.controls.target.set(0, 4, 0);
-      this.viewer?.controls.update();
-    });
-
-    // Sub-nav tabs
-    const tabModel = document.getElementById('tab-3d-model');
-    const tabPointCloud = document.getElementById('tab-3d-pointcloud');
-    const tabWireframe = document.getElementById('tab-3d-wireframe');
-    const tabEvidence = document.getElementById('tab-3d-evidence');
-
-    const subTabs = [tabModel, tabPointCloud, tabWireframe, tabEvidence];
-    subTabs.forEach(tab => {
-      tab?.addEventListener('click', () => {
-        subTabs.forEach(t => t?.classList.remove('active'));
-        tab.classList.add('active');
-
-        if (tab === tabModel) {
-          this.viewer?.currentMesh?.traverse(child => {
-            if (child.isMesh && child.material) child.material.wireframe = false;
-          });
-        } else if (tab === tabWireframe || tab === tabPointCloud) {
-          this.viewer?.currentMesh?.traverse(child => {
-            if (child.isMesh && child.material) child.material.wireframe = true;
-          });
-        }
-      });
-    });
   }
 
   // ==========================================================================
-  // 10. Step 4 (Validation & Export) Actions
+  // 8. Screen 06: Validation & Export Events
   // ==========================================================================
-  updateDonutChart(evidence) {
-    if (!evidence) return;
-
-    const segObserved = document.getElementById('donut-seg-observed');
-    const segRecon = document.getElementById('donut-seg-reconstructed');
-    const segInferred = document.getElementById('donut-seg-inferred');
-    const segUnknown = document.getElementById('donut-seg-unknown');
-
-    const centerPct = document.getElementById('donut-observed-pct');
-    const legObs = document.getElementById('legend-pct-observed');
-    const legRec = document.getElementById('legend-pct-reconstructed');
-    const legInf = document.getElementById('legend-pct-inferred');
-    const legUnk = document.getElementById('legend-pct-unknown');
-
-    const obs = evidence.observed;
-    const rec = evidence.reconstructed;
-    const inf = evidence.inferred;
-    const unk = evidence.unknown;
-
-    if (segObserved) segObserved.setAttribute('stroke-dasharray', `${obs} ${100 - obs}`);
-    if (segRecon) {
-      segRecon.setAttribute('stroke-dasharray', `${rec} ${100 - rec}`);
-      segRecon.setAttribute('stroke-dashoffset', `-${obs}`);
-    }
-    if (segInferred) {
-      segInferred.setAttribute('stroke-dasharray', `${inf} ${100 - inf}`);
-      segInferred.setAttribute('stroke-dashoffset', `-${obs + rec}`);
-    }
-    if (segUnknown) {
-      segUnknown.setAttribute('stroke-dasharray', `${unk} ${100 - unk}`);
-      segUnknown.setAttribute('stroke-dashoffset', `-${obs + rec + inf}`);
-    }
-
-    if (centerPct) centerPct.textContent = `${obs}%`;
-    if (legObs) legObs.textContent = `${obs}%`;
-    if (legRec) legRec.textContent = `${rec}%`;
-    if (legInf) legInf.textContent = `${inf}%`;
-    if (legUnk) legUnk.textContent = `${unk}%`;
-  }
-
-  bindExportActions() {
-    const triggerDownload = (filename, label) => {
+  initScreen06Events() {
+    document.getElementById('btn-download-all')?.addEventListener('click', () => {
       const mission = this.store.getMission();
-      const actualFile = filename.replace('pb2', mission.id);
+      const exportData = {
+        mission: mission.name,
+        code: mission.code,
+        crs: mission.crsDatum,
+        reprojectionError: mission.reprojectionError,
+        spatialAccuracy: mission.spatialAccuracy,
+        coverage: mission.coverage,
+        meshFaces: mission.meshFaces,
+        timestamp: new Date().toISOString(),
+        evidence: mission.evidence
+      };
 
-      const link = document.createElement('a');
-      link.href = mission.glbUrl;
-      link.download = actualFile;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      alert(`Downloaded: ${label} (${actualFile})`);
-    };
-
-    document.getElementById('btn-dl-mesh')?.addEventListener('click', () => {
-      triggerDownload('pb2_model.glb', 'Textured 3D Mesh');
-    });
-
-    document.getElementById('btn-dl-ply')?.addEventListener('click', () => {
-      triggerDownload('pb2_pointcloud.ply', 'Dense Point Cloud');
-    });
-
-    document.getElementById('btn-dl-ortho')?.addEventListener('click', () => {
-      triggerDownload('pb2_ortho.tif', 'GeoTIFF Orthomosaic');
-    });
-
-    document.getElementById('btn-dl-pdf')?.addEventListener('click', () => {
-      triggerDownload('AeroSculpt_NTRO_Report.pdf', 'NTRO Quality Report');
-    });
-
-    document.getElementById('btn-dl-all-zip')?.addEventListener('click', () => {
-      const mission = this.store.getMission();
-      alert(`Preparing Complete NTRO Deliverable Package for ${mission.name} (168.4 MB)... Download started.`);
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AeroSculpt_${mission.id}_Reconstruction_Package.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     });
   }
 
+  renderScreen06Metrics() {
+    const mission = this.store.getMission();
+
+    const reprojElem = document.getElementById('exp-reproj-val');
+    const covElem = document.getElementById('exp-coverage-val');
+    const accElem = document.getElementById('exp-accuracy-val');
+    const totFramesElem = document.getElementById('exp-total-frames');
+    const kfElem = document.getElementById('exp-keyframes');
+    const procTimeElem = document.getElementById('exp-proc-time');
+    const outSizeElem = document.getElementById('exp-output-size');
+
+    if (reprojElem) reprojElem.textContent = mission.reprojectionError;
+    if (covElem) covElem.textContent = mission.coverage;
+    if (accElem) accElem.textContent = `~${mission.spatialAccuracy} (Est.)`;
+    if (totFramesElem) totFramesElem.textContent = mission.gpsRecords ? mission.gpsRecords.split(' ')[0] : '18,000';
+    if (kfElem) kfElem.textContent = mission.frameCount;
+    if (procTimeElem) procTimeElem.textContent = mission.reconstructionTime;
+    if (outSizeElem) outSizeElem.textContent = mission.outputSize;
+
+    // Donut percentages
+    const obs = mission.evidence?.observed || 62.3;
+    const recon = mission.evidence?.reconstructed || 24.1;
+    const inf = mission.evidence?.inferred || 9.8;
+    const unk = mission.evidence?.unknown || 3.8;
+
+    document.getElementById('donut-pct-obs').textContent = `${obs}%`;
+    document.getElementById('donut-pct-recon').textContent = `${recon}%`;
+    document.getElementById('donut-pct-inf').textContent = `${inf}%`;
+    document.getElementById('donut-pct-unk').textContent = `${unk}%`;
+  }
+
   // ==========================================================================
-  // 11. NTRO Documentation Modal
+  // 9. Automated Demo Tour (Hands-Free Evaluator Walkthrough)
   // ==========================================================================
-  bindDocsModal() {
+  startAutomatedDemoTour(missionId = 'pb2') {
+    this.stopTour();
+    this.isTourRunning = true;
+    this.hasRunSimulation = false;
+    this.switchMission(missionId);
+
+    // Step 1: Start on Screen 02 (Upload & Configuration)
+    this.showScreen(2);
+
+    // After 2.0s, advance to Screen 03 (Input Validation)
+    this.tourTimer = setTimeout(() => {
+      if (!this.isTourRunning) return;
+      this.showScreen(3, true);
+      // Screen 03 dynamically advances to Screen 04 after quality checks complete (~3.8s)
+    }, 2000);
+  }
+
+  stopTour() {
+    this.isTourRunning = false;
+    if (this.tourTimer) {
+      clearTimeout(this.tourTimer);
+      this.tourTimer = null;
+    }
+    if (this.flightAnimFrame) {
+      cancelAnimationFrame(this.flightAnimFrame);
+      this.flightAnimFrame = null;
+    }
+  }
+
+  // ==========================================================================
+  // 10. Data Hydration Across All Screens
+  // ==========================================================================
+  hydrateMissionData(mission) {
+    if (!mission) return;
+
+    // Stepper label
+    const stepLabel = document.getElementById('stepper-mission-label');
+    if (stepLabel) stepLabel.textContent = `${mission.code} · ${mission.name}`;
+
+    // Screen 02 Card Values
+    const vThumb = document.getElementById('file-video-preview');
+    if (vThumb) vThumb.src = mission.videoUrl;
+
+    const vName = document.getElementById('card-val-video-name');
+    if (vName) vName.textContent = mission.videoUrl.split('/').pop();
+
+    const vSpecs = document.getElementById('card-val-video-specs');
+    if (vSpecs) vSpecs.textContent = `${mission.videoDuration} | ${mission.videoResolution} | ${mission.frameRate} | ${mission.rawVideoSize}`;
+
+    const gpsName = document.getElementById('card-val-gps-name');
+    if (gpsName) gpsName.textContent = mission.gpsFile;
+
+    const gpsSpecs = document.getElementById('card-val-gps-specs');
+    if (gpsSpecs) gpsSpecs.textContent = mission.gpsRecords;
+
+    const metaName = document.getElementById('card-val-meta-name');
+    if (metaName) metaName.textContent = mission.metaFile;
+
+    const metaSpecs = document.getElementById('card-val-meta-specs');
+    if (metaSpecs) metaSpecs.textContent = `Platform: ${mission.uavPlatform.split(' ')[0]} | Area: ${mission.sceneCategory}`;
+
+    // Screen 03 Mission Summary Table
+    const statDur = document.getElementById('stat-duration');
+    if (statDur) statDur.textContent = `${mission.videoDuration} (${mission.videoDurationSec} s)`;
+
+    const statRes = document.getElementById('stat-res');
+    if (statRes) statRes.textContent = mission.videoResolution;
+
+    const statFps = document.getElementById('stat-fps');
+    if (statFps) statFps.textContent = mission.frameRate;
+
+    const statTot = document.getElementById('stat-total-frames');
+    if (statTot) statTot.textContent = mission.gpsRecords.split(' ')[0];
+
+    const statGps = document.getElementById('stat-gps');
+    if (statGps) statGps.textContent = mission.gpsRecords;
+
+    const statCam = document.getElementById('stat-camera');
+    if (statCam) statCam.textContent = mission.cameraSensor.split('(')[0];
+
+    const statArea = document.getElementById('stat-area-type');
+    if (statArea) statArea.textContent = mission.sceneType;
+
+    const statProc = document.getElementById('stat-est-proc');
+    if (statProc) statProc.textContent = mission.reconstructionTime;
+
+    const crsUtm = document.getElementById('val-crs-utm');
+    if (crsUtm) crsUtm.textContent = mission.crsName;
+
+    // Screen 05 HUD
+    const hudThumb = document.getElementById('hud-point-thumb');
+    if (hudThumb) hudThumb.src = `${mission.framesDir}${mission.framePrefix}0001${mission.frameExt}`;
+
+    const hudCrs = document.getElementById('hud-point-crs');
+    if (hudCrs) hudCrs.textContent = mission.crsDatum.split(' ')[0];
+  }
+
+  // ==========================================================================
+  // 11. Documentation Modal
+  // ==========================================================================
+  initDocsModal() {
     const modal = document.getElementById('modal-docs');
-    const btnOpen = document.getElementById('nav-btn-docs');
     const btnClose = document.getElementById('btn-close-docs-modal');
-    const btnConfirm = document.getElementById('btn-close-docs-confirm');
+    const btnFooterClose = document.getElementById('btn-close-docs-footer');
 
-    btnOpen?.addEventListener('click', () => modal?.classList.add('active'));
     btnClose?.addEventListener('click', () => modal?.classList.remove('active'));
-    btnConfirm?.addEventListener('click', () => modal?.classList.remove('active'));
+    btnFooterClose?.addEventListener('click', () => modal?.classList.remove('active'));
 
     modal?.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
     });
   }
+
+  openDocsModal() {
+    document.getElementById('modal-docs')?.classList.add('active');
+  }
 }
 
-// Bootstrap
+// Instantiate application on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   window.aerosculptApp = new AeroSculptApp();
 });

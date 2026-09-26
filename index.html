@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AeroSculpt — Single-Pass Drone Video to Accurate 3D Model | NTRO SH/26158</title>
+  <title>AeroSculpt — Single-Pass UAV → Georeferenced 3D World | NTRO SH/26158</title>
   <meta name="description" content="AeroSculpt transforms continuous UAV video into an accurate, measurable, and georeferenced 3D model for real-world situational understanding. Aligned with NTRO Problem Statement 17.">
   
   <!-- Fonts & Icons -->
@@ -17,87 +17,90 @@
   <link rel="stylesheet" href="styles/workflow.css">
   <link rel="icon" type="image/png" href="assets/aerosculpt_logo.png">
 </head>
-<body class="as-body">
+<body>
 
   <!-- ==========================================================================
-       Screen 01: Landing Page (Default Home Page)
+       Global Fixed Navigation Header (Screens 01 - 06)
        ========================================================================== -->
-  <main id="view-landing" class="active">
-    <div class="hero-background-layer"></div>
-    <div class="hero-overlay-grid"></div>
-    <div class="hero-tactical-grid"></div>
+  <header id="global-header">
+    <div class="header-brand" id="header-brand-logo" title="AeroSculpt Home">
+      <img src="assets/aerosculpt_logo.png" alt="AeroSculpt Logo" class="brand-logo-img">
+      <span class="brand-name-title">AEROSCULPT</span>
+    </div>
 
-    <!-- Landing Page Top Navigation Bar -->
-    <header class="landing-top-bar">
-      <div class="landing-brand">
-        <img src="assets/aerosculpt_logo.png" alt="AeroSculpt Logo" class="brand-logo-img">
-        <div>
-          <div class="landing-brand-text">
-            AEROSCULPT
-            <span class="sidebar-version-badge">v2.4</span>
-          </div>
-          <div class="landing-brand-sub">NTRO Problem Statement 17 (SH/26158)</div>
+    <!-- Header Navigation Tabs -->
+    <nav class="header-nav-tabs">
+      <button class="nav-tab-btn active" id="nav-tab-home">Home</button>
+      <button class="nav-tab-btn" id="nav-tab-process">Process</button>
+      <button class="nav-tab-btn" id="nav-tab-viewer">3D Viewer</button>
+      <button class="nav-tab-btn" id="nav-tab-export">Export</button>
+      <button class="nav-tab-btn" id="nav-tab-docs">Docs</button>
+    </nav>
+
+    <!-- Header Right: Authentic NTRO Emblem & Evaluator Avatar -->
+    <div class="header-right">
+      <div class="ntro-header-badge" title="National Technical Research Organisation · SH/26158">
+        <img src="assets/ntro_emblem.svg" alt="NTRO Emblem" class="ntro-emblem-icon">
+        <div class="ntro-badge-text">
+          <span class="ntro-title">NTRO</span>
+          <span class="ntro-code">SH/26158</span>
         </div>
       </div>
+      <div class="user-avatar-badge" title="Evaluator Profile">D</div>
+    </div>
+  </header>
 
-      <!-- Real NTRO Official Emblem Badge -->
-      <div class="landing-ntro-emblem-badge" title="National Technical Research Organisation (Government of India)">
-        <img src="assets/ntro_emblem.svg" alt="NTRO Official Emblem" class="ntro-official-emblem-img">
-        <div class="ntro-emblem-text">
-          <span class="ntro-emblem-title">NATIONAL TECHNICAL RESEARCH ORGANISATION</span>
-          <span class="ntro-emblem-sub">GOVERNMENT OF INDIA · TECHNICAL INTELLIGENCE</span>
-        </div>
-      </div>
-    </header>
+  <!-- ==========================================================================
+       Screen 01: Mission Home / Landing Page
+       ========================================================================== -->
+  <section id="screen-01-landing" class="active">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-grid-lines"></div>
 
-    <!-- Hero Content -->
     <div class="hero-content">
-      <div class="hero-pre-badge">
-        <i class="fa-solid fa-satellite-dish"></i> NTRO PROBLEM STATEMENT 17 · ADVANCED UAV GEOMATICS
-      </div>
-
-      <h1 class="hero-title">
-        <span class="gradient-text">AEROSCULPT</span>
+      <h1 class="hero-main-title">
+        <span class="hero-cyan-mark">A</span>EROSCULPT
       </h1>
-
-      <h2 class="hero-subtitle">
-        Single-Pass UAV Video → Georeferenced 3D World
+      
+      <h2 class="hero-subtitle-text">
+        Single-Pass UAV → Georeferenced 3D World
       </h2>
 
-      <p class="hero-description">
-        Transform continuous drone flight video and asynchronous GNSS telemetry into accurate, measurable, and georeferenced 3D models with evidence-aware verification. Built specifically for reconnaissance, disaster assessment, and strategic infrastructure mapping.
+      <p class="hero-desc-text">
+        Transform a single drone video into an accurate, measurable and georeferenced 3D model for real-world situational understanding.
       </p>
 
-      <div class="hero-feature-chips">
-        <div class="feature-chip"><i class="fa-solid fa-bolt"></i> Single-Pass Processing</div>
-        <div class="feature-chip"><i class="fa-solid fa-earth-americas"></i> Georeferenced 3D Reconstruction</div>
-        <div class="feature-chip"><i class="fa-solid fa-ruler-combined"></i> Precision Metric Measurement</div>
-        <div class="feature-chip"><i class="fa-solid fa-shield-halved"></i> Evidence-Aware Verification</div>
+      <div class="hero-pills-row">
+        <div class="hero-pill"><i class="fa-solid fa-bolt"></i> Single-Pass Processing</div>
+        <div class="hero-pill"><i class="fa-solid fa-earth-americas"></i> Georeferenced 3D Reconstruction</div>
+        <div class="hero-pill"><i class="fa-solid fa-chart-simple"></i> Measurement & Analysis</div>
+        <div class="hero-pill"><i class="fa-solid fa-shield-halved"></i> Evidence-Aware Output</div>
       </div>
 
-      <div class="hero-actions">
-        <button class="btn-hero-primary" id="btn-hero-demo">
+      <div class="hero-cta-btns">
+        <button class="btn-hero-load-demo" id="btn-hero-demo">
           <i class="fa-solid fa-play"></i> Load Demo Mission
         </button>
-        <button class="btn-hero-secondary" id="btn-hero-select">
-          <i class="fa-solid fa-layer-group"></i> Select Mission (PB1 / PB2 / PB3)
+        <button class="btn-hero-upload-mission" id="btn-hero-upload">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload Your Own Mission
         </button>
       </div>
 
-      <footer style="margin-top: 20px; font-size: 0.8rem; color: #94a3b8; letter-spacing: 0.02em;">
-        Built for strategic mapping, disaster response, and tactical reconnaissance. · SMART INDIA HACKATHON 2026
-      </footer>
+      <div class="hero-footer-label">
+        Built for strategic mapping, disaster response, infrastructure inspection and reconnaissance. · SMART INDIA HACKATHON 2026
+      </div>
     </div>
-  </main>
+  </section>
 
   <!-- ==========================================================================
-       Mission Selection Modal
+       Mission Selection Modal (PB1 / PB2 / PB3)
        ========================================================================== -->
   <div class="as-modal-backdrop" id="modal-mission-picker">
     <div class="as-modal-window">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <h2><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> Select Flight Mission Dataset</h2>
+          <h2><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> Select UAV Mission Dataset</h2>
           <p>Choose an authenticated UAV survey to simulate the single-pass reconstruction pipeline.</p>
         </div>
         <button class="modal-close-btn" id="btn-close-mission-modal" title="Close Modal">
@@ -108,24 +111,24 @@
       <div class="modal-body">
         <div class="mission-cards-grid">
           
-          <!-- Mission 02 (Recommended Default) -->
-          <div class="mission-card recommended selected" data-mission-id="pb2">
+          <!-- Mission 02 (Default / Recommended) -->
+          <div class="mission-card recommended selected" data-mission-id="pb2" id="mcard-pb2">
             <div class="mission-card-badge">RECOMMENDED</div>
             <div class="mission-number">MISSION 02 · POLAR RECON</div>
-            <h3 class="mission-name">Svalbard Arctic Reconnaissance</h3>
+            <h3 class="mission-name">Svalbard Arctic Recon</h3>
             <div class="mission-scene-type">Rural / Glacial · Coastal Fjord</div>
             <p class="mission-desc">High-latitude polar terrain with glacial rock formations, extreme lighting, low-contrast snow surfaces, and rugged coastal cliffs.</p>
             <div class="mission-specs-list">
               <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">05:18 (318 s)</span></div>
               <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">513 frames</span></div>
-              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.031 m</span></div>
+              <div class="spec-row"><span>Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.031 m</span></div>
               <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:32633 UTM</span></div>
               <div class="spec-row"><span>Platform:</span> <span class="spec-val">DJI Mavic 3E RTK</span></div>
             </div>
           </div>
 
           <!-- Mission 01 -->
-          <div class="mission-card" data-mission-id="pb1">
+          <div class="mission-card" data-mission-id="pb1" id="mcard-pb1">
             <div class="mission-card-badge">URBAN</div>
             <div class="mission-number">MISSION 01 · CADASTRAL</div>
             <h3 class="mission-name">Komorowice Cadastral Survey</h3>
@@ -134,14 +137,14 @@
             <div class="mission-specs-list">
               <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">03:42 (222 s)</span></div>
               <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">94 frames</span></div>
-              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.021 m</span></div>
+              <div class="spec-row"><span>Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.021 m</span></div>
               <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:2180 PUWG</span></div>
               <div class="spec-row"><span>Platform:</span> <span class="spec-val">DJI Mini 3 Pro</span></div>
             </div>
           </div>
 
           <!-- Mission 03 -->
-          <div class="mission-card" data-mission-id="pb3">
+          <div class="mission-card" data-mission-id="pb3" id="mcard-pb3">
             <div class="mission-card-badge">ALPINE</div>
             <div class="mission-number">MISSION 03 · TOPOGRAPHIC</div>
             <h3 class="mission-name">Zermatt Alpine Survey</h3>
@@ -150,7 +153,7 @@
             <div class="mission-specs-list">
               <div class="spec-row"><span>Video Duration:</span> <span class="spec-val">04:02 (242 s)</span></div>
               <div class="spec-row"><span>Keyframes:</span> <span class="spec-val">181 frames</span></div>
-              <div class="spec-row"><span>Spatial Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.011 m</span></div>
+              <div class="spec-row"><span>Accuracy:</span> <span class="spec-val" style="color: var(--as-green);">0.011 m</span></div>
               <div class="spec-row"><span>CRS Datum:</span> <span class="spec-val">EPSG:2056 LV95</span></div>
               <div class="spec-row"><span>Platform:</span> <span class="spec-val">senseFly eBee X</span></div>
             </div>
@@ -160,762 +163,781 @@
       </div>
 
       <div class="modal-footer">
-        <div style="font-size: 0.85rem; color: #cbd5e1;">
+        <div style="font-size: 0.82rem; color: #cbd5e1;">
           Selected: <strong id="modal-summary-mission-name" style="color: #ffffff;">Mission 02 · Svalbard Arctic Reconnaissance</strong>
         </div>
-        <button class="btn-step-action primary" id="btn-confirm-mission">
-          <span>Launch Automated Reconstruction Tour</span>
-          <i class="fa-solid fa-arrow-right"></i>
+        <button class="btn-primary-action" id="btn-confirm-mission">
+          <span>Apply Dataset</span>
+          <i class="fa-solid fa-check"></i>
         </button>
       </div>
     </div>
   </div>
 
   <!-- ==========================================================================
-       Screen 02: 4-Step Operational Workflow Layout (#view-workflow)
+       Main Workflow Container (Screens 02, 03, 04, 06)
        ========================================================================== -->
-  <div id="view-workflow">
+  <div class="workflow-app-container" id="workflow-app-container">
     
-    <!-- Left Navigation Sidebar -->
-    <aside id="app-sidebar">
-      <div class="sidebar-brand-header" id="sidebar-brand-home" title="Return to Landing Page">
-        <img src="assets/aerosculpt_logo.png" alt="AeroSculpt Logo" class="sidebar-logo-img">
-        <div class="sidebar-title-wrap">
-          <div class="sidebar-brand-title">
-            AEROSCULPT
-            <span class="sidebar-version-badge">v2.4</span>
-          </div>
-          <div class="sidebar-brand-sub">NTRO SH/26158 · PS-17</div>
-        </div>
-      </div>
+    <!-- Persistent Left Stepper -->
+    <aside class="workflow-left-stepper">
+      <button class="stepper-nav-item active" data-step="1" id="stepper-step-1">
+        <span class="stepper-circle-num">1</span>
+        <span>Upload & Configure</span>
+      </button>
 
-      <!-- 4 Tab Stepper Items -->
-      <ul class="sidebar-nav-list">
-        <li>
-          <button class="sidebar-nav-item active" data-step="1" id="nav-step-1">
-            <i class="fa-solid fa-route"></i>
-            <span>Trajectory Validation</span>
-            <span class="sidebar-nav-badge">01</span>
-          </button>
-        </li>
-        <li>
-          <button class="sidebar-nav-item" data-step="2" id="nav-step-2">
-            <i class="fa-solid fa-gears"></i>
-            <span>Processing Pipeline</span>
-            <span class="sidebar-nav-badge">02</span>
-          </button>
-        </li>
-        <li>
-          <button class="sidebar-nav-item" data-step="3" id="nav-step-3">
-            <i class="fa-solid fa-cube"></i>
-            <span>3D Model & Studio</span>
-            <span class="sidebar-nav-badge">03</span>
-          </button>
-        </li>
-        <li>
-          <button class="sidebar-nav-item" data-step="4" id="nav-step-4">
-            <i class="fa-solid fa-award"></i>
-            <span>Validation & Export</span>
-            <span class="sidebar-nav-badge">04</span>
-          </button>
-        </li>
-        <li style="margin-top: 10px; border-top: 1px solid var(--as-border-subtle); padding-top: 10px;">
-          <button class="sidebar-nav-item" id="nav-btn-docs">
-            <i class="fa-solid fa-book"></i>
-            <span>NTRO PS-17 Docs</span>
-          </button>
-        </li>
-      </ul>
+      <button class="stepper-nav-item" data-step="2" id="stepper-step-2">
+        <span class="stepper-circle-num">2</span>
+        <span>Validate Input</span>
+      </button>
 
-      <!-- Active Mission Card -->
-      <div class="sidebar-mission-card">
-        <div class="sidebar-mission-label">ACTIVE MISSION</div>
-        <div class="sidebar-mission-name" id="sidebar-mission-name-display">
-          PB2 · Svalbard Arctic Recon
-        </div>
-        <button class="btn-sidebar-switch-mission" id="btn-sidebar-switch-mission">
-          <i class="fa-solid fa-repeat"></i> Switch Mission
+      <button class="stepper-nav-item" data-step="3" id="stepper-step-3">
+        <span class="stepper-circle-num">3</span>
+        <span>Process</span>
+      </button>
+
+      <button class="stepper-nav-item" data-step="4" id="stepper-step-4">
+        <span class="stepper-circle-num">4</span>
+        <span>3D View & Analyze</span>
+      </button>
+
+      <button class="stepper-nav-item" data-step="5" id="stepper-step-5">
+        <span class="stepper-circle-num">5</span>
+        <span>Export</span>
+      </button>
+
+      <!-- Active Mission Info in Stepper -->
+      <div style="margin-top: auto; padding: 12px; background: rgba(14, 22, 38, 0.8); border: 1px solid var(--as-border-subtle); border-radius: 8px;">
+        <div style="font-size: 0.65rem; color: var(--as-cyan); font-weight: 800; text-transform: uppercase;">Active Mission</div>
+        <div style="font-size: 0.78rem; font-weight: 700; color: #ffffff; margin: 2px 0 6px 0;" id="stepper-mission-label">PB2 · Svalbard Arctic</div>
+        <button id="btn-switch-dataset-stepper" style="width: 100%; padding: 4px; font-size: 0.68rem; background: rgba(255,255,255,0.05); border: 1px solid var(--as-border-medium); border-radius: 4px; color: #cbd5e1; cursor: pointer;">
+          <i class="fa-solid fa-repeat"></i> Switch Dataset
         </button>
-      </div>
-
-      <!-- Sidebar Footer Hardware & Datum -->
-      <div class="sidebar-footer">
-        <div><strong>NODE:</strong> <span style="color: var(--as-green);">Online (T4 RTX GPU)</span></div>
-        <div><strong>DATUM:</strong> <span id="sidebar-datum-display">EPSG:32633 UTM</span></div>
-        <div><strong>STANDARDS:</strong> <span>NTRO PS-17 Compliant</span></div>
       </div>
     </aside>
 
-    <!-- Top Header Bar -->
-    <header id="top-header-bar">
-      <div class="header-breadcrumb">
-        <i class="fa-solid fa-layer-group"></i>
-        <span id="breadcrumb-current-step">Trajectory Validation & Feasibility</span>
-      </div>
-
-      <div class="header-right-tools">
-        <!-- Return to Home Link -->
-        <button class="btn-step-action secondary" id="btn-header-home" style="padding: 6px 12px; font-size: 0.78rem;">
-          <i class="fa-solid fa-house"></i> Home
+    <!-- ==========================================================================
+         Screen 02: Upload & Configuration
+         ========================================================================== -->
+    <main class="workflow-screen-pane active" id="pane-screen-02">
+      <div class="pane-header-row">
+        <div class="pane-title-group">
+          <h2>Upload Mission Data</h2>
+          <p>Provide UAV video and available sensor data. Required fields are mandatory for processing.</p>
+        </div>
+        <button class="btn-primary-action" id="btn-demo-dataset" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--as-border-medium);">
+          <i class="fa-solid fa-folder-open"></i> Demo Dataset
         </button>
-
-        <!-- Official NTRO Emblem -->
-        <div class="ntro-official-header-badge" title="National Technical Research Organisation">
-          <img src="assets/ntro_emblem.svg" alt="NTRO Emblem" class="ntro-header-logo-img">
-          <div class="ntro-header-text">
-            <span class="ntro-header-title">NTRO · PS-17</span>
-            <span class="ntro-header-sub">AUTHENTICATED</span>
-          </div>
-        </div>
-
-        <div class="evaluator-profile-tag" title="Authenticated Evaluator Session">
-          <div class="evaluator-avatar-circle">E</div>
-          <span>Evaluator</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <main id="main-app-content">
-
-      <!-- Automated Tour Notice Banner -->
-      <div id="auto-tour-banner">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="ntro-dot-pulse" style="background: #ffffff; box-shadow: 0 0 8px #ffffff;"></span>
-          <span id="tour-banner-text">⚡ AUTOMATED DEMO TOUR ACTIVE · Step 1/4: Trajectory Validation · Auto-advancing in 3.0s</span>
-        </div>
-        <div class="tour-controls-wrap">
-          <button class="btn-tour-pill" id="btn-tour-pause"><i class="fa-solid fa-pause"></i> Pause</button>
-          <button class="btn-tour-pill" id="btn-tour-resume" style="display: none;"><i class="fa-solid fa-play"></i> Resume</button>
-          <button class="btn-tour-pill" id="btn-tour-skip"><i class="fa-solid fa-forward-step"></i> Skip to 3D Model</button>
-        </div>
       </div>
 
-      <!-- ==========================================================================
-           Tab 1: Trajectory Validation & Feasibility
-           ========================================================================== -->
-      <div class="step-pane active" id="step-1-pane">
-        <div class="step-header-row">
-          <div class="step-title-wrap">
-            <h1><i class="fa-solid fa-route" style="color: var(--as-green);"></i> Trajectory Validation & Feasibility</h1>
-            <p>Checking data integrity, sensor synchronization, and flight trajectory feasibility prior to 3D reconstruction.</p>
-          </div>
-          <div class="step-header-actions">
-            <button class="btn-step-action secondary" id="btn-step1-home">
-              <i class="fa-solid fa-house"></i> Return to Home
-            </button>
-            <button class="btn-step-action primary" id="btn-step1-proceed">
-              <span>Proceed to Processing</span> <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="validation-grid-layout">
-          <!-- 2D GNSS Flight Trajectory Canvas -->
-          <div class="validation-card">
-            <div class="validation-card-header">
-              <div class="validation-card-title">
-                <i class="fa-solid fa-route" style="color: var(--as-cyan);"></i> Flight Path Trajectory Preview (GNSS 10Hz)
-              </div>
-              <span class="badge-verified">✓ Trajectory Valid</span>
-            </div>
-
-            <div class="flight-path-canvas-wrap">
-              <canvas id="flight-path-canvas" width="600" height="320"></canvas>
-              <div class="canvas-overlay-legend">
-                <div class="canvas-legend-item">
-                  <span class="legend-dot" style="background: var(--as-green);"></span> Takeoff (Start)
-                </div>
-                <div class="canvas-legend-item">
-                  <span class="legend-dot" style="background: var(--as-cyan);"></span> UAV Flight Spline
-                </div>
-                <div class="canvas-legend-item">
-                  <span class="legend-dot" style="background: var(--as-red);"></span> Landing (End)
-                </div>
-              </div>
-            </div>
-
-            <div class="validation-stats-grid">
-              <div class="stat-item">
-                <span class="stat-label">Flight Duration:</span>
-                <span class="stat-val" id="step1-duration">05:18 (318 s)</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">GPS Records:</span>
-                <span class="stat-val" id="step1-gps-count">9,540 pts (10 Hz)</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Ground Sampling Distance:</span>
-                <span class="stat-val" id="step1-gsd">2.4 cm/px</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Est. Compute Duration:</span>
-                <span class="stat-val" id="step1-compute-time" style="color: var(--as-cyan);">~11 min (T4 GPU)</span>
-              </div>
-            </div>
+      <div class="upload-config-wrapper">
+        
+        <!-- Category 1: REQUIRED INPUTS -->
+        <div class="inputs-category-container">
+          <div class="category-label-row required">
+            <i class="fa-solid fa-circle-exclamation"></i> REQUIRED INPUTS
           </div>
 
-          <!-- Data Quality Checklist & CRS -->
-          <div class="validation-card">
-            <div class="validation-card-header">
-              <div class="validation-card-title">
-                <i class="fa-solid fa-list-check" style="color: var(--as-blue);"></i> Data Quality Checks
+          <div class="cards-grid-3col">
+            <!-- UAV Video -->
+            <div class="file-input-card required-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-film" style="color: #ef4444;"></i> UAV Video *</span>
+                <span class="badge-check-ok">READY</span>
               </div>
-              <span class="badge-verified">6 / 6 Passed</span>
-            </div>
-
-            <div class="checklist-items">
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>Video Container & Codec Valid</div>
-                  <div class="check-meta-desc">H.264 / AVC · Continuous stream · 0 dropped frames</div>
-                </div>
+              <div class="file-video-thumb-preview">
+                <video id="file-video-preview" src="datasets/pb2_video.mp4" muted loop playsinline autoplay></video>
               </div>
-
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>GPS & Video Timestamps Synchronized</div>
-                  <div class="check-meta-desc">Time offset Δt &lt; 0.02s · Hardware locked</div>
-                </div>
-              </div>
-
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>Flight Metadata Integrity</div>
-                  <div class="check-meta-desc">Sensor dimensions and focal length verified</div>
-                </div>
-              </div>
-
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>IMU Stream Continuity</div>
-                  <div class="check-meta-desc">100 Hz accelerometer & gyro drift bounded</div>
-                </div>
-              </div>
-
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>Camera Calibration Feasibility</div>
-                  <div class="check-meta-desc">Brown-Conrady lens distortion model supported</div>
-                </div>
-              </div>
-
-              <div class="check-item">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <div>
-                  <div>RTK Differential Positioning</div>
-                  <div class="check-meta-desc">Fixed carrier-phase solution active</div>
-                </div>
+              <div class="card-file-telemetry">
+                <span class="file-name-bold" id="card-val-video-name">sample_flight.mp4</span>
+                <span id="card-val-video-specs">05:18 | 1920×1080 | 30 FPS | 113.9 MB</span>
               </div>
             </div>
 
-            <div style="margin-top: 20px; padding: 14px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 8px;">
-              <div style="font-size: 0.72rem; color: var(--as-cyan); font-weight: 800; text-transform: uppercase; margin-bottom: 4px;">Coordinate Reference System (CRS)</div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: #ffffff;" id="step1-crs-name">EPSG:32633 (WGS 84 / UTM Zone 33N)</div>
-              <div style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono); margin-top: 4px;">Universal Transverse Mercator · Northern Hemisphere</div>
+            <!-- GPS / GNSS -->
+            <div class="file-input-card required-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-location-dot" style="color: var(--as-cyan);"></i> GPS / GNSS *</span>
+                <span class="badge-check-ok">READY</span>
+              </div>
+              <div style="height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                <i class="fa-solid fa-file-csv" style="font-size: 2.2rem; color: var(--as-cyan);"></i>
+              </div>
+              <div class="card-file-telemetry">
+                <span class="file-name-bold" id="card-val-gps-name">flight_01_gnss.csv</span>
+                <span id="card-val-gps-specs">9,540 records | 10 Hz</span>
+              </div>
+            </div>
+
+            <!-- Flight Metadata -->
+            <div class="file-input-card required-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-file-code" style="color: var(--as-amber);"></i> Flight Metadata *</span>
+                <span class="badge-check-ok">READY</span>
+              </div>
+              <div style="height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                <i class="fa-solid fa-file-lines" style="font-size: 2.2rem; color: var(--as-amber);"></i>
+              </div>
+              <div class="card-file-telemetry">
+                <span class="file-name-bold" id="card-val-meta-name">flight_01_meta.json</span>
+                <span id="card-val-meta-specs">Platform: DJI Mavic 3E | Area: Rural</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Category 2: OPTIONAL INPUTS (IMPROVES ACCURACY) -->
+        <div class="inputs-category-container">
+          <div class="category-label-row optional">
+            <i class="fa-solid fa-circle-check"></i> OPTIONAL INPUTS (IMPROVES ACCURACY)
+          </div>
+
+          <div class="cards-grid-4col">
+            <!-- IMU Data -->
+            <div class="file-input-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-compass" style="color: var(--as-blue-light);"></i> IMU Data</span>
+                <span class="badge-check-ok">SYNCED</span>
+              </div>
+              <div class="card-file-telemetry" style="margin-top: 4px;">
+                <span class="file-name-bold" id="card-val-imu-name">flight_01_imu.csv</span>
+                <span id="card-val-imu-specs">60,000 records | 100 Hz</span>
+              </div>
+            </div>
+
+            <!-- RTK / PPK -->
+            <div class="file-input-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-satellite" style="color: var(--as-green);"></i> RTK / PPK</span>
+                <span class="badge-check-ok">FIXED</span>
+              </div>
+              <div class="card-file-telemetry" style="margin-top: 4px;">
+                <span class="file-name-bold" id="card-val-rtk-name">rtk_data.csv</span>
+                <span id="card-val-rtk-specs">Fixed Carrier Solution</span>
+              </div>
+            </div>
+
+            <!-- Camera Intrinsics -->
+            <div class="file-input-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-camera" style="color: var(--as-cyan);"></i> Camera Intrinsics</span>
+                <span class="badge-check-ok">CALIBRATED</span>
+              </div>
+              <div class="card-file-telemetry" style="margin-top: 4px;">
+                <span class="file-name-bold" id="card-val-cam-name">camera_meta.json</span>
+                <span id="card-val-cam-specs">Hasselblad L2D-20c</span>
+              </div>
+            </div>
+
+            <!-- Barometric Altitude -->
+            <div class="file-input-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-gauge-high" style="color: #a855f7;"></i> Barometric Altitude</span>
+                <span class="badge-check-ok">OPTIONAL</span>
+              </div>
+              <div class="card-file-telemetry" style="margin-top: 4px;">
+                <span class="file-name-bold" id="card-val-alt-name">altitude.csv</span>
+                <span id="card-val-alt-specs">45m – 82m AGL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reconstruction Settings & Start Processing -->
+        <div class="screen02-bottom-bar">
+          <div style="display: flex; gap: 32px; align-items: center;">
+            <!-- Scene Type -->
+            <div class="setting-col-group">
+              <span class="setting-title-txt">Scene Type</span>
+              <div class="pill-selectors-wrap">
+                <button class="setting-pill-choice" id="scene-type-urban">Urban Area</button>
+                <button class="setting-pill-choice active" id="scene-type-rural">Rural</button>
+                <button class="setting-pill-choice" id="scene-type-mountain">Mountainous</button>
+                <button class="setting-pill-choice" id="scene-type-coastal">Coastal</button>
+              </div>
+            </div>
+
+            <!-- Reconstruction Mode -->
+            <div class="setting-col-group">
+              <span class="setting-title-txt">Reconstruction Mode (Auto)</span>
+              <div class="pill-selectors-wrap">
+                <button class="setting-pill-choice" id="mode-easy">Easy (Fast)</button>
+                <button class="setting-pill-choice active" id="mode-medium">Medium (Balanced)</button>
+                <button class="setting-pill-choice" id="mode-hard">Hard (High Detail)</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary-action" id="btn-start-processing">
+            <span>Start Processing</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
       </div>
-
-      <!-- ==========================================================================
-           Tab 2: Processing Pipeline
-           ========================================================================== -->
-      <div class="step-pane" id="step-2-pane">
-        <div class="step-header-row">
-          <div class="step-title-wrap">
-            <h1><i class="fa-solid fa-gears" style="color: var(--as-cyan);"></i> Processing Mission</h1>
-            <p>Analyzing video, selecting keyframes, reconstructing 3D model and aligning with real-world coordinates.</p>
-          </div>
-          <div class="step-header-actions">
-            <button class="btn-step-action secondary" id="btn-step2-back">
-              <i class="fa-solid fa-arrow-left"></i> Back to Trajectory
-            </button>
-            <button class="btn-step-action primary" id="btn-step2-proceed">
-              <span>View 3D Model & Studio</span> <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="pipeline-progress-container">
-          <div class="progress-header-row">
-            <div class="progress-title-text" id="pipeline-status-text">
-              <span class="ntro-dot-pulse"></span> Pipeline Active: Adaptive 3D Reconstruction...
-            </div>
-            <div class="progress-percent-text" id="pipeline-percent-text">0%</div>
-          </div>
-
-          <div class="pipeline-progress-bar-track">
-            <div class="pipeline-progress-bar-fill" id="pipeline-progress-fill"></div>
-          </div>
-
-          <!-- 7-Stage Pipeline Checklist -->
-          <div class="pipeline-stages-list" id="pipeline-stages-list">
-            <div class="pipeline-stage-chip" data-stage="1">
-              <div class="stage-chip-num">01</div>
-              <div class="stage-chip-title">Input Analysis</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:05</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="2">
-              <div class="stage-chip-num">02</div>
-              <div class="stage-chip-title">Keyframe Selection</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:18</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="3">
-              <div class="stage-chip-num">03</div>
-              <div class="stage-chip-title">Scene Understanding</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:32</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="4">
-              <div class="stage-chip-num">04</div>
-              <div class="stage-chip-title">Adaptive 3D (SfM)</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">02:14</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="5">
-              <div class="stage-chip-num">05</div>
-              <div class="stage-chip-title">Georeferencing</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:45</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="6">
-              <div class="stage-chip-num">06</div>
-              <div class="stage-chip-title">Metric Validation</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:20</div>
-            </div>
-            <div class="pipeline-stage-chip" data-stage="7">
-              <div class="stage-chip-num">07</div>
-              <div class="stage-chip-title">Generating Output</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 4px;">00:15</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Keyframe Gallery Stream -->
-        <div class="keyframe-gallery-box">
-          <div class="keyframe-gallery-header">
-            <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-film" style="color: var(--as-cyan);"></i> Extracted Keyframe Stream
-            </div>
-            <span style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono);" id="keyframe-count-badge">Displaying sampled frames</span>
-          </div>
-
-          <div class="keyframe-strip" id="keyframe-strip-container">
-            <!-- Populated dynamically -->
-          </div>
-        </div>
-
-        <!-- AI Semantic Segmentation Panel -->
-        <div class="semantic-segmentation-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--as-green);"></i> Scene Understanding & Dynamic Object Masking (NTRO PS-17)
-            </div>
-            <span style="font-size: 0.72rem; color: var(--as-cyan); font-family: var(--as-font-mono);">YOLOv8 + SAM Segmentation Active</span>
-          </div>
-
-          <div class="semantic-filters-row">
-            <div class="semantic-tag"><span class="tag-dot" style="background: #ef4444;"></span> Buildings</div>
-            <div class="semantic-tag"><span class="tag-dot" style="background: #3b82f6;"></span> Roads / Ground</div>
-            <div class="semantic-tag"><span class="tag-dot" style="background: #10b981;"></span> Vegetation</div>
-            <div class="semantic-tag"><span class="tag-dot" style="background: #f59e0b;"></span> Vehicles</div>
-            <div class="semantic-tag"><span class="tag-dot" style="background: #a855f7;"></span> Dynamic Pedestrians (Masked Out)</div>
-          </div>
-
-          <div class="semantic-previews-grid" id="semantic-previews-grid">
-            <!-- Segmented preview tiles -->
-          </div>
-        </div>
-      </div>
-
-      <!-- ==========================================================================
-           Tab 3: 3D Model & Studio Viewer
-           ========================================================================== -->
-      <div class="step-pane" id="step-3-pane">
-        <div class="step-header-row">
-          <div class="step-title-wrap">
-            <h1><i class="fa-solid fa-cube" style="color: var(--as-cyan);"></i> 3D Model & Studio</h1>
-            <p>Interactive georeferenced 3D textured mesh, dense point cloud inspection, and precision metric measurement.</p>
-          </div>
-          <div class="step-header-actions">
-            <button class="btn-step-action secondary" id="btn-step3-back">
-              <i class="fa-solid fa-arrow-left"></i> Back to Processing
-            </button>
-            <button class="btn-step-action primary" id="btn-step3-proceed">
-              <span>View Validation & Deliverables</span> <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="viewer-workspace-container">
-          <!-- Left Tool Palette -->
-          <div class="viewer-tools-sidebar">
-            <div>
-              <div class="tools-group-title">Display Layers</div>
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="tool-toggle-item active" id="toggle-layer-mesh">
-                  <span><i class="fa-solid fa-draw-polygon fa-fw"></i> Textured Mesh</span>
-                  <i class="fa-solid fa-check"></i>
-                </div>
-                <div class="tool-toggle-item" id="toggle-layer-points">
-                  <span><i class="fa-solid fa-braille fa-fw"></i> Point Cloud</span>
-                  <i class="fa-solid fa-circle"></i>
-                </div>
-                <div class="tool-toggle-item active" id="toggle-layer-roi">
-                  <span><i class="fa-solid fa-vector-square fa-fw"></i> Bounding Box</span>
-                  <i class="fa-solid fa-check"></i>
-                </div>
-                <div class="tool-toggle-item active" id="toggle-layer-frustums">
-                  <span><i class="fa-solid fa-camera fa-fw"></i> Drone Cameras</span>
-                  <i class="fa-solid fa-check"></i>
-                </div>
-                <div class="tool-toggle-item active" id="toggle-layer-grid">
-                  <span><i class="fa-solid fa-border-all fa-fw"></i> Metric Datum Grid</span>
-                  <i class="fa-solid fa-check"></i>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="tools-group-title">Analysis Tools</div>
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="tool-toggle-item active" id="tool-mode-orbit">
-                  <span><i class="fa-solid fa-arrows-spin fa-fw"></i> Orbit Rotate</span>
-                </div>
-                <div class="tool-toggle-item" id="tool-mode-measure">
-                  <span><i class="fa-solid fa-ruler fa-fw"></i> 2-Point Measure</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="tools-group-title">Camera Presets</div>
-              <div class="view-preset-btns-grid">
-                <button class="btn-preset-view" id="btn-cam-iso">Iso</button>
-                <button class="btn-preset-view" id="btn-cam-top">Top</button>
-                <button class="btn-preset-view" id="btn-cam-front">Front</button>
-                <button class="btn-preset-view" id="btn-cam-side">Side</button>
-              </div>
-              <button class="btn-preset-view" id="btn-cam-reset" style="width: 100%; margin-top: 6px;">
-                <i class="fa-solid fa-crosshairs"></i> Reset Framing
-              </button>
-            </div>
-          </div>
-
-          <!-- Center 3D WebGL Canvas Area -->
-          <div class="viewer-webgl-area">
-            <div class="viewer-top-modes-bar">
-              <button class="mode-tab-btn active" id="tab-3d-model">3D Model (PBR)</button>
-              <button class="mode-tab-btn" id="tab-3d-pointcloud">Dense Point Cloud</button>
-              <button class="mode-tab-btn" id="tab-3d-wireframe">Wireframe Inspection</button>
-              <button class="mode-tab-btn" id="tab-3d-evidence">Evidence Confidence</button>
-            </div>
-
-            <div id="viewer3d-canvas-container"></div>
-
-            <div class="viewer-loading-overlay" id="viewer3d-loading">
-              <div class="spinner-3d"></div>
-              <div style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">Loading Georeferenced 3D Model...</div>
-              <div style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono);" id="viewer-load-filename">pb2_model.glb</div>
-            </div>
-
-            <div class="viewer-evidence-legend">
-              <div class="evidence-tag"><span class="tag-dot" style="background: #10b981;"></span> Observed (Direct LOS)</div>
-              <div class="evidence-tag"><span class="tag-dot" style="background: #3b82f6;"></span> Reconstructed (Multi-View)</div>
-              <div class="evidence-tag"><span class="tag-dot" style="background: #f59e0b;"></span> Inferred (Geometric Prior)</div>
-              <div class="evidence-tag"><span class="tag-dot" style="background: #ef4444;"></span> Unknown (Occluded Void)</div>
-            </div>
-          </div>
-
-          <!-- Right Telemetry & Coordinates HUD -->
-          <div class="viewer-telemetry-hud">
-            <div class="telemetry-card">
-              <div class="telemetry-card-title">
-                <i class="fa-solid fa-crosshairs"></i> Point Information
-              </div>
-              <div class="coord-readout-list">
-                <div class="coord-row"><span>World X:</span> <span class="coord-val" id="hud-coord-x">0.00 m</span></div>
-                <div class="coord-row"><span>World Y:</span> <span class="coord-val" id="hud-coord-y">0.00 m</span></div>
-                <div class="coord-row"><span>World Z:</span> <span class="coord-val" id="hud-coord-z">0.00 m</span></div>
-                <div class="coord-row" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--as-border-subtle);">
-                  <span>Latitude:</span> <span class="coord-val" id="hud-coord-lat">78° 13' 24" N</span>
-                </div>
-                <div class="coord-row"><span>Longitude:</span> <span class="coord-val" id="hud-coord-lon">15° 38' 49" E</span></div>
-                <div class="coord-row"><span>Elevation:</span> <span class="coord-val" id="hud-coord-alt">68.4 m MSL</span></div>
-              </div>
-            </div>
-
-            <div class="telemetry-card">
-              <div class="telemetry-card-title">
-                <i class="fa-solid fa-ruler-combined"></i> Metric Distance
-              </div>
-              <div class="measure-result-box">
-                <div class="measure-dist-num" id="hud-measure-dist">0.00 m</div>
-                <div class="measure-dist-label" id="hud-measure-status">Click 2 points on model</div>
-              </div>
-            </div>
-
-            <div class="telemetry-card" style="font-size: 0.72rem; color: var(--as-text-muted); line-height: 1.5;">
-              <div><strong>Controls:</strong></div>
-              <div>• Left Drag: Orbit Camera</div>
-              <div>• Right Drag: Pan Canvas</div>
-              <div>• Scroll: Zoom In/Out</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==========================================================================
-           Tab 4: Validation & Deliverables
-           ========================================================================== -->
-      <div class="step-pane" id="step-4-pane">
-        <div class="step-header-row">
-          <div class="step-title-wrap">
-            <h1><i class="fa-solid fa-file-shield" style="color: var(--as-cyan);"></i> Validation & Deliverables</h1>
-            <p>Verification against NTRO Problem Statement 17 criteria, spatial accuracy validation, and 3D world export.</p>
-          </div>
-          <div class="step-header-actions">
-            <button class="btn-step-action secondary" id="btn-step4-back">
-              <i class="fa-solid fa-arrow-left"></i> Back to 3D Model
-            </button>
-            <button class="btn-step-action primary" id="btn-step4-home">
-              <i class="fa-solid fa-house"></i> Return to Home
-            </button>
-          </div>
-        </div>
-
-        <div class="export-three-col-grid">
-          <!-- Column 1: NTRO Metric Validation Table -->
-          <div class="export-panel-card">
-            <div class="export-panel-title">
-              <i class="fa-solid fa-award" style="color: var(--as-green);"></i> NTRO PS-17 Evaluation Criteria
-            </div>
-
-            <table class="ntro-table">
-              <thead>
-                <tr>
-                  <th>Criteria</th>
-                  <th>Target</th>
-                  <th>Achieved</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Reprojection Error</td>
-                  <td>&lt; 1.0 px</td>
-                  <td class="metric-val" id="val-reproj">0.44 px</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-                <tr>
-                  <td>Spatial Accuracy</td>
-                  <td>≤ 1.0 m</td>
-                  <td class="metric-val" id="val-spatial">0.031 m</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-                <tr>
-                  <td>Model Completeness</td>
-                  <td>&gt; 80%</td>
-                  <td class="metric-val" id="val-coverage">91.8%</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-                <tr>
-                  <td>Compute Speed</td>
-                  <td>&lt; 15 min</td>
-                  <td class="metric-val" id="val-time">11m 42s</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-                <tr>
-                  <td>Geometric Consistency</td>
-                  <td>Pass</td>
-                  <td class="metric-val">100%</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-                <tr>
-                  <td>Sim(3) Scale Consistency</td>
-                  <td>Pass</td>
-                  <td class="metric-val">1.0002</td>
-                  <td class="metric-pass">✓ Pass</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div style="margin-top: 16px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--as-border-subtle); border-radius: 8px; font-size: 0.72rem; color: var(--as-text-muted);">
-              <strong>Weightage Breakdown:</strong> Accuracy 30% · Completeness 20% · Speed 20% · Innovation 15% · Scalability 10% · UI 5%
-            </div>
-          </div>
-
-          <!-- Column 2: Evidence Distribution Donut Chart -->
-          <div class="export-panel-card">
-            <div class="export-panel-title">
-              <i class="fa-solid fa-chart-pie" style="color: var(--as-blue);"></i> Scene Evidence Distribution
-            </div>
-
-            <div class="donut-chart-container">
-              <div class="donut-svg-wrap">
-                <svg class="donut-svg" viewBox="0 0 42 42">
-                  <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="4.5"></circle>
-                  <circle id="donut-seg-observed" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#10b981" stroke-width="4.5" stroke-dasharray="62.3 37.7" stroke-dashoffset="0"></circle>
-                  <circle id="donut-seg-reconstructed" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#3b82f6" stroke-width="4.5" stroke-dasharray="24.1 75.9" stroke-dashoffset="-62.3"></circle>
-                  <circle id="donut-seg-inferred" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f59e0b" stroke-width="4.5" stroke-dasharray="9.8 90.2" stroke-dashoffset="-86.4"></circle>
-                  <circle id="donut-seg-unknown" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#ef4444" stroke-width="4.5" stroke-dasharray="3.8 96.2" stroke-dashoffset="-96.2"></circle>
-                </svg>
-                <div class="donut-center-label">
-                  <div class="donut-center-percent" id="donut-observed-pct">62.3%</div>
-                  <div class="donut-center-sub">Observed LOS</div>
-                </div>
-              </div>
-
-              <div class="donut-legend-list">
-                <div class="donut-legend-row">
-                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #10b981;"></span> Direct Sensor LOS:</span>
-                  <strong id="legend-pct-observed">62.3%</strong>
-                </div>
-                <div class="donut-legend-row">
-                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #3b82f6;"></span> Multi-View Reconstructed:</span>
-                  <strong id="legend-pct-reconstructed">24.1%</strong>
-                </div>
-                <div class="donut-legend-row">
-                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #f59e0b;"></span> Inferred Geometric Prior:</span>
-                  <strong id="legend-pct-inferred">9.8%</strong>
-                </div>
-                <div class="donut-legend-row">
-                  <span style="display: flex; align-items: center; gap: 6px;"><span class="tag-dot" style="background: #ef4444;"></span> Unknown / Occluded:</span>
-                  <strong id="legend-pct-unknown">3.8%</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Column 3: Deliverable Export Cards -->
-          <div class="export-panel-card">
-            <div class="export-panel-title">
-              <i class="fa-solid fa-download" style="color: var(--as-cyan);"></i> Export Deliverable Package
-            </div>
-
-            <div class="deliverable-cards-list">
-              <div class="download-file-card">
-                <div class="download-file-info">
-                  <i class="fa-solid fa-cube download-icon"></i>
-                  <div>
-                    <div class="download-file-name">Textured 3D Mesh (.glb)</div>
-                    <div class="download-file-meta" id="dl-mesh-meta">pb2_model.glb · 36.4 MB</div>
-                  </div>
-                </div>
-                <button class="btn-file-dl" id="btn-dl-mesh"><i class="fa-solid fa-download"></i></button>
-              </div>
-
-              <div class="download-file-card">
-                <div class="download-file-info">
-                  <i class="fa-solid fa-braille download-icon"></i>
-                  <div>
-                    <div class="download-file-name">Dense Point Cloud (.ply)</div>
-                    <div class="download-file-meta">pointcloud_dense.ply · 19.8 MB</div>
-                  </div>
-                </div>
-                <button class="btn-file-dl" id="btn-dl-ply"><i class="fa-solid fa-download"></i></button>
-              </div>
-
-              <div class="download-file-card">
-                <div class="download-file-info">
-                  <i class="fa-solid fa-map download-icon"></i>
-                  <div>
-                    <div class="download-file-name">Georeferenced Ortho (GeoTIFF)</div>
-                    <div class="download-file-meta">ortho_mosaic.tif · 84.2 MB</div>
-                  </div>
-                </div>
-                <button class="btn-file-dl" id="btn-dl-ortho"><i class="fa-solid fa-download"></i></button>
-              </div>
-
-              <div class="download-file-card">
-                <div class="download-file-info">
-                  <i class="fa-solid fa-file-pdf download-icon" style="color: var(--as-red);"></i>
-                  <div>
-                    <div class="download-file-name">NTRO Quality Report (.pdf)</div>
-                    <div class="download-file-meta">AeroSculpt_NTRO_Report.pdf · 3.2 MB</div>
-                  </div>
-                </div>
-                <button class="btn-file-dl" id="btn-dl-pdf"><i class="fa-solid fa-download"></i></button>
-              </div>
-            </div>
-
-            <button class="btn-download-all-zip" id="btn-dl-all-zip">
-              <i class="fa-solid fa-file-zipper"></i>
-              <span>Download Complete Package (.zip)</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
     </main>
+
+    <!-- ==========================================================================
+         Screen 03: Input Validation
+         ========================================================================== -->
+    <main class="workflow-screen-pane" id="pane-screen-03">
+      <div class="pane-header-row">
+        <div class="pane-title-group">
+          <h2>Input Validation</h2>
+          <p>Checking data integrity, synchronization and flight feasibility.</p>
+        </div>
+        <span class="badge-check-ok" id="badge-inputs-status" style="font-size: 0.82rem; padding: 4px 12px;">
+          <i class="fa-solid fa-circle-check"></i> All Inputs Valid
+        </span>
+      </div>
+
+      <div class="screen03-3col-layout">
+        
+        <!-- Column 1: Mission Summary -->
+        <div class="validation-card-panel">
+          <div class="validation-card-title">
+            <i class="fa-solid fa-clipboard-list" style="color: var(--as-cyan);"></i> Mission Summary
+          </div>
+          <div class="summary-kv-list">
+            <div class="summary-kv-row"><span>Video Duration</span> <strong id="stat-duration">05:18 (318 s)</strong></div>
+            <div class="summary-kv-row"><span>Resolution</span> <strong id="stat-res">1920 × 1080</strong></div>
+            <div class="summary-kv-row"><span>Frame Rate</span> <strong id="stat-fps">30 FPS</strong></div>
+            <div class="summary-kv-row"><span>Total Frames</span> <strong id="stat-total-frames">9,540</strong></div>
+            <div class="summary-kv-row"><span>GPS Records</span> <strong id="stat-gps">9,540 (10 Hz)</strong></div>
+            <div class="summary-kv-row"><span>IMU Records</span> <strong id="stat-imu">60,000 (100 Hz)</strong></div>
+            <div class="summary-kv-row"><span>Camera</span> <strong id="stat-camera">Hasselblad L2D-20c</strong></div>
+            <div class="summary-kv-row"><span>RTK / PPK</span> <strong id="stat-rtk" style="color: var(--as-green);">Available</strong></div>
+            <div class="summary-kv-row"><span>Area Type</span> <strong id="stat-area-type">Rural / Glacial</strong></div>
+            <div class="summary-kv-row"><span>Estimated Processing</span> <strong id="stat-est-proc" style="color: var(--as-cyan);">~11 min (T4 GPU)</strong></div>
+          </div>
+        </div>
+
+        <!-- Column 2: Flight Path Preview (GNSS Canvas) -->
+        <div class="validation-card-panel">
+          <div class="validation-card-title">
+            <i class="fa-solid fa-route" style="color: var(--as-green);"></i> Flight Path Preview (GNSS)
+          </div>
+          <div class="flight-canvas-container">
+            <canvas id="screen03-flight-canvas" width="460" height="280"></canvas>
+            <div class="flight-legend-bar">
+              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--as-green);"></span> Start</span>
+              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 12px; height: 3px; background: var(--as-cyan);"></span> Flight Path</span>
+              <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> End</span>
+              <span style="margin-left: auto; color: var(--as-text-muted);">Scale: 500 m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Data Quality Checks & CRS -->
+        <div class="validation-card-panel">
+          <div class="validation-card-title">
+            <i class="fa-solid fa-shield-check" style="color: var(--as-blue-light);"></i> Data Quality Checks
+          </div>
+
+          <div class="checks-checklist">
+            <div class="check-row-item" id="qc-check-1">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>Video file valid</span>
+            </div>
+            <div class="check-row-item" id="qc-check-2">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>GPS timestamps sync</span>
+            </div>
+            <div class="check-row-item" id="qc-check-3">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>Metadata format valid</span>
+            </div>
+            <div class="check-row-item" id="qc-check-4">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>IMU data valid</span>
+            </div>
+            <div class="check-row-item" id="qc-check-5">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>Camera intrinsics valid</span>
+            </div>
+            <div class="check-row-item" id="qc-check-6">
+              <i class="fa-solid fa-circle-check check-pass-icon"></i>
+              <span>RTK/PPK data valid</span>
+            </div>
+          </div>
+
+          <div style="margin-top: auto; padding: 10px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 6px;">
+            <div style="font-size: 0.68rem; color: var(--as-cyan); font-weight: 800; text-transform: uppercase;">Coordinate System</div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: #ffffff;" id="val-crs-wgs">WGS84 (EPSG:4326)</div>
+            <div style="font-size: 0.72rem; color: var(--as-text-muted); font-family: var(--as-font-mono);" id="val-crs-utm">UTM Zone 33N (Auto)</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+        <button class="btn-primary-action" id="btn-proceed-processing">
+          <span>Proceed to Processing</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </main>
+
+    <!-- ==========================================================================
+         Screen 04: Processing Pipeline
+         ========================================================================== -->
+    <main class="workflow-screen-pane" id="pane-screen-04">
+      <div class="pane-header-row">
+        <div class="pane-title-group">
+          <h2>Processing Mission</h2>
+          <p>Analyzing video, selecting keyframes, reconstructing 3D model and aligning with real-world coordinates.</p>
+        </div>
+        <button class="btn-stop-process" id="btn-stop-pipeline">
+          <i class="fa-solid fa-circle-stop"></i> Stop Process
+        </button>
+      </div>
+
+      <div class="screen04-layout">
+        
+        <!-- Column 1: 7-Stage Pipeline Status -->
+        <div class="pipeline-left-stages">
+          <!-- Stage 1 -->
+          <div class="pipeline-stage-item completed" id="stage-1">
+            <i class="fa-solid fa-circle-check stage-status-icon"></i>
+            <div>
+              <div class="stage-name-title">Input Analysis <span style="font-family: var(--as-font-mono); font-size: 0.7rem; color: var(--as-text-muted); margin-left: 8px;">00:05</span></div>
+              <div class="stage-sub-desc">Reading video and sensor data</div>
+            </div>
+          </div>
+
+          <!-- Stage 2 -->
+          <div class="pipeline-stage-item completed" id="stage-2">
+            <i class="fa-solid fa-circle-check stage-status-icon"></i>
+            <div>
+              <div class="stage-name-title">Keyframe Selection <span style="font-family: var(--as-font-mono); font-size: 0.7rem; color: var(--as-text-muted); margin-left: 8px;">00:18</span></div>
+              <div class="stage-sub-desc">Selecting high-quality informative frames...</div>
+            </div>
+          </div>
+
+          <!-- Stage 3 -->
+          <div class="pipeline-stage-item running" id="stage-3">
+            <i class="fa-solid fa-circle-notch fa-spin stage-status-icon"></i>
+            <div>
+              <div class="stage-name-title">Scene Understanding <span style="font-family: var(--as-font-mono); font-size: 0.7rem; color: var(--as-cyan); margin-left: 8px;">00:32</span></div>
+              <div class="stage-sub-desc">Detecting objects and filtering dynamic elements...</div>
+            </div>
+          </div>
+
+          <!-- Stage 4 -->
+          <div class="pipeline-stage-item" id="stage-4">
+            <i class="fa-regular fa-circle stage-status-icon" style="color: var(--as-text-dim);"></i>
+            <div>
+              <div class="stage-name-title">Adaptive 3D Reconstruction</div>
+              <div class="stage-sub-desc">Generating sparse and dense geometry...</div>
+            </div>
+          </div>
+
+          <!-- Stage 5 -->
+          <div class="pipeline-stage-item" id="stage-5">
+            <i class="fa-regular fa-circle stage-status-icon" style="color: var(--as-text-dim);"></i>
+            <div>
+              <div class="stage-name-title">Georeferencing</div>
+              <div class="stage-sub-desc">Aligning with GPS/RTK/PPK data...</div>
+            </div>
+          </div>
+
+          <!-- Stage 6 -->
+          <div class="pipeline-stage-item" id="stage-6">
+            <i class="fa-regular fa-circle stage-status-icon" style="color: var(--as-text-dim);"></i>
+            <div>
+              <div class="stage-name-title">Metric Validation</div>
+              <div class="stage-sub-desc">Checking geometric consistency...</div>
+            </div>
+          </div>
+
+          <!-- Stage 7 -->
+          <div class="pipeline-stage-item" id="stage-7">
+            <i class="fa-regular fa-circle stage-status-icon" style="color: var(--as-text-dim);"></i>
+            <div>
+              <div class="stage-name-title">Generating Output</div>
+              <div class="stage-sub-desc">Finalizing textured mesh and point cloud...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Live Progress, Keyframes & Semantic Preview -->
+        <div class="pipeline-right-stream">
+          
+          <!-- Live Progress -->
+          <div class="live-progress-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.76rem; font-weight: 800; color: #ffffff;">Live Progress</span>
+              <span style="font-size: 0.72rem; color: var(--as-cyan); font-family: var(--as-font-mono);" id="pipe-eta-val">ETA: ~7 min</span>
+            </div>
+            <div style="font-size: 0.76rem; color: #cbd5e1;">
+              Stage: <strong id="pipe-current-stage" style="color: #ffffff;">Scene Understanding</strong>
+            </div>
+            <div class="live-progress-bar-wrap">
+              <div class="live-progress-fill" id="pipe-progress-fill" style="width: 42%;"></div>
+            </div>
+          </div>
+
+          <!-- Selected Keyframes Filmstrip -->
+          <div class="keyframes-stream-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.76rem; font-weight: 800; color: #ffffff;">
+                Selected Keyframes (<span id="pipe-kf-count">513</span> / <span id="pipe-total-frames">9,540</span>)
+              </span>
+              <span style="font-size: 0.68rem; color: var(--as-text-muted);">Sharpness &gt; 0.88</span>
+            </div>
+            <div class="keyframes-filmstrip-row" id="pipeline-filmstrip">
+              <!-- Dynamically populated keyframe cards -->
+            </div>
+          </div>
+
+          <!-- Scene Understanding Live Preview -->
+          <div class="semantic-live-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.76rem; font-weight: 800; color: #ffffff;">Scene Understanding (Live Preview)</span>
+              <div class="semantic-classes-chips">
+                <span style="color: var(--as-cyan);"><i class="fa-solid fa-square-check"></i> Buildings</span>
+                <span style="color: #60a5fa;"><i class="fa-solid fa-square-check"></i> Roads</span>
+                <span style="color: var(--as-green);"><i class="fa-solid fa-square-check"></i> Vegetation</span>
+                <span style="color: #c084fc;"><i class="fa-solid fa-square-check"></i> Vehicles</span>
+                <span style="color: #f87171;"><i class="fa-solid fa-square-check"></i> People (Masked)</span>
+              </div>
+            </div>
+
+            <div class="semantic-grid-tiles" id="semantic-tiles-container">
+              <!-- 5 segmentation live preview tiles -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+        <button class="btn-primary-action" id="btn-proceed-viewer">
+          <span>Proceed to 3D Viewer</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </main>
+
+    <!-- ==========================================================================
+         Screen 06: Validation & Export
+         ========================================================================== -->
+    <main class="workflow-screen-pane" id="pane-screen-06">
+      <div class="pane-header-row">
+        <div class="pane-title-group">
+          <h2>Validation & Export</h2>
+          <p>Evaluating geometric consistency, evidence distribution and export deliverables.</p>
+        </div>
+      </div>
+
+      <div class="screen06-layout">
+        
+        <!-- Column 1: Metric Validation -->
+        <div class="screen06-card">
+          <div class="screen06-card-title">Metric Validation</div>
+          <div style="font-size: 0.7rem; color: var(--as-text-muted); margin-bottom: 8px;">
+            Evaluating geometric consistency and spatial accuracy.
+          </div>
+
+          <table class="metrics-table-spec">
+            <tbody>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Reprojection Error</td><td id="exp-reproj-val">0.44 px</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Geometric Consistency</td><td style="color: var(--as-green);">Pass</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Scale Consistency</td><td style="color: var(--as-green);">Pass</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Spatial Alignment</td><td style="color: var(--as-green);">Pass</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Coverage</td><td id="exp-coverage-val">91.8%</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Point Confidence</td><td style="color: var(--as-cyan);">High</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Georeferencing</td><td style="color: var(--as-green);">Verified</td></tr>
+              <tr><td><i class="fa-solid fa-circle-check" style="color: var(--as-green); margin-right: 6px;"></i> Accuracy (Absolute)</td><td id="exp-accuracy-val" style="color: var(--as-green);">~0.031 m (Est.)</td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--as-border-subtle);">
+            <div style="font-size: 0.74rem; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Mission Summary</div>
+            <div class="summary-kv-list" style="font-size: 0.68rem;">
+              <div class="summary-kv-row"><span>Total Frames</span> <strong id="exp-total-frames">9,540</strong></div>
+              <div class="summary-kv-row"><span>Selected Keyframes</span> <strong id="exp-keyframes">513</strong></div>
+              <div class="summary-kv-row"><span>Processing Time</span> <strong id="exp-proc-time">~11.8 min</strong></div>
+              <div class="summary-kv-row"><span>Output Size</span> <strong id="exp-output-size">168.4 MB</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Evidence Distribution (Donut Chart) -->
+        <div class="screen06-card">
+          <div class="screen06-card-title">Evidence Distribution</div>
+          
+          <div class="donut-wrap-06">
+            <svg class="donut-svg-06" viewBox="0 0 100 100" id="evidence-donut-svg">
+              <circle cx="50" cy="50" r="38" fill="transparent" stroke="#10b981" stroke-width="12" stroke-dasharray="148.8 238.7" stroke-dashoffset="0"></circle>
+              <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3b82f6" stroke-width="12" stroke-dasharray="57.5 238.7" stroke-dashoffset="-148.8"></circle>
+              <circle cx="50" cy="50" r="38" fill="transparent" stroke="#f59e0b" stroke-width="12" stroke-dasharray="23.4 238.7" stroke-dashoffset="-206.3"></circle>
+              <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ef4444" stroke-width="12" stroke-dasharray="9.0 238.7" stroke-dashoffset="-229.7"></circle>
+            </svg>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.74rem; font-family: var(--as-font-mono);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Observed</span>
+              <strong id="donut-pct-obs" style="color: #10b981;">62.3%</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Reconstructed</span>
+              <strong id="donut-pct-recon" style="color: #3b82f6;">24.1%</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span> Inferred</span>
+              <strong id="donut-pct-inf" style="color: #f59e0b;">9.8%</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> Unknown</span>
+              <strong id="donut-pct-unk" style="color: #ef4444;">3.8%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Export 3D World -->
+        <div class="screen06-card">
+          <div class="screen06-card-title">Export 3D World</div>
+          <div style="font-size: 0.7rem; color: var(--as-text-muted); margin-bottom: 8px;">
+            Download reconstructed outputs.
+          </div>
+
+          <div class="export-dl-cards-list">
+            <div class="export-dl-item">
+              <div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-cube" style="color: var(--as-cyan); margin-right: 6px;"></i> Textured Mesh</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">OBJ / GLB / FBX (Photorealistic 3D)</div>
+              </div>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-cyan); font-size: 1.1rem; cursor: pointer;"></i>
+            </div>
+
+            <div class="export-dl-item">
+              <div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-braille" style="color: #60a5fa; margin-right: 6px;"></i> Point Cloud</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">PLY / LAS / LAZ (3.1M georeferenced pts)</div>
+              </div>
+              <i class="fa-solid fa-circle-down" style="color: #60a5fa; font-size: 1.1rem; cursor: pointer;"></i>
+            </div>
+
+            <div class="export-dl-item">
+              <div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-map-location-dot" style="color: var(--as-green); margin-right: 6px;"></i> GeoTIFF / GeoJSON</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Georeferenced DEM & boundary vector</div>
+              </div>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-green); font-size: 1.1rem; cursor: pointer;"></i>
+            </div>
+
+            <div class="export-dl-item">
+              <div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-image" style="color: var(--as-amber); margin-right: 6px;"></i> Orthophoto (GeoTIFF)</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">2D calibrated map orthomosaic</div>
+              </div>
+              <i class="fa-solid fa-circle-down" style="color: var(--as-amber); font-size: 1.1rem; cursor: pointer;"></i>
+            </div>
+
+            <div class="export-dl-item">
+              <div>
+                <div style="font-weight: 700; color: #ffffff;"><i class="fa-solid fa-globe" style="color: #c084fc; margin-right: 6px;"></i> Interactive 3D Viewer</div>
+                <div style="font-size: 0.65rem; color: var(--as-text-muted);">Standalone WebGL bundle (Shareable)</div>
+              </div>
+              <i class="fa-solid fa-circle-down" style="color: #c084fc; font-size: 1.1rem; cursor: pointer;"></i>
+            </div>
+          </div>
+
+          <button class="btn-download-all-outputs" id="btn-download-all">
+            <i class="fa-solid fa-download"></i> Download All Outputs
+          </button>
+        </div>
+
+      </div>
+    </main>
+
   </div>
 
   <!-- ==========================================================================
-       Documentation & Compliance Modal (#modal-docs)
+       Screen 05: 3D Viewer & Analysis
+       ========================================================================== -->
+  <section id="screen-05-viewer">
+    
+    <!-- Left Toolbar: Layers & Measurement Tools -->
+    <div class="viewer05-left-toolbar">
+      <div class="toolbar-header-txt">Layers</div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-mesh" checked style="accent-color: var(--as-cyan);"> Textured Mesh</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-points" style="accent-color: var(--as-cyan);"> Point Cloud</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-bldgs" checked style="accent-color: var(--as-cyan);"> Buildings</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-roads" checked style="accent-color: #60a5fa;"> Roads</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-veg" checked style="accent-color: var(--as-green);"> Vegetation</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-veh" checked style="accent-color: #c084fc;"> Vehicles</label>
+        <label class="layer-toggle-btn"><input type="checkbox" id="layer-ppl" checked style="accent-color: #f87171;"> People (Masked)</label>
+      </div>
+
+      <div class="toolbar-header-txt" style="margin-top: 10px;">Tools</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <button class="layer-toggle-btn active" id="tool-measure" style="background: rgba(37,99,235,0.2); padding: 4px 8px; border-radius: 4px; color: #ffffff;">
+          <i class="fa-solid fa-ruler-combined" style="color: var(--as-cyan);"></i> Measure
+        </button>
+        <button class="layer-toggle-btn" id="tool-area" style="padding: 4px 8px; border-radius: 4px;">
+          <i class="fa-solid fa-draw-polygon" style="color: #60a5fa;"></i> Area
+        </button>
+        <button class="layer-toggle-btn" id="tool-coord" style="padding: 4px 8px; border-radius: 4px;">
+          <i class="fa-solid fa-location-crosshairs" style="color: var(--as-green);"></i> Coordinate Pick
+        </button>
+      </div>
+
+      <!-- Quick Stepper Navigation Links -->
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px;">
+        <button id="btn-viewer-back-process" style="padding: 6px; font-size: 0.72rem; background: rgba(255,255,255,0.06); border: 1px solid var(--as-border-subtle); border-radius: 6px; color: #cbd5e1; cursor: pointer;">
+          <i class="fa-solid fa-arrow-left"></i> Process Pipeline
+        </button>
+        <button id="btn-viewer-go-export" style="padding: 6px; font-size: 0.72rem; background: var(--as-blue); border: none; border-radius: 6px; color: #ffffff; font-weight: 700; cursor: pointer;">
+          Validation & Export <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Viewport: Three.js Canvas & Subnav -->
+    <div class="viewer05-center-canvas">
+      <canvas id="screen05-webgl-canvas"></canvas>
+
+      <!-- Subnav Tabs -->
+      <div class="viewer05-top-tabs">
+        <button class="v-tab-btn active" id="vtab-3d">3D View</button>
+        <button class="v-tab-btn" id="vtab-ortho">Ortho</button>
+        <button class="v-tab-btn" id="vtab-points">Point Cloud</button>
+        <button class="v-tab-btn" id="vtab-evidence">Evidence</button>
+      </div>
+
+      <!-- 3D Compass Rose Gizmo -->
+      <div class="compass-rose-gizmo" title="North Orientation">
+        <span class="compass-arrow-n">N</span>
+        <div class="compass-center-dot"></div>
+      </div>
+
+      <!-- Viewport Zoom Controls -->
+      <div class="viewer-canvas-tools">
+        <button class="canvas-tool-btn" id="btn-zoom-in" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+        <button class="canvas-tool-btn" id="btn-zoom-out" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+        <button class="canvas-tool-btn" id="btn-reset-cam" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+        <button class="canvas-tool-btn" id="btn-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+      </div>
+
+      <!-- Bottom Scene Evidence Legend -->
+      <div class="viewer05-bottom-evidence">
+        <span style="font-size: 0.72rem; font-weight: 800; color: #ffffff;">Scene Evidence</span>
+        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Observed
+        </span>
+        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span> Reconstructed
+        </span>
+        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span> Inferred
+        </span>
+        <span style="font-size: 0.68rem; display: flex; align-items: center; gap: 5px; color: #cbd5e1;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span> Unknown
+        </span>
+      </div>
+    </div>
+
+    <!-- Right HUD: Point Information & Measurement -->
+    <div class="viewer05-right-hud">
+      <div class="toolbar-header-txt">Point Information</div>
+      <div class="point-thumb-preview">
+        <img id="hud-point-thumb" src="datasets/frames_pb2/frame_0001.jpg" alt="Point Landmark">
+      </div>
+      <div class="summary-kv-list" style="font-size: 0.68rem;">
+        <div class="summary-kv-row"><span>Latitude</span> <strong id="hud-point-lat">78.2232° N</strong></div>
+        <div class="summary-kv-row"><span>Longitude</span> <strong id="hud-point-lon">15.6267° E</strong></div>
+        <div class="summary-kv-row"><span>Elevation</span> <strong id="hud-point-elev">42.4 m MSL</strong></div>
+        <div class="summary-kv-row"><span>CRS</span> <strong id="hud-point-crs">EPSG:32633 UTM</strong></div>
+      </div>
+
+      <div class="toolbar-header-txt" style="margin-top: 14px;">Measurement</div>
+      <div class="measurement-mode-tabs">
+        <button class="measure-tab-btn active" id="mtab-dist">Distance</button>
+        <button class="measure-tab-btn" id="mtab-area">Area</button>
+        <button class="measure-tab-btn" id="mtab-elev">Elevation</button>
+      </div>
+
+      <div class="measure-readout-box">
+        <div style="font-size: 0.65rem; color: var(--as-text-muted); text-transform: uppercase;">Real-world Distance</div>
+        <div class="measure-val-text" id="hud-measure-dist-val">142.7 m</div>
+      </div>
+
+      <div class="measure-points-list">
+        <div class="measure-pt-item">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-green);"></span>
+          <span>Point A:</span>
+          <strong style="color: #cbd5e1;" id="hud-point-a-coords">78.2232° N, 15.6267° E</strong>
+        </div>
+        <div class="measure-pt-item">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--as-cyan);"></span>
+          <span>Point B:</span>
+          <strong style="color: #cbd5e1;" id="hud-point-b-coords">78.2241° N, 15.6284° E</strong>
+        </div>
+      </div>
+
+      <div style="margin-top: auto; font-size: 0.68rem; color: var(--as-text-dim); text-align: center;">
+        <i class="fa-solid fa-hand-pointer"></i> Click anywhere on 3D terrain to measure or inspect coordinates.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==========================================================================
+       NTRO PS-17 Documentation Modal
        ========================================================================== -->
   <div class="as-modal-backdrop" id="modal-docs">
-    <div class="as-modal-window">
+    <div class="as-modal-window" style="max-width: 860px;">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <h2><i class="fa-solid fa-book" style="color: var(--as-cyan);"></i> System Architecture & NTRO PS-17 Compliance</h2>
-          <p>National Technical Research Organisation (NTRO) · Problem Statement 17 Specifications</p>
+          <h2><i class="fa-solid fa-book-bookmark" style="color: var(--as-cyan);"></i> NTRO Problem Statement 17 Documentation</h2>
+          <p>Single-pass UAV photogrammetry, real-time georeferencing and evidence-aware 3D reconstruction.</p>
         </div>
         <button class="modal-close-btn" id="btn-close-docs-modal" title="Close Modal">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="modal-body docs-modal-content">
-        <div style="margin-bottom: 20px;">
-          <h3 style="font-size: 1.05rem; color: #ffffff; margin-bottom: 8px;">
-            <i class="fa-solid fa-bullseye" style="color: var(--as-cyan);"></i> Problem Statement 17 Objective
-          </h3>
-          <p style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.6;">
-            To develop an advanced algorithmic software system capable of taking continuous <strong>single-pass drone video</strong> (1080p/4K) together with asynchronous GPS/GNSS and flight metadata, and generating a <strong>georeferenced, accurate 3D model</strong> with spatial error &le; 1.0 m in under 15 minutes of compute time.
-          </p>
-        </div>
+      <div class="modal-body" style="line-height: 1.6; color: #cbd5e1; font-size: 0.82rem;">
+        <h3 style="color: #ffffff; margin-bottom: 8px;">1. Operational Overview</h3>
+        <p style="margin-bottom: 14px;">
+          AeroSculpt addresses the core challenge of NTRO Problem Statement 17 (SH/26158): converting raw, single-pass continuous aerial video collected by UAVs into accurate, georeferenced, metric 3D digital surfaces and point clouds without requiring multi-pass crisscross flights.
+        </p>
 
-        <div style="margin-bottom: 20px;">
-          <h3 style="font-size: 1.05rem; color: #ffffff; margin-bottom: 8px;">
-            <i class="fa-solid fa-microchip" style="color: var(--as-green);"></i> Technological Innovations
-          </h3>
-          <p style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.6;">
-            • <strong>Dynamic Object Masking:</strong> Integrates real-time YOLOv8 and Segment Anything Model (SAM) to isolate and mask moving vehicles, pedestrians, and dynamic vegetation before feature matching.<br>
-            • <strong>Sim(3) 7-Parameter Georeferencing:</strong> Optimizes 3D rotation, translation, and absolute metric scale against GNSS/RTK fixes without requiring pre-surveyed Ground Control Points.<br>
-            • <strong>Evidence-Aware Representation:</strong> Categorizes every vertex and triangle into Observed (direct line-of-sight), Reconstructed (multi-view stereo), Inferred (geometric priors), or Unknown (occluded voids).
-          </p>
-        </div>
+        <h3 style="color: #ffffff; margin-bottom: 8px;">2. Sensor Synchronization & Trajectory Verification</h3>
+        <p style="margin-bottom: 14px;">
+          The system synchronizes video frames with asynchronous 10 Hz GNSS records and 100 Hz IMU telemetry. The flight path validation verifies that spatial coverage satisfies stereoscopic parallax requirements (overlap &gt; 65%) while rejecting high-blur or turn-induced degraded keyframes.
+        </p>
 
-        <div>
-          <h3 style="font-size: 1.05rem; color: #ffffff; margin-bottom: 8px;">
-            <i class="fa-solid fa-scale-balanced" style="color: var(--as-blue);"></i> Evaluation Weightage Distribution
-          </h3>
-          <table class="docs-table">
-            <thead>
-              <tr><th>Component</th><th>Weight</th><th>AeroSculpt Implementation</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Reconstruction Accuracy</td><td>30%</td><td>Reprojection error &le; 0.44 px, Spatial error &le; 0.031 m</td></tr>
-              <tr><td>Model Completeness</td><td>20%</td><td>Multi-view coverage &gt; 91%, Screened Poisson surface</td></tr>
-              <tr><td>Processing Speed</td><td>20%</td><td>Optimized GPU SfM pipeline completes &lt; 12 minutes</td></tr>
-              <tr><td>Innovation & Approach</td><td>15%</td><td>Evidence classification, dynamic YOLO masking</td></tr>
-              <tr><td>Scalability & Robustness</td><td>10%</td><td>Dockerized microservice, arbitrary terrain handling</td></tr>
-              <tr><td>User Interface & Analytics</td><td>5%</td><td>Interactive 3D WebGL viewer, metric distance measuring</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <h3 style="color: #ffffff; margin-bottom: 8px;">3. Evidence-Aware 3D Representation</h3>
+        <p style="margin-bottom: 14px;">
+          Unlike conventional black-box photogrammetry, AeroSculpt categorizes every triangle and vertex into 4 strict confidence tiers:
+          <strong style="color: #10b981;">Observed (Direct Optical Multi-view rays)</strong>,
+          <strong style="color: #3b82f6;">Reconstructed (Stereo Match)</strong>,
+          <strong style="color: #f59e0b;">Inferred (Occluded / Interpolated)</strong>, and
+          <strong style="color: #ef4444;">Unknown (Unsurveyed Blindspots)</strong>.
+        </p>
+
+        <h3 style="color: #ffffff; margin-bottom: 8px;">4. Verified Standards Compliance</h3>
+        <p>
+          Meets ASPRS Positional Accuracy Standards for Digital Geospatial Data (Class 1, RMSE &lt; 0.05m with RTK fixed telemetry). Output formats include textured GLB/OBJ meshes, georeferenced LAS/PLY point clouds, and orthorectified GeoTIFF rasters.
+        </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-step-action primary" id="btn-close-docs-confirm">Close Documentation</button>
+        <span style="font-size: 0.72rem; color: var(--as-text-muted);">NTRO SH/26158 · Ministry of Electronics & IT · Smart India Hackathon 2026</span>
+        <button class="btn-primary-action" id="btn-close-docs-footer" style="padding: 6px 14px; font-size: 0.78rem;">
+          Close Documentation
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- JavaScript Bundle -->
+  <!-- Application Entry Point -->
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
