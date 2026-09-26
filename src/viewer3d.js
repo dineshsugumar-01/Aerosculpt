@@ -373,8 +373,21 @@ export class AeroSculptViewer {
   }
 
   recenterCamera(immediate = false) {
-    const target = new THREE.Vector3(2, 6.2, 0);
-    const position = new THREE.Vector3(-16, 14, -52);
+    // Auto-fit camera to loaded model bounding box
+    let target = new THREE.Vector3(2, 0, 0);
+    let position = new THREE.Vector3(0, 40, 60);
+
+    if (this.modelContainer) {
+      const box = new THREE.Box3().setFromObject(this.modelContainer);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      // Largest dimension determines viewing distance
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const dist = Math.max(maxDim * 1.2, 20);
+      // Position camera at oblique 45° angle — looking at model from front-above
+      target.set(center.x, center.y, center.z);
+      position.set(center.x, center.y + dist * 0.55, center.z + dist * 0.85);
+    }
 
     if (immediate) {
       this.camera.position.copy(position);
@@ -386,26 +399,35 @@ export class AeroSculptViewer {
   }
 
   setCameraPreset(preset) {
-    if (preset === 'top') {
-      this.flyTo({
-        position: new THREE.Vector3(2, 90, -0.5),
-        target: new THREE.Vector3(2, 6.2, 0),
-        duration: 700
-      });
-    } else if (preset === 'front' || preset === 'oblique') {
-      this.flyTo({
-        position: new THREE.Vector3(-16, 14, -52),
-        target: new THREE.Vector3(2, 6.2, 0),
-        duration: 650
-      });
-    } else if (preset === 'iso') {
-      this.flyTo({
-        position: new THREE.Vector3(-36, 28, -42),
-        target: new THREE.Vector3(2, 6.2, 0),
-        duration: 650
-      });
-    } else if (preset === 'reset') {
+    let target = new THREE.Vector3(0, 0, 0);
+    let position = new THREE.Vector3(0, 40, 60);
+
+    if (this.modelContainer) {
+      const box = new THREE.Box3().setFromObject(this.modelContainer);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const dist = Math.max(maxDim * 1.2, 20);
+      target.copy(center);
+
+      if (preset === 'top') {
+        position.set(center.x, center.y + dist * 1.6, center.z);
+      } else if (preset === 'front' || preset === 'oblique') {
+        position.set(center.x, center.y + dist * 0.55, center.z + dist * 0.85);
+      } else if (preset === 'iso') {
+        position.set(center.x - dist * 0.6, center.y + dist * 0.7, center.z + dist * 0.7);
+      } else if (preset === 'side') {
+        position.set(center.x + dist * 1.2, center.y + dist * 0.4, center.z);
+      } else {
+        // reset
+        position.set(center.x, center.y + dist * 0.55, center.z + dist * 0.85);
+      }
+    }
+
+    if (preset === 'reset') {
       this.recenterCamera(false);
+    } else {
+      this.flyTo({ position, target, duration: 650 });
     }
   }
 
