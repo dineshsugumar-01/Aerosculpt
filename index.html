@@ -1027,7 +1027,7 @@
                   <div class="brand-hex-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                   <div class="brand-text-col">
                     <span class="studio-title">AEROSCULPT STUDIO</span>
-                    <span class="mission-tag" id="studio-mission-tag">MISSION 02 · EPSG:32630</span>
+                    <span class="mission-tag" id="studio-mission-tag">AEROSCULPT STUDIO · STANDBY</span>
                   </div>
                 </div>
               </div>
@@ -1037,8 +1037,9 @@
                 <i class="fa fa-layer-group text-primary"></i>
                 <label for="studio-dataset-selector" class="hidden-xs">Dataset:</label>
                 <select id="studio-dataset-selector" class="studio-dataset-select" title="Switch Survey Dataset">
+                  <option value="" selected disabled>Select Prebuild Dataset...</option>
                   <option value="01">01 · Komorowice Cadastral Survey (26.2 MB)</option>
-                  <option value="02" selected>02 · Svalbard Arctic 3D Scan (34.7 MB)</option>
+                  <option value="02">02 · Svalbard Arctic 3D Scan (34.7 MB)</option>
                   <option value="03">03 · Zermatt Alpine Survey (31.7 MB)</option>
                 </select>
               </div>
@@ -1101,40 +1102,40 @@
                   <div class="tactical-card" id="studio-output-deliverables-card">
                     <div class="t-card-header">
                       <h5><i class="fa fa-box-archive text-success"></i> Output Deliverables & Precision</h5>
-                      <span class="badge badge-success" id="studio-output-badge">DELIVERABLES READY</span>
+                      <span class="badge" id="studio-output-badge" style="background:#334155;color:#94a3b8;">STANDBY</span>
                     </div>
 
                     <div class="output-metrics-grid">
                       <div class="out-stat-chip">
                         <span class="out-lbl">Ground Sampling Dist (GSD)</span>
-                        <strong class="out-val" id="studio-out-gsd">1.82 cm/px</strong>
+                        <strong class="out-val" id="studio-out-gsd">—</strong>
                       </div>
                       <div class="out-stat-chip">
                         <span class="out-lbl">Mean Reproj Error</span>
-                        <strong class="out-val" id="studio-out-reproj">0.48 px</strong>
+                        <strong class="out-val" id="studio-out-reproj">—</strong>
                       </div>
                       <div class="out-stat-chip">
                         <span class="out-lbl">Watertight Triangles</span>
-                        <strong class="out-val" id="studio-out-poly">384,192 Faces</strong>
+                        <strong class="out-val" id="studio-out-poly">—</strong>
                       </div>
                       <div class="out-stat-chip">
                         <span class="out-lbl">Positional Accuracy (RMSE)</span>
-                        <strong class="out-val" id="studio-out-rmse">H: 0.028m · V: 0.041m</strong>
+                        <strong class="out-val" id="studio-out-rmse">—</strong>
                       </div>
                     </div>
 
                     <div class="output-files-list" id="studio-output-files-list">
                       <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-cube text-primary"></i> <span class="out-file-name" id="studio-out-glb-name">02_slam_model.glb</span></div>
-                        <span class="out-file-size" id="studio-out-glb-size">9.6 MB</span>
+                        <div class="out-file-left"><i class="fa fa-cube text-muted"></i> <span class="out-file-name" id="studio-out-glb-name">No dataset loaded</span></div>
+                        <span class="out-file-size" id="studio-out-glb-size">—</span>
                       </div>
                       <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-video text-info"></i> <span class="out-file-name" id="studio-out-vid-name">02_slam_tracking.mp4</span></div>
-                        <span class="out-file-size" id="studio-out-vid-size">5.7 MB</span>
+                        <div class="out-file-left"><i class="fa fa-video text-muted"></i> <span class="out-file-name" id="studio-out-vid-name">No stream active</span></div>
+                        <span class="out-file-size" id="studio-out-vid-size">—</span>
                       </div>
                       <div class="out-file-item">
-                        <div class="out-file-left"><i class="fa fa-file-pdf text-danger"></i> <span class="out-file-name">survey_quality_report.pdf</span></div>
-                        <span class="out-file-size">1.8 MB</span>
+                        <div class="out-file-left"><i class="fa fa-file-pdf text-muted"></i> <span class="out-file-name">survey_quality_report.pdf</span></div>
+                        <span class="out-file-size">—</span>
                       </div>
                     </div>
                   </div>
@@ -1143,7 +1144,7 @@
                   <div class="tactical-card">
                     <div class="t-card-header">
                       <h5><i class="fa fa-location-dot"></i> Ground Control Points (GCP)</h5>
-                      <span class="badge-status-locked" id="studio-datum-badge">EPSG:32630 Locked</span>
+                      <span class="badge-status-locked" id="studio-datum-badge" style="background:rgba(51,65,85,0.5);border-color:#475569;color:#94a3b8;">Standby</span>
                     </div>
 
                     <div class="gcp-table-shell">
@@ -1152,10 +1153,7 @@
                           <tr><th>GCP ID</th><th>Landmark Name</th><th>Status</th></tr>
                         </thead>
                         <tbody id="studio-gcp-table-body">
-                          <tr class="active-gcp-row" data-gcp="GCP-01" data-lat="55.937222000" data-lon="-4.558333000" data-elev="24.312"><td><strong>GCP-01</strong></td><td>South Rampart</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
-                          <tr data-gcp="GCP-02" data-lat="55.937612000" data-lon="-4.557945000" data-elev="38.905"><td><strong>GCP-02</strong></td><td>Castle Gate</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
-                          <tr data-gcp="GCP-03" data-lat="55.936954000" data-lon="-4.558710000" data-elev="4.110"><td><strong>GCP-03</strong></td><td>River Wall</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
-                          <tr data-gcp="GCP-04" data-lat="55.938120000" data-lon="-4.557280000" data-elev="72.450"><td><strong>GCP-04</strong></td><td>North Ridge</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
+                          <tr><td colspan="3" style="text-align:center;color:#64748b;padding:14px;font-size:11px;">Standby · No Ground Control Points active</td></tr>
                         </tbody>
                       </table>
                     </div>
@@ -1377,8 +1375,8 @@
                         <div class="optical-reticle-crosshair"></div>
                         <!-- Metadata Chip -->
                         <div class="keyframe-meta-chip">
-                          <span id="keyframe-filename-chip">pose_station_024.jpg</span>
-                          <span class="chip-res">5472×3648</span>
+                          <span id="keyframe-filename-chip">Standby — No Feed</span>
+                          <span class="chip-res">—</span>
                         </div>
                       </div>
                     </div>
@@ -1473,7 +1471,7 @@
                 <!-- Station Badge -->
                 <div class="timeline-frame-badge">
                   <span class="badge-label">STATION</span>
-                  <strong class="badge-num" id="timeline-badge-val">Pose 24</strong>
+                  <strong class="badge-num" id="timeline-badge-val">—</strong>
                 </div>
 
                 <!-- Exact Station Spinbox -->

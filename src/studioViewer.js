@@ -102,21 +102,10 @@ export class AeroSculptStudioViewer {
     this.grid.material.transparent = true;
     this.scene.add(this.grid);
 
-    // 7. 3D Region of Interest (ROI) Box
-    this.createRoiBox();
+    // 7. Initial clean empty workstation state — no model, no box, no frustums until dataset loaded
+    this.showEmptyState();
 
-    // 8. 50 Calibrated Camera Frustums along UAV Flight Path
-    this.createCameraFrustums();
-
-    // 9. Optical Sightline Dynamic Laser Beam
-    this.createSightlineBeam();
-
-    // 10. Ground Control Point 3D Target Pins
-    this.createGcpMarkers();
-
-    // 11. Studio model loaded externally via loadDemoDataset — no auto-load here
-
-    // 12. Listeners
+    // 8. Listeners
     window.addEventListener('resize', () => this.onWindowResize());
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => this.onWindowResize());
@@ -126,7 +115,7 @@ export class AeroSculptStudioViewer {
     this.renderer.domElement.addEventListener('pointermove', (e) => this.onPointerMove(e));
     this.renderer.domElement.addEventListener('pointerdown', (e) => this.onPointerDown(e));
 
-    // 13. Render Loop
+    // 9. Render Loop
     this.animate();
   }
 
@@ -143,9 +132,137 @@ export class AeroSculptStudioViewer {
     this.scene.add(fillLight);
   }
 
-  createRoiBox() {
-    // Metric bounding box around Dumbarton Castle ramparts (approx 45m x 22m x 55m)
-    const geom = new THREE.BoxGeometry(46, 22, 54);
+  showEmptyState() {
+    this.clearModel();
+    this.clearAnnotations();
+    this.isLoaded = false;
+    this.currentModelSize = null;
+    this.currentModelBox = null;
+
+    if (this.camera) {
+      this.camera.position.set(0, 32, 52);
+    }
+    if (this.controls) {
+      this.controls.target.set(0, 0, 0);
+      this.controls.update();
+    }
+
+    const loaderElem = document.getElementById('studio-viewport-loader');
+    if (loaderElem) loaderElem.style.display = 'none';
+
+    const prev = this.container?.querySelector('.studio-empty-state-overlay');
+    if (prev) prev.remove();
+
+    if (this.container) {
+      const overlay = document.createElement('div');
+      overlay.className = 'studio-empty-state-overlay';
+      overlay.innerHTML = `
+        <div class="studio-empty-inner" style="text-align:center;padding:24px;max-width:540px;">
+          <div class="studio-empty-icon-ring" style="width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 25px rgba(56,189,248,0.2);">
+            <i class="fa-solid fa-cube fa-2x" style="color:#38bdf8;"></i>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;letter-spacing:1px;color:#f8fafc;margin:12px 0 4px;">AEROSCULPT DIGITAL TWIN WORKSTATION</h3>
+          <p style="font-size:12px;font-weight:600;color:#94a3b8;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.5px;">No Survey Dataset Loaded</p>
+          <p style="font-size:12px;color:#64748b;max-width:440px;line-height:1.5;margin:0 auto 16px;">Select a benchmark prebuild survey (PB01, PB02, PB03) from the top bar or click Ingest Video to begin 3D reconstruction.</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm btn-primary" id="btn-empty-ingest-trigger" style="display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Ingest Video
+            </button>
+            <button type="button" class="btn btn-sm btn-default" id="btn-empty-load-pb2" style="display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-play text-cyan"></i> Load PB02 (Svalbard)
+            </button>
+            <button type="button" class="btn btn-sm btn-default" id="btn-empty-load-pb1" style="display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-play text-warning"></i> Load PB01 (Komorowice)
+            </button>
+            <button type="button" class="btn btn-sm btn-default" id="btn-empty-load-pb3" style="display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-play text-info"></i> Load PB03 (Zermatt)
+            </button>
+          </div>
+        </div>
+      `;
+      overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:15;background:radial-gradient(ellipse at center, rgba(15,23,42,0.75) 0%, rgba(10,13,20,0.92) 100%);pointer-events:auto;backdrop-filter:blur(4px);border-radius:inherit;';
+      if (this.container) {
+        this.container.style.position = 'relative';
+        this.container.appendChild(overlay);
+      }
+
+      overlay.querySelector('#btn-empty-ingest-trigger')?.addEventListener('click', () => {
+        window.app?.openModal('modal-upload-backdrop');
+      });
+      overlay.querySelector('#btn-empty-load-pb1')?.addEventListener('click', () => {
+        window.app?.loadDemoDatasetWithTimedIngestion('01');
+      });
+      overlay.querySelector('#btn-empty-load-pb2')?.addEventListener('click', () => {
+        window.app?.loadDemoDatasetWithTimedIngestion('02');
+      });
+      overlay.querySelector('#btn-empty-load-pb3')?.addEventListener('click', () => {
+        window.app?.loadDemoDatasetWithTimedIngestion('03');
+      });
+    }
+  }
+
+  clearEmptyState() {
+    const overlay = this.container?.querySelector('.studio-empty-state-overlay');
+    if (overlay) overlay.remove();
+  }
+
+  clearModel() {
+    const toRemove = [];
+    this.scene.children.forEach(child => {
+      if (child.name === 'StudioTerrainContainer' || child === this.modelContainer || child === this.model) {
+        toRemove.push(child);
+      }
+    });
+    toRemove.forEach(obj => this.scene.remove(obj));
+    this.modelContainer = null;
+    this.model = null;
+    this.originalMaterials.clear();
+  }
+
+  clearAnnotations() {
+    if (this.roiBox) {
+      this.scene.remove(this.roiBox);
+      this.roiBox.geometry?.dispose();
+      this.roiBox.material?.dispose();
+      this.roiBox = null;
+    }
+    if (this.cameraPyramids && this.cameraPyramids.length) {
+      this.cameraPyramids.forEach(p => {
+        if (p.group) this.scene.remove(p.group);
+      });
+      this.cameraPyramids = [];
+    }
+    if (this.trajectoryLine) {
+      this.scene.remove(this.trajectoryLine);
+      this.trajectoryLine.geometry?.dispose();
+      this.trajectoryLine.material?.dispose();
+      this.trajectoryLine = null;
+    }
+    if (this.sightlineBeam) {
+      this.scene.remove(this.sightlineBeam);
+      this.sightlineBeam.geometry?.dispose();
+      this.sightlineBeam.material?.dispose();
+      this.sightlineBeam = null;
+    }
+    if (this.gcpMarkers && this.gcpMarkers.length) {
+      this.gcpMarkers.forEach(m => this.scene.remove(m));
+      this.gcpMarkers = [];
+    }
+  }
+
+  updateRoiBox(size, center) {
+    if (this.roiBox) {
+      this.scene.remove(this.roiBox);
+      this.roiBox.geometry?.dispose();
+      this.roiBox.material?.dispose();
+      this.roiBox = null;
+    }
+
+    const boxW = Math.max(size.x + 3.5, 20);
+    const boxH = Math.max(size.y + 2.5, 12);
+    const boxD = Math.max(size.z + 3.5, 20);
+
+    const geom = new THREE.BoxGeometry(boxW, boxH, boxD);
     const edges = new THREE.EdgesGeometry(geom);
     this.roiBox = new THREE.LineSegments(
       edges,
@@ -158,49 +275,60 @@ export class AeroSculptStudioViewer {
       })
     );
     this.roiBox.computeLineDistances();
-    this.roiBox.position.set(2, 10.5, 0);
+    // Position so bottom is aligned flat on datum ground Y=0
+    this.roiBox.position.set(0, boxH / 2, 0);
+    this.roiBox.visible = this.layers.roi;
     this.scene.add(this.roiBox);
   }
 
-  createCameraFrustums(datasetId = '01') {
-    // Remove previous pyramids if any
+  createCameraFrustums(datasetId = '01', modelSize = null) {
     if (this.cameraPyramids && this.cameraPyramids.length) {
       this.cameraPyramids.forEach(p => {
         if (p.group) this.scene.remove(p.group);
       });
+      this.cameraPyramids = [];
     }
     if (this.trajectoryLine) {
       this.scene.remove(this.trajectoryLine);
+      this.trajectoryLine.geometry?.dispose();
+      this.trajectoryLine.material?.dispose();
       this.trajectoryLine = null;
     }
 
     this.currentTrajectoryDataset = datasetId;
     const isOrbit = datasetId === '03';
     const totalWaypoints = isOrbit ? 33 : 50;
-    this.cameraPyramids = [];
     this.cameraPositions = [];
 
-    // Flight trajectory line
+    const sizeX = modelSize ? modelSize.x : 38;
+    const sizeY = modelSize ? modelSize.y : 20;
+    const sizeZ = modelSize ? modelSize.z : 38;
+
+    const centroid = new THREE.Vector3(0, sizeY * 0.4, 0);
+    this.centroidTarget = centroid;
+
     const trajPoints = [];
+    const radX = Math.max(sizeX * 0.65 + 6, 24);
+    const radZ = Math.max(sizeZ * 0.65 + 6, 24);
+    const orbitRad = Math.max(sizeX, sizeZ) * 0.65 + 6;
+    const heightBase = sizeY + 5;
 
     for (let i = 0; i < totalWaypoints; i++) {
       let pos;
       if (isOrbit) {
-        // True 360-degree orbital survey around centroid (2, 6.2, 0)
         const angle = (i / totalWaypoints) * Math.PI * 2;
-        const radius = 25.0;
-        const px = 2 + Math.cos(angle) * radius;
-        const pz = 0 + Math.sin(angle) * radius;
-        const py = 12.0 + Math.sin(i * 0.4) * 1.5;
+        const px = Math.cos(angle) * orbitRad;
+        const pz = Math.sin(angle) * orbitRad;
+        const py = heightBase + Math.sin(i * 0.4) * 1.5;
         pos = new THREE.Vector3(px, py, pz);
       } else {
         const t = i / totalWaypoints;
         const angle = t * Math.PI * 4;
-        const radiusX = 26 + Math.sin(t * Math.PI * 2) * 8;
-        const radiusZ = 22 + Math.cos(t * Math.PI * 2) * 6;
-        const px = Math.cos(angle) * radiusX;
-        const pz = Math.sin(angle) * radiusZ;
-        const py = 13 + Math.sin(i * 0.45) * 3;
+        const rx = radX + Math.sin(t * Math.PI * 2) * 5;
+        const rz = radZ + Math.cos(t * Math.PI * 2) * 4;
+        const px = Math.cos(angle) * rx;
+        const pz = Math.sin(angle) * rz;
+        const py = heightBase + Math.sin(i * 0.45) * 2.5;
         pos = new THREE.Vector3(px, py, pz);
       }
 
@@ -210,11 +338,8 @@ export class AeroSculptStudioViewer {
       // Camera Frustum Pyramid Geometry
       const frustumGroup = new THREE.Group();
       frustumGroup.position.copy(pos);
+      frustumGroup.lookAt(centroid);
 
-      // Look at model centroid
-      frustumGroup.lookAt(2, 6.2, 0);
-
-      // Pyramid wireframe
       const coneGeom = new THREE.ConeGeometry(1.0, 1.8, 4, 1, false);
       coneGeom.rotateY(Math.PI / 4);
       coneGeom.rotateX(Math.PI / 2);
@@ -231,13 +356,12 @@ export class AeroSculptStudioViewer {
       const pyramidMesh = new THREE.LineSegments(edges, mat);
       frustumGroup.add(pyramidMesh);
 
-      // Waypoint index data
       frustumGroup.userData = { waypointIndex: i };
+      frustumGroup.visible = this.layers.frustums;
       this.scene.add(frustumGroup);
       this.cameraPyramids.push({ group: frustumGroup, lines: pyramidMesh });
     }
 
-    // Trajectory spline
     const spline = new THREE.CatmullRomCurve3(trajPoints, true);
     const splineGeom = new THREE.BufferGeometry().setFromPoints(spline.getPoints(200));
     const splineMat = new THREE.LineBasicMaterial({
@@ -247,6 +371,7 @@ export class AeroSculptStudioViewer {
       linewidth: 1.5
     });
     this.trajectoryLine = new THREE.Line(splineGeom, splineMat);
+    this.trajectoryLine.visible = this.layers.frustums;
     this.scene.add(this.trajectoryLine);
 
     if (this.sightlineBeam) {
@@ -255,13 +380,19 @@ export class AeroSculptStudioViewer {
   }
 
   setDatasetTrajectory(datasetId) {
-    this.createCameraFrustums(datasetId);
+    this.currentTrajectoryDataset = datasetId;
+    if (this.currentModelSize) {
+      this.createCameraFrustums(datasetId, this.currentModelSize);
+    }
   }
 
-
   createSightlineBeam() {
+    if (this.sightlineBeam) {
+      this.scene.remove(this.sightlineBeam);
+      this.sightlineBeam = null;
+    }
     const activePos = this.cameraPositions[this.activeKeyframeIndex] || new THREE.Vector3(0, 14, 25);
-    const targetPos = new THREE.Vector3(2, 6.2, 0);
+    const targetPos = this.centroidTarget || new THREE.Vector3(0, 6, 0);
 
     const geom = new THREE.BufferGeometry().setFromPoints([activePos, targetPos]);
     const mat = new THREE.LineBasicMaterial({
@@ -271,6 +402,7 @@ export class AeroSculptStudioViewer {
       linewidth: 2
     });
     this.sightlineBeam = new THREE.Line(geom, mat);
+    this.sightlineBeam.visible = this.layers.frustums;
     this.scene.add(this.sightlineBeam);
   }
 
@@ -279,29 +411,40 @@ export class AeroSculptStudioViewer {
     const activePos = this.cameraPositions[this.activeKeyframeIndex];
     if (!activePos) return;
 
-    const targetPos = new THREE.Vector3(2, 6.2, 0);
+    const targetPos = this.centroidTarget || new THREE.Vector3(0, 6, 0);
     this.sightlineBeam.geometry.setFromPoints([activePos, targetPos]);
   }
 
-  createGcpMarkers() {
+  createGcpMarkers(worldBox = null) {
+    if (this.gcpMarkers && this.gcpMarkers.length) {
+      this.gcpMarkers.forEach(m => this.scene.remove(m));
+      this.gcpMarkers = [];
+    }
+
+    let minX = -18, maxX = 18, minZ = -18, maxZ = 18;
+    if (worldBox) {
+      minX = worldBox.min.x;
+      maxX = worldBox.max.x;
+      minZ = worldBox.min.z;
+      maxZ = worldBox.max.z;
+    }
+
     const gcpCoords = [
-      { id: 'GCP-01', name: 'South Rampart', pos: new THREE.Vector3(-12.4, 2.5, 14.2) },
-      { id: 'GCP-02', name: 'Castle Gate', pos: new THREE.Vector3(10.8, 5.2, -8.4) },
-      { id: 'GCP-03', name: 'River Wall', pos: new THREE.Vector3(-18.2, 0.4, -12.1) },
-      { id: 'GCP-04', name: 'North Ridge', pos: new THREE.Vector3(16.5, 10.1, 12.8) }
+      { id: 'GCP-01', name: 'South Rampart', pos: new THREE.Vector3(minX + 2, 0.4, maxZ - 2) },
+      { id: 'GCP-02', name: 'Castle Gate', pos: new THREE.Vector3(maxX - 2, 0.4, minZ + 2) },
+      { id: 'GCP-03', name: 'River Wall', pos: new THREE.Vector3(minX + 2, 0.4, minZ + 2) },
+      { id: 'GCP-04', name: 'North Ridge', pos: new THREE.Vector3(maxX - 2, 0.4, maxZ - 2) }
     ];
 
     gcpCoords.forEach(gcp => {
       const group = new THREE.Group();
       group.position.copy(gcp.pos);
 
-      // Red cross marker
-      const markerGeom = new THREE.SphereGeometry(0.45, 16, 16);
+      const markerGeom = new THREE.SphereGeometry(0.5, 16, 16);
       const markerMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
       const sphere = new THREE.Mesh(markerGeom, markerMat);
       group.add(sphere);
 
-      // Pin stem to ground
       const stemGeom = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(0, -gcp.pos.y, 0)
@@ -310,41 +453,27 @@ export class AeroSculptStudioViewer {
       const stem = new THREE.Line(stemGeom, stemMat);
       group.add(stem);
 
+      group.visible = this.layers.gcp;
       this.scene.add(group);
       this.gcpMarkers.push(group);
     });
   }
 
-  loadModel(url, rotationY = 0, scaleFactor = 1, rotX = -Math.PI / 2) {
+  loadModel(url, rotationY = 0, scaleFactor = 1, rotX = 0, datasetId = '01') {
+    this.clearEmptyState();
     this.currentLoadId = (this.currentLoadId || 0) + 1;
     const loadId = this.currentLoadId;
 
-    // Immediately remove existing model and containers
-    const toRemove = [];
-    this.scene.children.forEach(child => {
-      if (child.name === 'StudioTerrainContainer' || child === this.modelContainer || child === this.model) {
-        toRemove.push(child);
-      }
-    });
-    toRemove.forEach(obj => this.scene.remove(obj));
-    this.modelContainer = null;
-    this.model = null;
-    this.originalMaterials.clear();
+    this.clearModel();
+    this.clearAnnotations();
 
     const loaderElem = document.getElementById('studio-viewport-loader');
     if (loaderElem) loaderElem.style.display = 'flex';
 
     const onModelReady = (rootObject) => {
-      // Discard stale asynchronous loads
       if (loadId !== this.currentLoadId) return;
 
-      // Ensure any older containers are thoroughly purged
-      const stale = [];
-      this.scene.children.forEach(child => {
-        if (child.name === 'StudioTerrainContainer') stale.push(child);
-      });
-      stale.forEach(obj => this.scene.remove(obj));
-
+      this.clearModel();
       this.model = rootObject;
 
       // 1. Wrap in container to manage photogrammetry coordinate transform
@@ -380,12 +509,15 @@ export class AeroSculptStudioViewer {
 
       const rawBox = new THREE.Box3().setFromObject(this.model);
       const rawSize = rawBox.getSize(new THREE.Vector3());
-      const rawMaxDim = Math.max(rawSize.x, rawSize.y, rawSize.z);
 
-      // Auto-normalize scale to ~60-unit viewing box
-      const targetSize = 60;
-      const autoScale = (rawMaxDim > 0.001) ? (targetSize / rawMaxDim) : 1;
+      // Auto-fit: target footprint ~40x42 units, max height 22
+      const targetW = 40;
+      const targetD = 42;
+      const targetH = 22;
+      const scaleH = Math.min(targetW / Math.max(rawSize.x, 0.001), targetD / Math.max(rawSize.z, 0.001));
+      const autoScale = (rawSize.y * scaleH > targetH) ? (targetH / Math.max(rawSize.y, 0.001)) : scaleH;
       const finalScale = (scaleFactor && scaleFactor !== 1) ? scaleFactor : autoScale;
+
       this.model.scale.setScalar(finalScale);
       this.model.updateMatrixWorld(true);
 
@@ -401,17 +533,30 @@ export class AeroSculptStudioViewer {
       this.scene.add(this.modelContainer);
       this.modelContainer.updateMatrixWorld(true);
 
-      // 5. Place model base exactly on ground grid (Y=0)
+      // 5. Place model base exactly on ground grid (Y=0) and centered at (0, 0)
       const worldBox = new THREE.Box3().setFromObject(this.modelContainer);
       const worldCenter = worldBox.getCenter(new THREE.Vector3());
       this.modelContainer.position.set(-worldCenter.x, -worldBox.min.y, -worldCenter.z);
       this.modelContainer.updateMatrixWorld(true);
 
-      // Hide loading indicator if present
+      // 6. Fitted world dimensions
+      const finalWorldBox = new THREE.Box3().setFromObject(this.modelContainer);
+      const finalSize = finalWorldBox.getSize(new THREE.Vector3());
+      const finalCenter = finalWorldBox.getCenter(new THREE.Vector3());
+      this.currentModelSize = finalSize;
+      this.currentModelBox = finalWorldBox;
+
+      // 7. Create dynamic annotations fitted to this specific model
+      this.updateRoiBox(finalSize, finalCenter);
+      this.createCameraFrustums(datasetId, finalSize);
+      this.createSightlineBeam();
+      this.createGcpMarkers(finalWorldBox);
+
+      this.isLoaded = true;
       if (loaderElem) loaderElem.style.display = 'none';
 
-      // Set initial camera to front facade
-      this.setCameraPreset('front');
+      // 8. Focus camera onto loaded model
+      this.recenterCamera(false);
     };
 
     if (url.toLowerCase().endsWith('.ply')) {
@@ -535,29 +680,58 @@ export class AeroSculptStudioViewer {
     }
   }
 
+  // Recenter Camera on loaded model or grid
+  recenterCamera(animate = false) {
+    if (!this.controls || !this.camera) return;
+
+    let target = new THREE.Vector3(0, 0, 0);
+    let dist = 55;
+
+    if (this.currentModelSize) {
+      const size = this.currentModelSize;
+      const maxDim = Math.max(size.x, size.y, size.z);
+      dist = Math.max(maxDim * 1.35, 30);
+      target = new THREE.Vector3(0, size.y * 0.4, 0);
+    }
+
+    const newPos = new THREE.Vector3(0, target.y + dist * 0.55, dist * 0.95);
+    this.controls.target.copy(target);
+    this.camera.position.copy(newPos);
+    this.controls.update();
+  }
+
   // Camera Orientation Presets
   setCameraPreset(preset) {
     if (!this.controls || !this.camera) return;
 
-    const target = new THREE.Vector3(2, 6.2, 0);
+    let target = new THREE.Vector3(0, 0, 0);
+    let dist = 55;
+
+    if (this.currentModelSize) {
+      const size = this.currentModelSize;
+      const maxDim = Math.max(size.x, size.y, size.z);
+      dist = Math.max(maxDim * 1.35, 30);
+      target = new THREE.Vector3(0, size.y * 0.4, 0);
+    }
+
     this.controls.target.copy(target);
 
     switch (preset) {
       case 'top': // Nadir 90°
-        this.camera.position.set(2, 85, 0.5);
+        this.camera.position.set(0, target.y + dist * 1.6, 0.01);
         break;
       case 'front': // Front elevation
-        this.camera.position.set(-16, 14, -52);
+        this.camera.position.set(0, target.y + dist * 0.45, dist * 0.95);
         break;
       case 'side': // Profile elevation
-        this.camera.position.set(-52, 12, 4);
+        this.camera.position.set(dist * 0.95, target.y + dist * 0.45, 0);
         break;
       case 'iso': // 45° isometric
-        this.camera.position.set(-42, 38, -42);
+        this.camera.position.set(-dist * 0.7, target.y + dist * 0.65, dist * 0.7);
         break;
       case 'reset': // Recenter extents
       default:
-        this.camera.position.set(-22, 18, -60);
+        this.camera.position.set(0, target.y + dist * 0.55, dist * 0.95);
         break;
     }
 

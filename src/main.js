@@ -1903,7 +1903,7 @@ class AeroSculptApp {
         dataset.modelUrl,
         dataset.rotationY || 0,
         dataset.scaleFactor || 1,
-        dataset.rotX !== undefined ? dataset.rotX : -Math.PI / 2
+        dataset.rotX || 0
       );
     } else if (metaOnlyNoModel && this.viewer3d) {
       // Show empty placeholder state - no model loaded
@@ -2051,14 +2051,17 @@ class AeroSculptApp {
 
     // 2. Load 3D model into Studio Viewer & setup trajectory
     if (this.studioViewer) {
-      this.studioViewer.setDatasetTrajectory(demoId);
-      this.studioViewer.loadModel(dataset.modelUrl, dataset.rotationY || 0, dataset.scaleFactor || 1, dataset.rotX !== undefined ? dataset.rotX : -Math.PI / 2);
+      this.studioViewer.loadModel(
+        dataset.modelUrl,
+        dataset.rotationY || 0,
+        dataset.scaleFactor || 1,
+        dataset.rotX || 0,
+        demoId
+      );
     }
 
-    // 3. Load 3D model into Main 3D Viewer
-    if (this.viewer3d) {
-      this.viewer3d.loadModel(dataset.modelUrl, dataset.rotationY || 0, dataset.scaleFactor || 1, dataset.rotX !== undefined ? dataset.rotX : -Math.PI / 2);
-    }
+    // 3. Keep Main 3D Viewer & Dashboard synchronized
+    this.selectDatasetOnDashboard(demoId, false, false);
 
 
 
@@ -2169,8 +2172,16 @@ class AeroSculptApp {
     const rReproj = document.querySelector('.report-stats-cards .r-card:nth-child(3) .r-val');
     if (rReproj) rReproj.textContent = dataset.reprojectionError;
 
-    const rArea = document.querySelector('.report-stats-cards .r-card:nth-child(4) .r-val');
-    if (rArea) rArea.textContent = dataset.reconstructedArea;
+    // 8b. Update Studio GCP Table Body
+    const gcpTableBody = document.getElementById('studio-gcp-table-body');
+    if (gcpTableBody) {
+      gcpTableBody.innerHTML = `
+        <tr class="active-gcp-row" data-gcp="GCP-01"><td><strong>GCP-01</strong></td><td>South Rampart</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
+        <tr data-gcp="GCP-02"><td><strong>GCP-02</strong></td><td>Castle Gate</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
+        <tr data-gcp="GCP-03"><td><strong>GCP-03</strong></td><td>River Wall</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
+        <tr data-gcp="GCP-04"><td><strong>GCP-04</strong></td><td>North Ridge</td><td><span class="pill-locked">Locked 🟢</span></td></tr>
+      `;
+    }
 
     // 9. Reset Keyframe to station appropriate for dataset
     this.setKeyframe(demoId === '03' ? 15 : 24);

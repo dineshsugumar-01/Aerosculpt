@@ -223,10 +223,12 @@ export class AeroSculptViewer {
       const rawSize = rawBox.getSize(new THREE.Vector3());
       const rawMaxDim = Math.max(rawSize.x, rawSize.y, rawSize.z);
 
-      // Auto-normalize scale: fit any model into a ~60-unit viewing box
-      // Override with explicit scaleFactor if provided
-      const targetSize = 60;
-      const autoScale = (rawMaxDim > 0.001) ? (targetSize / rawMaxDim) : 1;
+      // Auto-fit model: footprint ~42x44 units, max height 22
+      const targetW = 42;
+      const targetD = 44;
+      const targetH = 22;
+      const scaleH = Math.min(targetW / Math.max(rawSize.x, 0.001), targetD / Math.max(rawSize.z, 0.001));
+      const autoScale = (rawSize.y * scaleH > targetH) ? (targetH / Math.max(rawSize.y, 0.001)) : scaleH;
       const finalScale = (scaleFactor && scaleFactor !== 1) ? scaleFactor : autoScale;
       this.model.scale.setScalar(finalScale);
       this.model.updateMatrixWorld(true);
