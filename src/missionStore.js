@@ -78,6 +78,14 @@ export const MISSIONS = {
       { x: 440, y: 160 }
     ],
 
+    // Scene-specific real terrain features (NO fake classes!)
+    sceneFeatures: [
+      { id: 'mountain', name: 'Mountains & Bedrock', color: '#38bdf8', border: '#38bdf8', icon: 'fa-mountain' },
+      { id: 'snow', name: 'Snow & Permafrost', color: '#e2e8f0', border: '#cbd5e1', icon: 'fa-snowflake' },
+      { id: 'outpost', name: 'Arctic Outpost Buildings', color: '#f59e0b', border: '#f59e0b', icon: 'fa-building' },
+      { id: 'fjord', name: 'Coastal Fjord Water', color: '#06b6d4', border: '#06b6d4', icon: 'fa-water' }
+    ],
+
     keyframeIndices: [1, 24, 68, 112, 185, 240, 310, 385, 442, 500]
   },
 
@@ -151,6 +159,14 @@ export const MISSIONS = {
       { x: 420, y: 100 }
     ],
 
+    // Scene-specific real terrain features (Residential Cadastral Grid)
+    sceneFeatures: [
+      { id: 'bldgs', name: 'Residential Buildings', color: '#00f0ff', border: '#00f0ff', icon: 'fa-building' },
+      { id: 'roads', name: 'Roads & Pavements', color: '#60a5fa', border: '#60a5fa', icon: 'fa-road' },
+      { id: 'veg', name: 'Vegetation & Farmland', color: '#10b981', border: '#10b981', icon: 'fa-tree' },
+      { id: 'cadastral', name: 'Cadastral Parcels', color: '#a855f7', border: '#a855f7', icon: 'fa-vector-square' }
+    ],
+
     keyframeIndices: [1, 10, 22, 35, 48, 60, 72, 85, 94]
   },
 
@@ -222,6 +238,14 @@ export const MISSIONS = {
       { x: 320, y: 95 },
       { x: 370, y: 75 },
       { x: 420, y: 110 }
+    ],
+
+    // Scene-specific real terrain features (Alpine Mountain Relief)
+    sceneFeatures: [
+      { id: 'peaks', name: 'Alpine Mountain Peaks', color: '#38bdf8', border: '#38bdf8', icon: 'fa-mountain' },
+      { id: 'ridges', name: 'Bedrock Ridges', color: '#94a3b8', border: '#94a3b8', icon: 'fa-gem' },
+      { id: 'glacier', name: 'Glacial Snowpack', color: '#e0f2fe', border: '#cbd5e1', icon: 'fa-snowflake' },
+      { id: 'barriers', name: 'Avalanche Barriers', color: '#f59e0b', border: '#f59e0b', icon: 'fa-bars' }
     ],
 
     keyframeIndices: [1, 20, 45, 75, 105, 130, 155, 180]

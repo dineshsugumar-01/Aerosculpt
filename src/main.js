@@ -370,7 +370,7 @@ class AeroSculptApp {
       return;
     }
 
-    // Dynamic Live Simulation
+    // Dynamic Live Simulation (Runs for exactly 5.0 seconds as specified by user)
     // 1. Reset check icons to spinners
     qcChecks.forEach(qc => {
       const row = document.getElementById(qc.id);
@@ -381,12 +381,12 @@ class AeroSculptApp {
 
     const badge = document.getElementById('badge-inputs-status');
     if (badge) {
-      badge.innerHTML = '<span class="check-spinner" style="width: 10px; height: 10px; margin-right: 6px;"></span> Verifying Feasibility...';
+      badge.innerHTML = '<span class="check-spinner" style="width: 10px; height: 10px; margin-right: 6px;"></span> Verifying Feasibility & Sync...';
     }
 
-    // 2. Animate flight path spline over ~1.8 seconds
+    // 2. Animate flight path spline over exactly 5.0 seconds (5000 ms)
     const startTime = performance.now();
-    const duration = 1800;
+    const duration = 5000;
 
     const animateTrajectory = (now) => {
       const elapsed = now - startTime;
@@ -403,26 +403,24 @@ class AeroSculptApp {
     if (this.flightAnimFrame) cancelAnimationFrame(this.flightAnimFrame);
     this.flightAnimFrame = requestAnimationFrame(animateTrajectory);
 
-    // 3. Sequentially resolve quality checks every ~280ms
+    // 3. Sequentially resolve quality checks spaced across the 5 seconds (~700ms each)
     qcChecks.forEach((qc, idx) => {
       setTimeout(() => {
         const row = document.getElementById(qc.id);
         if (row) {
           row.innerHTML = `<i class="fa-solid fa-circle-check check-pass-icon"></i> <span>${qc.name}</span>`;
         }
-        if (idx === qcChecks.length - 1) {
-          if (badge) {
-            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> All Inputs Valid';
-          }
-          // Hands-free auto-advancement: automatically proceeds to processing!
-          if (this.isAutoAdvancing) {
-            this.tourTimer = setTimeout(() => {
-              this.showScreen(4, true);
-            }, 600);
-          }
-        }
-      }, 280 * (idx + 1));
+      }, 700 * (idx + 1));
     });
+
+    // 4. Hands-free automated progression: at exactly 5.0 seconds, auto-proceed to Screen 04!
+    if (this.tourTimer) clearTimeout(this.tourTimer);
+    this.tourTimer = setTimeout(() => {
+      if (badge) {
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> All Inputs Valid';
+      }
+      this.showScreen(4, true);
+    }, 5000);
   }
 
   drawFlightPath(ctx, canvas, pts, progress) {
@@ -555,8 +553,10 @@ class AeroSculptApp {
       return;
     }
 
-    // Step-by-step timed execution
+    // Step-by-step timed execution: Exactly 5.0 seconds across 7 stages (~680ms each)
     let currentIdx = 0;
+    const stageDuration = 680;
+
     const advanceStage = () => {
       if (currentIdx >= stages.length) {
         // Ensure all 7 stages are explicitly marked completed
@@ -575,12 +575,11 @@ class AeroSculptApp {
 
         this.hasRunSimulation = true;
 
-        if (this.isAutoAdvancing) {
-          this.tourTimer = setTimeout(() => {
-            this.showScreen(5);
-            this.isAutoAdvancing = false; // Stops at Screen 05 as requested by user!
-          }, 800);
-        }
+        // Auto-advance to Screen 05 (3D View & Analyze) and STOP there!
+        if (this.tourTimer) clearTimeout(this.tourTimer);
+        this.tourTimer = setTimeout(() => {
+          this.showScreen(5);
+        }, 240);
         return;
       }
 
@@ -598,7 +597,7 @@ class AeroSculptApp {
         if (icon) icon.className = 'fa-solid fa-circle-notch fa-spin stage-status-icon';
       }
 
-      // After 380ms, mark completed and move next
+      // Transition to next stage
       setTimeout(() => {
         if (item) {
           item.className = 'pipeline-stage-item completed';
@@ -607,7 +606,7 @@ class AeroSculptApp {
         }
         currentIdx++;
         advanceStage();
-      }, 380);
+      }, stageDuration);
     };
 
     advanceStage();
@@ -647,31 +646,42 @@ class AeroSculptApp {
 
   populateSemanticTiles(mission) {
     const container = document.getElementById('semantic-tiles-container');
+    const chipsContainer = document.getElementById('semantic-classes-chips');
     if (!container) return;
     container.innerHTML = '';
 
-    const labels = [
-      { name: 'Buildings', color: 'rgba(0, 240, 255, 0.25)', border: 'var(--as-cyan)' },
-      { name: 'Roads', color: 'rgba(96, 165, 250, 0.25)', border: '#60a5fa' },
-      { name: 'Vegetation', color: 'rgba(16, 185, 129, 0.25)', border: 'var(--as-green)' },
-      { name: 'Vehicles', color: 'rgba(192, 132, 252, 0.25)', border: '#c084fc' },
-      { name: 'People (Masked)', color: 'rgba(239, 68, 68, 0.25)', border: '#ef4444' }
+    // Real scene features from mission (NO fake classes!)
+    const features = mission.sceneFeatures || [
+      { id: 'mountain', name: 'Mountains & Bedrock', color: '#38bdf8', border: '#38bdf8', icon: 'fa-mountain' },
+      { id: 'snow', name: 'Snow & Permafrost', color: '#e2e8f0', border: '#cbd5e1', icon: 'fa-snowflake' },
+      { id: 'outpost', name: 'Arctic Outpost Buildings', color: '#f59e0b', border: '#f59e0b', icon: 'fa-building' },
+      { id: 'fjord', name: 'Coastal Fjord Water', color: '#06b6d4', border: '#06b6d4', icon: 'fa-water' }
     ];
+
+    // Populate top semantic chips
+    if (chipsContainer) {
+      chipsContainer.innerHTML = features.map(feat => `
+        <span style="color: ${feat.color}; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-square-check"></i> ${feat.name}
+        </span>
+      `).join('');
+    }
 
     const frameIndices = mission.keyframeIndices || [1, 24, 68, 112, 185];
 
-    labels.forEach((lbl, i) => {
-      const fIdx = frameIndices[i] || 1;
+    features.forEach((feat, i) => {
+      const fIdx = frameIndices[i % frameIndices.length] || 1;
       const paddedNum = String(fIdx).padStart(4, '0');
       const imgPath = `${mission.framesDir}${mission.framePrefix}${paddedNum}${mission.frameExt}`;
 
       const tile = document.createElement('div');
       tile.className = 'semantic-tile';
       tile.innerHTML = `
-        <img src="${imgPath}" alt="${lbl.name}" onerror="this.src='datasets/frames_pb2/frame_0001.jpg'">
-        <div class="semantic-tile-overlay" style="background: ${lbl.color}; border-color: ${lbl.border};">
-          <span style="position: absolute; bottom: 4px; left: 4px; font-size: 0.65rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px;">
-            ${lbl.name}
+        <img src="${imgPath}" alt="${feat.name}" onerror="this.src='datasets/frames_pb2/frame_0001.jpg'">
+        <div class="semantic-tile-overlay" style="background: ${feat.color}22; border-bottom: 2px solid ${feat.border};">
+          <span style="position: absolute; bottom: 4px; left: 4px; font-size: 0.65rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fa-solid ${feat.icon || 'fa-tag'}" style="color: ${feat.color}; font-size: 0.6rem;"></i>
+            ${feat.name}
           </span>
         </div>
       `;
@@ -680,60 +690,218 @@ class AeroSculptApp {
   }
 
   // ==========================================================================
-  // 7. Screen 05: 3D Viewer & Studio (Auto-Fit, Centered, Facing Forward)
+  // 7. Screen 05: 3D Viewer & Studio (Restored Old Tools, 360° Auto-Orbit, Real Scene Layers)
   // ==========================================================================
   initScreen05Viewer() {
-    // Navigation back & forward pills
+    // Navigation back & forward
     document.getElementById('btn-viewer-back-process')?.addEventListener('click', () => {
-      this.stopTour();
       this.showScreen(4, false);
     });
 
     document.getElementById('btn-viewer-go-export')?.addEventListener('click', () => {
-      this.stopTour();
       this.showScreen(6);
     });
 
-    // Subnav Tabs
-    document.getElementById('vtab-3d')?.addEventListener('click', () => this.setViewerMode('3d'));
-    document.getElementById('vtab-ortho')?.addEventListener('click', () => this.setViewerMode('ortho'));
-    document.getElementById('vtab-points')?.addEventListener('click', () => this.setViewerMode('points'));
-    document.getElementById('vtab-evidence')?.addEventListener('click', () => this.setViewerMode('evidence'));
+    // Subnav Mode Tabs (Top Modes Bar)
+    const tabModel = document.getElementById('tab-3d-model');
+    const tabPointCloud = document.getElementById('tab-3d-pointcloud');
+    const tabWireframe = document.getElementById('tab-3d-wireframe');
+    const tabEvidence = document.getElementById('tab-3d-evidence');
 
-    // Layer checkboxes
-    document.getElementById('layer-mesh')?.addEventListener('change', (e) => {
-      if (this.viewer?.currentMesh) this.viewer.currentMesh.visible = e.target.checked;
+    const subTabs = [tabModel, tabPointCloud, tabWireframe, tabEvidence];
+    subTabs.forEach(tab => {
+      tab?.addEventListener('click', () => {
+        subTabs.forEach(t => t?.classList.remove('active'));
+        tab.classList.add('active');
+
+        if (tab === tabModel) {
+          this.viewer?.currentMesh?.traverse(child => {
+            if (child.isMesh && child.material) {
+              child.material.wireframe = false;
+              child.material.needsUpdate = true;
+            }
+          });
+        } else if (tab === tabWireframe || tab === tabPointCloud) {
+          this.viewer?.currentMesh?.traverse(child => {
+            if (child.isMesh && child.material) {
+              child.material.wireframe = true;
+              child.material.needsUpdate = true;
+            }
+          });
+        } else if (tab === tabEvidence) {
+          this.viewer?.currentMesh?.traverse(child => {
+            if (child.isMesh && child.material) {
+              child.material.wireframe = false;
+              child.material.needsUpdate = true;
+            }
+          });
+        }
+      });
     });
 
-    document.getElementById('layer-points')?.addEventListener('change', (e) => {
-      if (this.viewer?.pointCloudMesh) this.viewer.pointCloudMesh.visible = e.target.checked;
+    // Layer Toggles
+    const toggleMesh = document.getElementById('toggle-layer-mesh');
+    const togglePoints = document.getElementById('toggle-layer-points');
+    const toggleRoi = document.getElementById('toggle-layer-roi');
+    const toggleFrustums = document.getElementById('toggle-layer-frustums');
+    const toggleGrid = document.getElementById('toggle-layer-grid');
+
+    toggleMesh?.addEventListener('click', () => {
+      const active = toggleMesh.classList.toggle('active');
+      const check = toggleMesh.querySelector('.check-state');
+      if (check) check.className = active ? 'fa-solid fa-check check-state' : 'fa-solid fa-xmark check-state';
+      if (this.viewer?.modelContainer) {
+        this.viewer.modelContainer.visible = active;
+      }
     });
 
-    // Measurement tab buttons
-    document.getElementById('mtab-dist')?.addEventListener('click', () => this.setMeasureMode('dist'));
-    document.getElementById('mtab-area')?.addEventListener('click', () => this.setMeasureMode('area'));
-    document.getElementById('mtab-elev')?.addEventListener('click', () => this.setMeasureMode('elev'));
-
-    // Zoom buttons
-    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
-      if (this.viewer?.camera) this.viewer.camera.position.multiplyScalar(0.85);
+    togglePoints?.addEventListener('click', () => {
+      const active = togglePoints.classList.toggle('active');
+      const check = togglePoints.querySelector('.check-state');
+      if (check) check.style.opacity = active ? '1' : '0.2';
+      if (this.viewer?.currentMesh) {
+        this.viewer.currentMesh.traverse(child => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = active;
+            child.material.needsUpdate = true;
+          }
+        });
+      }
     });
 
-    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-      if (this.viewer?.camera) this.viewer.camera.position.multiplyScalar(1.15);
+    toggleRoi?.addEventListener('click', () => {
+      const active = toggleRoi.classList.toggle('active');
+      const check = toggleRoi.querySelector('.check-state');
+      if (check) check.className = active ? 'fa-solid fa-check check-state' : 'fa-solid fa-xmark check-state';
+      if (this.viewer?.roiBox) {
+        this.viewer.roiBox.visible = active;
+      }
     });
 
-    document.getElementById('btn-reset-cam')?.addEventListener('click', () => {
+    toggleFrustums?.addEventListener('click', () => {
+      const active = toggleFrustums.classList.toggle('active');
+      const check = toggleFrustums.querySelector('.check-state');
+      if (check) check.className = active ? 'fa-solid fa-check check-state' : 'fa-solid fa-xmark check-state';
+      this.viewer?.cameraPyramids?.forEach(p => p.visible = active);
+    });
+
+    toggleGrid?.addEventListener('click', () => {
+      const active = toggleGrid.classList.toggle('active');
+      const check = toggleGrid.querySelector('.check-state');
+      if (check) check.className = active ? 'fa-solid fa-check check-state' : 'fa-solid fa-xmark check-state';
+      if (this.viewer?.grid) {
+        this.viewer.grid.visible = active;
+      }
+    });
+
+    // Tool Modes: Auto-Orbit 360° & 2-Point Measure
+    const modeOrbit = document.getElementById('tool-mode-orbit');
+    const modeMeasure = document.getElementById('tool-mode-measure');
+    const orbitIndicator = document.getElementById('hud-orbit-indicator');
+
+    modeOrbit?.addEventListener('click', () => {
+      const isActive = modeOrbit.classList.toggle('active');
+      if (this.viewer?.controls) {
+        this.viewer.controls.autoRotate = isActive;
+      }
+      if (orbitIndicator) {
+        orbitIndicator.innerHTML = isActive 
+          ? '<i class="fa-solid fa-arrows-spin"></i> 360° Auto-Orbit Active'
+          : '<i class="fa-solid fa-pause"></i> Orbit Paused';
+      }
+      if (isActive) {
+        modeMeasure?.classList.remove('active');
+        this.measureActive = false;
+      }
+    });
+
+    modeMeasure?.addEventListener('click', () => {
+      const isActive = modeMeasure.classList.toggle('active');
+      this.measureActive = isActive;
+      if (isActive) {
+        modeOrbit?.classList.remove('active');
+        if (this.viewer?.controls) {
+          this.viewer.controls.autoRotate = false;
+        }
+        if (orbitIndicator) {
+          orbitIndicator.innerHTML = '<i class="fa-solid fa-ruler"></i> 2-Point Measure Active';
+        }
+        this.clearMeasurement();
+      } else {
+        modeOrbit?.classList.add('active');
+        if (this.viewer?.controls) {
+          this.viewer.controls.autoRotate = true;
+        }
+        if (orbitIndicator) {
+          orbitIndicator.innerHTML = '<i class="fa-solid fa-arrows-spin"></i> 360° Auto-Orbit Active';
+        }
+      }
+    });
+
+    // Clear Measure button
+    document.getElementById('btn-clear-measure')?.addEventListener('click', () => {
+      this.clearMeasurement();
+    });
+
+    // Camera Presets
+    document.getElementById('btn-cam-iso')?.addEventListener('click', () => {
+      if (!this.viewer) return;
+      this.viewer.camera.position.set(-28, 22, -64);
+      this.viewer.controls.target.set(0, 4, 0);
+      this.viewer.controls.update();
+    });
+
+    document.getElementById('btn-cam-top')?.addEventListener('click', () => {
+      if (!this.viewer) return;
+      this.viewer.camera.position.set(0, 80, 0.1);
+      this.viewer.controls.target.set(0, 0, 0);
+      this.viewer.controls.update();
+    });
+
+    document.getElementById('btn-cam-front')?.addEventListener('click', () => {
+      if (!this.viewer) return;
+      this.viewer.camera.position.set(0, 12, -70);
+      this.viewer.controls.target.set(0, 4, 0);
+      this.viewer.controls.update();
+    });
+
+    document.getElementById('btn-cam-side')?.addEventListener('click', () => {
+      if (!this.viewer) return;
+      this.viewer.camera.position.set(70, 12, 0);
+      this.viewer.controls.target.set(0, 4, 0);
+      this.viewer.controls.update();
+    });
+
+    document.getElementById('btn-cam-reset')?.addEventListener('click', () => {
       this.resetViewerCamera();
     });
+  }
 
-    document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
-      const v = document.getElementById('screen-05-viewer');
-      if (!document.fullscreenElement) {
-        v?.requestFullscreen().catch(err => console.log(err));
-      } else {
-        document.exitFullscreen().catch(err => console.log(err));
-      }
+  populateViewerSemanticLayers(mission) {
+    const container = document.getElementById('viewer-semantic-layers');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const features = mission.sceneFeatures || [];
+    features.forEach(feat => {
+      const item = document.createElement('div');
+      item.className = 'tool-toggle-item active';
+      item.id = `toggle-feature-${feat.id}`;
+      item.innerHTML = `
+        <span style="display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid ${feat.icon || 'fa-tag'} fa-fw" style="color: ${feat.color}; font-size: 0.72rem;"></i>
+          ${feat.name}
+        </span>
+        <i class="fa-solid fa-check check-state" style="color: ${feat.color}; font-size: 0.65rem;"></i>
+      `;
+      item.addEventListener('click', () => {
+        const active = item.classList.toggle('active');
+        const check = item.querySelector('.check-state');
+        if (check) {
+          check.style.opacity = active ? '1' : '0.2';
+        }
+      });
+      container.appendChild(item);
     });
   }
 
@@ -763,19 +931,23 @@ class AeroSculptApp {
     controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't flip under the floor
     controls.target.set(0, 4, 0);
 
+    // Continuous 360° Auto-Orbit by default!
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 2.0;
+
     // Grid Floor on Y=0
-    const gridHelper = new THREE.GridHelper(80, 40, 0x00f0ff, 0x1e293b);
-    gridHelper.position.y = 0;
-    scene.add(gridHelper);
+    const grid = new THREE.GridHelper(80, 40, 0x00f0ff, 0x1e293b);
+    grid.position.y = 0;
+    scene.add(grid);
 
     // Realistic Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(ambientLight);
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.6);
     scene.add(hemiLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.3);
     dirLight1.position.set(45, 80, 50);
     scene.add(dirLight1);
 
@@ -791,10 +963,12 @@ class AeroSculptApp {
       camera,
       renderer,
       controls,
+      grid,
       modelContainer,
       currentMesh: null,
       pointCloudMesh: null,
       roiBox: null,
+      cameraPyramids: [],
       onResize: () => {
         const w = parent.clientWidth || 800;
         const h = parent.clientHeight || 600;
@@ -808,11 +982,27 @@ class AeroSculptApp {
       if (this.currentScreen === 5) this.viewer?.onResize();
     });
 
-    // Raycaster for inspection & measurement
+    // Raycaster for cursor hover telemetry & 2-point measurement
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(modelContainer.children, true);
+
+      if (intersects.length > 0) {
+        const pt = intersects[0].point;
+        this.updateCoordinatesHUD(pt);
+      }
+    });
+
     renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (!this.measureActive) return;
+
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -822,7 +1012,7 @@ class AeroSculptApp {
 
       if (intersects.length > 0) {
         const hit = intersects[0].point;
-        this.handle3DClick(hit);
+        this.handleMeasureClick(hit);
       }
     });
 
@@ -841,6 +1031,9 @@ class AeroSculptApp {
     };
     animate();
 
+    // Populate dynamic semantic layers in Left Palette
+    this.populateViewerSemanticLayers(this.store.getMission());
+
     // Load initial model (PB2 Svalbard)
     this.loadMissionModel(this.store.getMission());
   }
@@ -853,7 +1046,12 @@ class AeroSculptApp {
       this.viewer.scene.remove(this.viewer.roiBox);
       this.viewer.roiBox = null;
     }
+    this.viewer.cameraPyramids.forEach(p => this.viewer.scene.remove(p));
+    this.viewer.cameraPyramids = [];
     this.clearMeasurement();
+
+    // Update dynamic semantic layers for this mission
+    this.populateViewerSemanticLayers(mission);
 
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
@@ -901,6 +1099,9 @@ class AeroSculptApp {
         this.viewer.roiBox.position.copy(finalCenter);
         this.viewer.scene.add(this.viewer.roiBox);
 
+        // Create Drone Camera Frustums around model
+        this.createDroneFrustums(finalSize);
+
         // Camera placement looking forward at the model
         this.viewer.camera.position.set(
           mission.viewerSettings?.cameraPos?.[0] || -28,
@@ -908,22 +1109,121 @@ class AeroSculptApp {
           mission.viewerSettings?.cameraPos?.[2] || -64
         );
         this.viewer.controls.target.set(0, finalSize.y * 0.45, 0);
+
+        // Continuous 360° Orbiting active by default!
+        this.viewer.controls.autoRotate = true;
+        this.viewer.controls.autoRotateSpeed = 2.0;
         this.viewer.controls.update();
 
-        // Auto-rotation during automated tour
-        if (this.isTourRunning) {
-          this.viewer.controls.autoRotate = true;
-          this.viewer.controls.autoRotateSpeed = 2.0;
-          setTimeout(() => {
-            if (this.viewer?.controls) this.viewer.controls.autoRotate = false;
-          }, 3800);
-        }
+        // Update CRS in HUD
+        const crsElem = document.getElementById('hud-coord-crs');
+        if (crsElem) crsElem.textContent = mission.crsDatum ? mission.crsDatum.split(' ')[0] : 'EPSG:32633';
       },
       undefined,
       (err) => {
         console.error('Error loading 3D model:', err);
       }
     );
+  }
+
+  createDroneFrustums(size) {
+    const numFrustums = 10;
+    const radius = Math.max(size.x, size.z) * 0.85;
+    const height = size.y * 1.35;
+
+    for (let i = 0; i < numFrustums; i++) {
+      const angle = (i / numFrustums) * Math.PI * 2;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+
+      const pyrGeom = new THREE.ConeGeometry(1.4, 2.2, 4);
+      const pyrMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
+      const pyramid = new THREE.Mesh(pyrGeom, pyrMat);
+      pyramid.position.set(x, height, z);
+      pyramid.lookAt(0, size.y * 0.4, 0);
+
+      this.viewer.scene.add(pyramid);
+      this.viewer.cameraPyramids.push(pyramid);
+    }
+  }
+
+  updateCoordinatesHUD(pt) {
+    const hX = document.getElementById('hud-coord-x');
+    const hY = document.getElementById('hud-coord-y');
+    const hZ = document.getElementById('hud-coord-z');
+    const hLat = document.getElementById('hud-coord-lat');
+    const hLon = document.getElementById('hud-coord-lon');
+    const hAlt = document.getElementById('hud-coord-alt');
+
+    if (hX) hX.textContent = `${pt.x.toFixed(2)} m`;
+    if (hY) hY.textContent = `${pt.y.toFixed(2)} m`;
+    if (hZ) hZ.textContent = `${pt.z.toFixed(2)} m`;
+
+    const mission = this.store.getMission();
+    let baseLat = 78.2232;
+    let baseLon = 15.6267;
+    if (mission.id === 'pb1') { baseLat = 49.8821; baseLon = 19.0583; }
+    else if (mission.id === 'pb3') { baseLat = 45.9765; baseLon = 7.7491; }
+
+    if (hLat) hLat.textContent = `${(baseLat + pt.z * 0.0001).toFixed(4)}° N`;
+    if (hLon) hLon.textContent = `${(baseLon + pt.x * 0.0001).toFixed(4)}° E`;
+    if (hAlt) hAlt.textContent = `${(42.4 + pt.y * 1.5).toFixed(1)} m MSL`;
+  }
+
+  handleMeasureClick(pt) {
+    this.measurePoints.push(pt);
+
+    const sphereGeom = new THREE.SphereGeometry(0.6, 16, 16);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+    const marker = new THREE.Mesh(sphereGeom, sphereMat);
+    marker.position.copy(pt);
+    this.viewer.scene.add(marker);
+    this.measureMarkers.push(marker);
+
+    const statusLabel = document.getElementById('hud-measure-status');
+    const distNum = document.getElementById('hud-measure-dist');
+    const countLabel = document.getElementById('hud-measure-points-count');
+
+    if (this.measurePoints.length === 1) {
+      if (statusLabel) statusLabel.textContent = 'Point 1 set. Click Point 2...';
+      if (countLabel) countLabel.textContent = 'Points: 1/2';
+    } else if (this.measurePoints.length === 2) {
+      const p1 = this.measurePoints[0];
+      const p2 = this.measurePoints[1];
+      const dist = p1.distanceTo(p2) * 5.2; // Scaled to metric ground meters
+
+      // Draw high-visibility laser line
+      const lineGeom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 3 });
+      this.measureLine = new THREE.Line(lineGeom, lineMat);
+      this.viewer.scene.add(this.measureLine);
+
+      if (distNum) distNum.textContent = `${dist.toFixed(2)} m`;
+      if (statusLabel) statusLabel.textContent = 'Distance computed (Euclidean)';
+      if (countLabel) countLabel.textContent = 'Points: 2/2';
+    } else {
+      // 3rd click resets and starts new measurement
+      this.clearMeasurement();
+      this.handleMeasureClick(pt);
+    }
+  }
+
+  clearMeasurement() {
+    this.measurePoints = [];
+    if (this.measureLine) {
+      this.viewer?.scene.remove(this.measureLine);
+      this.measureLine = null;
+    }
+    this.measureMarkers.forEach(m => this.viewer?.scene.remove(m));
+    this.measureMarkers = [];
+
+    const distNum = document.getElementById('hud-measure-dist');
+    const statusLabel = document.getElementById('hud-measure-status');
+    const countLabel = document.getElementById('hud-measure-points-count');
+
+    if (distNum) distNum.textContent = '0.00 m';
+    if (statusLabel) statusLabel.textContent = 'Click 2 points on model';
+    if (countLabel) countLabel.textContent = 'Points: 0/2';
   }
 
   resetViewerCamera() {
@@ -936,119 +1236,6 @@ class AeroSculptApp {
     );
     this.viewer.controls.target.set(0, 4, 0);
     this.viewer.controls.update();
-  }
-
-  setViewerMode(mode) {
-    const tabs = ['3d', 'ortho', 'points', 'evidence'];
-    tabs.forEach(t => {
-      const btn = document.getElementById(`vtab-${t}`);
-      btn?.classList.remove('active');
-      if (t === mode) btn?.classList.add('active');
-    });
-
-    if (!this.viewer) return;
-
-    if (mode === '3d') {
-      this.resetViewerCamera();
-      if (this.viewer.currentMesh) {
-        this.viewer.currentMesh.traverse(child => {
-          if (child.isMesh && child.material) {
-            child.material.wireframe = false;
-          }
-        });
-      }
-    } else if (mode === 'ortho') {
-      // Top-down orthographic angle
-      this.viewer.camera.position.set(0, 75, 0.01);
-      this.viewer.controls.target.set(0, 0, 0);
-      this.viewer.controls.update();
-    } else if (mode === 'points') {
-      if (this.viewer.currentMesh) {
-        this.viewer.currentMesh.traverse(child => {
-          if (child.isMesh && child.material) {
-            child.material.wireframe = true;
-          }
-        });
-      }
-    } else if (mode === 'evidence') {
-      this.resetViewerCamera();
-      // Heatmap tint
-      if (this.viewer.currentMesh) {
-        this.viewer.currentMesh.traverse(child => {
-          if (child.isMesh && child.material) {
-            child.material.wireframe = false;
-          }
-        });
-      }
-    }
-  }
-
-  setMeasureMode(mode) {
-    this.measureMode = mode;
-    ['dist', 'area', 'elev'].forEach(m => {
-      const btn = document.getElementById(`mtab-${m}`);
-      btn?.classList.remove('active');
-      if (m === mode) btn?.classList.add('active');
-    });
-  }
-
-  handle3DClick(pt) {
-    // Update Point Info HUD
-    const baseLat = 78.2232;
-    const baseLon = 15.6267;
-    const hitLat = (baseLat + pt.z * 0.0001).toFixed(4);
-    const hitLon = (baseLon + pt.x * 0.0001).toFixed(4);
-    const hitElev = (42.4 + pt.y * 1.5).toFixed(1);
-
-    const latElem = document.getElementById('hud-point-lat');
-    const lonElem = document.getElementById('hud-point-lon');
-    const elevElem = document.getElementById('hud-point-elev');
-    if (latElem) latElem.textContent = `${hitLat}° N`;
-    if (lonElem) lonElem.textContent = `${hitLon}° E`;
-    if (elevElem) elevElem.textContent = `${hitElev} m MSL`;
-
-    // Measurement logic (Point A -> Point B)
-    this.measurePoints.push(pt);
-
-    const sphereGeom = new THREE.SphereGeometry(0.6, 16, 16);
-    const sphereMat = new THREE.MeshBasicMaterial({ color: this.measurePoints.length === 1 ? 0x10b981 : 0x00f0ff });
-    const marker = new THREE.Mesh(sphereGeom, sphereMat);
-    marker.position.copy(pt);
-    this.viewer.scene.add(marker);
-    this.measureMarkers.push(marker);
-
-    if (this.measurePoints.length === 1) {
-      const ptA = document.getElementById('hud-point-a-coords');
-      if (ptA) ptA.textContent = `${hitLat}° N, ${hitLon}° E`;
-    } else if (this.measurePoints.length === 2) {
-      const p1 = this.measurePoints[0];
-      const p2 = this.measurePoints[1];
-      const dist = p1.distanceTo(p2) * 5.2; // Scaled to metric ground meters
-
-      const ptB = document.getElementById('hud-point-b-coords');
-      if (ptB) ptB.textContent = `${hitLat}° N, ${hitLon}° E`;
-
-      const distElem = document.getElementById('hud-measure-dist-val');
-      if (distElem) distElem.textContent = `${dist.toFixed(1)} m`;
-
-      const lineGeom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
-      const lineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 3 });
-      this.measureLine = new THREE.Line(lineGeom, lineMat);
-      this.viewer.scene.add(this.measureLine);
-    } else if (this.measurePoints.length > 2) {
-      this.clearMeasurement();
-      this.handle3DClick(pt);
-    }
-  }
-
-  clearMeasurement() {
-    this.measurePoints = [];
-    this.measureMarkers.forEach(m => this.viewer?.scene.remove(m));
-    this.measureMarkers = [];
-    if (this.measureLine) {
-      this.viewer?.scene.remove(this.measureLine);
-      this.measureLine = null;
-    }
   }
 
   // ==========================================================================
