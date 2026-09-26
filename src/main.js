@@ -138,18 +138,98 @@ class AeroSculptApp {
     for (let i = 1; i <= 5; i++) {
       const btn = document.getElementById(`stepper-step-${i}`);
       if (!btn) continue;
+      const numSpan = btn.querySelector('.stepper-circle-num');
       btn.classList.remove('active');
-      if (i < stepIndex || this.hasRunSimulation) {
+
+      if (i < stepIndex) {
         btn.classList.add('completed');
-        const numSpan = btn.querySelector('.stepper-circle-num');
-        if (numSpan && !numSpan.querySelector('i')) {
+        if (numSpan) {
           numSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
         }
-      }
-      if (i === stepIndex) {
+      } else if (i === stepIndex) {
+        btn.classList.remove('completed');
         btn.classList.add('active');
+        if (numSpan) {
+          numSpan.textContent = i;
+        }
+      } else {
+        btn.classList.remove('completed');
+        if (numSpan) {
+          numSpan.textContent = i;
+        }
       }
     }
+  }
+
+  resetWorkflowState() {
+    this.hasRunSimulation = false;
+    this.isAutoAdvancing = false;
+
+    if (this.tourTimer) {
+      clearTimeout(this.tourTimer);
+      this.tourTimer = null;
+    }
+    if (this.flightAnimFrame) {
+      cancelAnimationFrame(this.flightAnimFrame);
+      this.flightAnimFrame = null;
+    }
+
+    // 1. Reset all stepper items to clean numbers and clear all completed tick marks
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById(`stepper-step-${i}`);
+      if (!btn) continue;
+      btn.classList.remove('completed', 'active');
+      const numSpan = btn.querySelector('.stepper-circle-num');
+      if (numSpan) {
+        numSpan.textContent = i;
+      }
+    }
+    const step1 = document.getElementById('stepper-step-1');
+    if (step1) {
+      step1.classList.add('active');
+    }
+
+    // 2. Reset Screen 03 (Feasibility & QC checks)
+    const qcChecks = [
+      { id: 'qc-check-1', name: 'Video file valid' },
+      { id: 'qc-check-2', name: 'GPS timestamps sync' },
+      { id: 'qc-check-3', name: 'Metadata format valid' },
+      { id: 'qc-check-4', name: 'IMU data valid' },
+      { id: 'qc-check-5', name: 'Camera intrinsics valid' },
+      { id: 'qc-check-6', name: 'RTK/PPK data valid' }
+    ];
+    qcChecks.forEach(qc => {
+      const row = document.getElementById(qc.id);
+      if (row) {
+        row.innerHTML = `<span class="check-spinner"></span> <span>${qc.name}</span>`;
+      }
+    });
+    const qcBadge = document.getElementById('badge-inputs-status');
+    if (qcBadge) {
+      qcBadge.innerHTML = '<span class="check-spinner" style="width: 10px; height: 10px; margin-right: 6px;"></span> Awaiting Verification';
+    }
+
+    // 3. Reset Screen 04 (Pipeline Stages)
+    const stages = ['stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7'];
+    stages.forEach(id => {
+      const item = document.getElementById(id);
+      if (item) {
+        item.className = 'pipeline-stage-item';
+        const icon = item.querySelector('.stage-status-icon');
+        if (icon) {
+          icon.className = 'fa-regular fa-circle stage-status-icon';
+        }
+      }
+    });
+
+    const currentStageElem = document.getElementById('pipe-current-stage');
+    if (currentStageElem) currentStageElem.textContent = 'Ready to Process';
+
+    const progressFill = document.getElementById('pipe-progress-fill');
+    if (progressFill) progressFill.style.width = '0%';
+
+    const etaElem = document.getElementById('pipe-eta-val');
+    if (etaElem) etaElem.textContent = '--m --s';
   }
 
   // ==========================================================================
@@ -241,7 +321,12 @@ class AeroSculptApp {
     });
 
     document.getElementById('btn-switch-dataset-stepper')?.addEventListener('click', () => {
-      this.openMissionModal();
+      const ingestModal = document.getElementById('modal-ingest-upload');
+      if (ingestModal) {
+        ingestModal.classList.add('active', 'show');
+      } else {
+        this.openMissionModal();
+      }
     });
   }
 
@@ -253,6 +338,10 @@ class AeroSculptApp {
     this.store.setMission(missionId);
     const mission = this.store.getMission();
     this.hydrateMissionData(mission);
+
+    // Reset workflow state and ticks on the side to start from fresh!
+    this.resetWorkflowState();
+    this.updateStepperActive(1);
 
     // Reload 3D model in background or next time Screen 05 is viewed
     if (this.viewer) {
@@ -445,6 +534,13 @@ class AeroSculptApp {
 
       const activeTitle = document.getElementById('modal-active-mission-title');
       if (activeTitle) activeTitle.textContent = `Custom Upload: ${stagedCustomFile.name}`;
+
+      const stepperLabel = document.getElementById('stepper-mission-label');
+      if (stepperLabel) stepperLabel.textContent = `Custom · ${stagedCustomFile.name}`;
+
+      // Reset workflow state and ticks on the side to start from fresh!
+      this.resetWorkflowState();
+      this.updateStepperActive(1);
 
       closeIngestModal();
     });
