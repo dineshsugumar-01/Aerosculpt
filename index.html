@@ -175,6 +175,154 @@
   </div>
 
   <!-- ==========================================================================
+       Ingest / Upload Mission Modal (Upload Dropzone at Top + Scroll Down for Pre-Built Missions)
+       ========================================================================== -->
+  <div class="as-modal-backdrop" id="modal-ingest-upload">
+    <div class="as-modal-window" style="max-width: 860px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2><i class="fa-solid fa-cloud-arrow-up" style="color: var(--as-cyan);"></i> Ingest UAV Mission Payload</h2>
+          <p>Upload your custom drone flight video or scroll down to select from calibrated pre-built missions.</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-ingest-modal" title="Close Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- SECTION 1 (TOP): Upload Option -->
+        <div class="modal-upload-section">
+          <div class="modal-sec-header">
+            <span class="modal-sec-title"><i class="fa-solid fa-file-video" style="color: #ef4444;"></i> UPLOAD CUSTOM UAV FLIGHT VIDEO</span>
+            <span class="modal-sec-sub">MP4, MOV, MKV · Auto-synchronizes with GNSS telemetry · Hardware accelerated decode</span>
+          </div>
+
+          <div class="modal-dropzone-box" id="modal-uav-dropzone">
+            <input type="file" id="modal-uav-file-input" accept="video/mp4,video/quicktime,video/x-matroska,video/*" style="display: none;">
+            
+            <!-- Default Upload View -->
+            <div id="modal-dropzone-empty" class="modal-dropzone-content">
+              <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.4rem; color: var(--as-cyan); margin-bottom: 8px;"></i>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #ffffff;">Drop UAV Aerial Video or Click to Browse</div>
+              <div style="font-size: 0.74rem; color: var(--as-text-muted); margin: 4px 0 12px 0;">Supports DJI, Autel, Skydio & custom UAV feeds · 1080p / 4K @ 30–60 FPS</div>
+              <button type="button" class="btn-primary-action" id="modal-btn-browse-trigger" style="padding: 7px 18px; font-size: 0.8rem; margin: 0 auto;">
+                <i class="fa-solid fa-folder-open"></i> Browse UAV Video File
+              </button>
+            </div>
+
+            <!-- Uploaded / Selected Preview View (Initially Hidden) -->
+            <div id="modal-dropzone-selected" class="modal-dropzone-selected-view" style="display: none;">
+              <div class="modal-selected-video-wrap">
+                <video id="modal-custom-video-preview" muted loop playsinline controls></video>
+                <div class="modal-video-badge"><i class="fa-solid fa-circle-check"></i> READY TO INGEST</div>
+              </div>
+              <div class="modal-selected-details">
+                <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff;" id="modal-custom-file-name">my_flight.mp4</div>
+                <div class="modal-selected-chips">
+                  <span class="chip-spec"><i class="fa-regular fa-clock"></i> <strong id="modal-custom-dur">--:--</strong></span>
+                  <span class="chip-spec"><i class="fa-solid fa-expand"></i> <strong id="modal-custom-res">--×--</strong></span>
+                  <span class="chip-spec"><i class="fa-solid fa-hard-drive"></i> <strong id="modal-custom-size">-- MB</strong></span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button type="button" class="btn-primary-action" id="modal-btn-confirm-upload" style="padding: 6px 14px; font-size: 0.78rem;">
+                    <i class="fa-solid fa-check"></i> Load Into Dataset Injection
+                  </button>
+                  <button type="button" class="btn-subtle-change" id="modal-btn-change-custom" style="padding: 6px 12px; font-size: 0.78rem; background: rgba(255,255,255,0.06); border: 1px solid var(--as-border-medium); border-radius: 6px; color: #cbd5e1; cursor: pointer;">
+                    <i class="fa-solid fa-rotate-left"></i> Change Video
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIVIDER -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="flex-grow: 1; height: 1px; background: var(--as-border-subtle);"></div>
+          <span style="font-size: 0.7rem; font-family: var(--as-font-mono); color: var(--as-cyan); font-weight: 800; letter-spacing: 0.05em;"><i class="fa-solid fa-arrow-down"></i> OR SCROLL DOWN FOR PRE-BUILT MISSIONS</span>
+          <div style="flex-grow: 1; height: 1px; background: var(--as-border-subtle);"></div>
+        </div>
+
+        <!-- SECTION 2 (DOWN): Pre-Built UAV Flight Archives -->
+        <div class="modal-prebuilt-section">
+          <div class="modal-sec-header">
+            <span class="modal-sec-title"><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> PRE-BUILT UAV FLIGHT ARCHIVES (1-CLICK INSTANT LOAD)</span>
+            <span class="modal-sec-sub">Fully calibrated photogrammetry datasets aligned with NTRO PS-17</span>
+          </div>
+
+          <div class="modal-prebuilt-grid">
+            <!-- PB2 Card -->
+            <div class="modal-prebuilt-card active" data-mission-id="pb2" id="modal-pb-card-pb2">
+              <div class="modal-pb-thumb-box">
+                <img src="datasets/frames_pb2/frame_0001.jpg" alt="Svalbard Arctic Reconnaissance" class="modal-pb-img">
+                <span class="modal-pb-dur"><i class="fa-solid fa-play"></i> 05:18</span>
+                <span class="modal-pb-badge">RECOMMENDED</span>
+              </div>
+              <div class="modal-pb-info">
+                <div class="modal-pb-number">MISSION 02 · POLAR RECON</div>
+                <div class="modal-pb-title">Svalbard Arctic Recon</div>
+                <div class="modal-pb-meta">DJI Mavic 3E RTK · 1080p 30fps · 113.9 MB · 513 Frames</div>
+                <div class="modal-pb-terrain"><i class="fa-solid fa-mountain"></i> Polar Glacial / Outpost (480m × 390m)</div>
+                <button type="button" class="btn-load-prebuilt-pill" id="btn-load-pb2">
+                  <i class="fa-solid fa-bolt"></i> Load Dataset
+                </button>
+              </div>
+            </div>
+
+            <!-- PB1 Card -->
+            <div class="modal-prebuilt-card" data-mission-id="pb1" id="modal-pb-card-pb1">
+              <div class="modal-pb-thumb-box">
+                <img src="datasets/frames_pb1/frame_0001.jpg" alt="Komorowice Cadastral Survey" class="modal-pb-img">
+                <span class="modal-pb-dur"><i class="fa-solid fa-play"></i> 03:42</span>
+                <span class="modal-pb-badge urban">URBAN</span>
+              </div>
+              <div class="modal-pb-info">
+                <div class="modal-pb-number">MISSION 01 · CADASTRAL</div>
+                <div class="modal-pb-title">Komorowice Cadastral Survey</div>
+                <div class="modal-pb-meta">DJI Mini 3 Pro · 1080p 30fps · 54.4 MB · 94 Frames</div>
+                <div class="modal-pb-terrain"><i class="fa-solid fa-building"></i> Urban Cadastral / Commercial (320m × 240m)</div>
+                <button type="button" class="btn-load-prebuilt-pill" id="btn-load-pb1">
+                  <i class="fa-solid fa-bolt"></i> Load Dataset
+                </button>
+              </div>
+            </div>
+
+            <!-- PB3 Card -->
+            <div class="modal-prebuilt-card" data-mission-id="pb3" id="modal-pb-card-pb3">
+              <div class="modal-pb-thumb-box">
+                <img src="datasets/frames_pb3/frame_0001.jpg" alt="Zermatt Alpine Survey" class="modal-pb-img">
+                <span class="modal-pb-dur"><i class="fa-solid fa-play"></i> 04:02</span>
+                <span class="modal-pb-badge alpine">ALPINE</span>
+              </div>
+              <div class="modal-pb-info">
+                <div class="modal-pb-number">MISSION 03 · TOPOGRAPHIC</div>
+                <div class="modal-pb-title">Zermatt Alpine Inspection</div>
+                <div class="modal-pb-meta">Autel EVO II Pro · 1080p 30fps · 72.8 MB · 181 Frames</div>
+                <div class="modal-pb-terrain"><i class="fa-solid fa-mountain-sun"></i> High Alpine / Rock Corridors (410m × 310m)</div>
+                <button type="button" class="btn-load-prebuilt-pill" id="btn-load-pb3">
+                  <i class="fa-solid fa-bolt"></i> Load Dataset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.8rem; color: #cbd5e1;">
+          Loaded Dataset: <strong id="modal-active-mission-title" style="color: var(--as-cyan);">M02 · Svalbard Arctic Reconnaissance</strong>
+        </div>
+        <button type="button" class="btn-primary-action" id="btn-done-ingest-modal" style="padding: 7px 18px;">
+          <span>Apply to Ingestion</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
        Main Workflow Container (Screens 02, 03, 04, 06)
        ========================================================================== -->
   <div class="workflow-app-container" id="workflow-app-container">
@@ -223,136 +371,81 @@
       <div class="pane-header-row">
         <div class="pane-title-group">
           <h2>UAV Aerial Data Ingestion</h2>
-          <p>Upload raw UAV video payload or select from calibrated mission archives. Georeferenced GNSS and flight metadata are synchronized automatically.</p>
+          <p>Review loaded UAV video payload and sensor telemetry. Use the Ingest / Upload tool to import custom video or pre-built datasets.</p>
         </div>
-        <div class="header-action-pill-badge" id="ingest-overall-status">
-          <i class="fa-solid fa-satellite-dish" style="color: var(--as-cyan);"></i>
-          <span>UAV TELEMETRY SYNCED</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="header-action-pill-badge" id="ingest-overall-status">
+            <i class="fa-solid fa-satellite-dish" style="color: var(--as-cyan);"></i>
+            <span>UAV TELEMETRY SYNCED</span>
+          </div>
+          <button class="btn-primary-action" id="btn-open-ingest-modal" style="background: linear-gradient(135deg, #2563eb, #00f0ff); border: 1px solid var(--as-cyan); box-shadow: 0 0 16px rgba(0,240,255,0.35); padding: 8px 18px; font-size: 0.84rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Ingest / Upload
+          </button>
         </div>
       </div>
 
       <div class="upload-config-wrapper">
         
-        <!-- Category 1: REQUIRED INPUTS WITH VIDEO UPLOAD DROPZONE -->
+        <!-- Category 1: REQUIRED INPUTS -->
         <div class="inputs-category-container">
           <div class="category-label-row required">
-            <i class="fa-solid fa-circle-exclamation"></i> PRIMARY UAV VIDEO & TELEMETRY PAYLOAD
+            <i class="fa-solid fa-circle-exclamation"></i> REQUIRED INPUTS (PRIMARY PAYLOAD)
           </div>
 
-          <div class="ingest-main-grid">
-            <!-- UAV Video Upload & Preview Dropzone -->
-            <div class="uav-upload-card" id="uav-upload-zone">
-              <input type="file" id="uav-video-file-input" accept="video/mp4,video/quicktime,video/x-matroska,video/*" style="display: none;">
-              
-              <div class="uav-video-player-container">
-                <video id="file-video-preview" src="datasets/pb2_video.mp4" muted loop playsinline autoplay controls></video>
-                <div class="video-overlay-badge">
-                  <i class="fa-solid fa-circle-check"></i> READY FOR RECONSTRUCTION
-                </div>
+          <div class="cards-grid-3col">
+            <!-- UAV Video -->
+            <div class="file-input-card required-card" style="position: relative;">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-film" style="color: #ef4444;"></i> UAV Video *</span>
+                <span class="badge-check-ok">READY</span>
               </div>
-
-              <div class="uav-video-details-row">
-                <div class="uav-file-info-group">
-                  <div class="uav-file-name-title" id="card-val-video-name">pb2_video.mp4</div>
-                  <div class="uav-file-specs-chips" id="card-val-video-specs">
-                    <span class="chip-spec"><i class="fa-regular fa-clock"></i> <strong id="chip-dur">05:18</strong></span>
-                    <span class="chip-spec"><i class="fa-solid fa-expand"></i> <strong id="chip-res">1920×1080 FHD</strong></span>
-                    <span class="chip-spec"><i class="fa-solid fa-gauge-high"></i> <strong id="chip-fps">30 FPS</strong></span>
-                    <span class="chip-spec"><i class="fa-solid fa-hard-drive"></i> <strong id="chip-size">113.9 MB</strong></span>
-                  </div>
-                </div>
-
-                <div class="uav-upload-actions">
-                  <button type="button" class="btn-browse-file" id="btn-browse-trigger" title="Upload local drone MP4/MOV file">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload UAV Video
-                  </button>
-                  <button type="button" class="btn-reset-file" id="btn-reset-video" title="Reset to default mission video" style="display: none;">
-                    <i class="fa-solid fa-rotate-left"></i> Reset
+              <div class="file-video-thumb-preview" style="height: 75px; position: relative;">
+                <video id="file-video-preview" src="datasets/pb2_video.mp4" muted loop playsinline autoplay controls style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;"></video>
+              </div>
+              <div class="card-file-telemetry">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span class="file-name-bold" id="card-val-video-name">pb2_video.mp4</span>
+                  <button type="button" id="btn-change-video-trigger" style="background: none; border: none; color: var(--as-cyan); font-size: 0.7rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                    <i class="fa-solid fa-repeat"></i> Change
                   </button>
                 </div>
+                <span id="card-val-video-specs">05:18 | 1920×1080 | 30 FPS | 113.9 MB</span>
               </div>
             </div>
 
-            <!-- Synchronized Primary Sensors Side-Cards -->
-            <div class="primary-sensors-col">
-              <!-- GPS / GNSS -->
-              <div class="file-input-card required-card compact-card">
-                <div class="card-top-status">
-                  <span class="card-field-name"><i class="fa-solid fa-location-dot" style="color: var(--as-cyan);"></i> GPS / GNSS Log *</span>
-                  <span class="badge-check-ok">READY</span>
-                </div>
-                <div class="card-telemetry-mini">
-                  <div class="file-name-bold" id="card-val-gps-name">flight_gnss_m02.csv</div>
-                  <div class="file-specs-muted" id="card-val-gps-specs">9,540 records · 10 Hz RTK Fixed</div>
-                </div>
+            <!-- GPS / GNSS -->
+            <div class="file-input-card required-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-location-dot" style="color: var(--as-cyan);"></i> GPS / GNSS *</span>
+                <span class="badge-check-ok">READY</span>
               </div>
+              <div style="height: 75px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                <i class="fa-solid fa-satellite" style="font-size: 2.2rem; color: var(--as-cyan);"></i>
+              </div>
+              <div class="card-file-telemetry">
+                <span class="file-name-bold" id="card-val-gps-name">flight_gnss_m02.csv</span>
+                <span id="card-val-gps-specs">9,540 records · 10 Hz RTK Fixed</span>
+              </div>
+            </div>
 
-              <!-- Flight Metadata -->
-              <div class="file-input-card required-card compact-card">
-                <div class="card-top-status">
-                  <span class="card-field-name"><i class="fa-solid fa-file-code" style="color: var(--as-amber);"></i> Flight Metadata *</span>
-                  <span class="badge-check-ok">READY</span>
-                </div>
-                <div class="card-telemetry-mini">
-                  <div class="file-name-bold" id="card-val-meta-name">flight_meta_m02.json</div>
-                  <div class="file-specs-muted" id="card-val-meta-specs">DJI Mavic 3E · Hasselblad L2D-20c</div>
-                </div>
+            <!-- Flight Metadata -->
+            <div class="file-input-card required-card">
+              <div class="card-top-status">
+                <span class="card-field-name"><i class="fa-solid fa-file-code" style="color: var(--as-amber);"></i> Flight Metadata *</span>
+                <span class="badge-check-ok">READY</span>
+              </div>
+              <div style="height: 75px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                <i class="fa-solid fa-file-lines" style="font-size: 2.2rem; color: var(--as-amber);"></i>
+              </div>
+              <div class="card-file-telemetry">
+                <span class="file-name-bold" id="card-val-meta-name">flight_meta_m02.json</span>
+                <span id="card-val-meta-specs">DJI Mavic 3E · Hasselblad L2D-20c</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Category 2: PRE-BUILT UAV FLIGHT ARCHIVES (1-CLICK LOAD) -->
-        <div class="inputs-category-container">
-          <div class="category-label-row prebuilt">
-            <span><i class="fa-solid fa-layer-group" style="color: var(--as-cyan);"></i> PRE-BUILT UAV FLIGHT ARCHIVES (1-CLICK INSTANT LOAD)</span>
-            <span style="margin-left: auto; font-size: 0.68rem; font-weight: 600; color: var(--as-text-muted);">Select any mission below to immediately stream its video & calibrate sensors</span>
-          </div>
-
-          <div class="prebuilt-missions-grid">
-            <!-- PB2 Card -->
-            <div class="prebuilt-video-card active" data-mission="pb2" id="prebuilt-card-pb2">
-              <div class="prebuilt-thumb-container">
-                <img src="datasets/frames_pb2/frame_0001.jpg" alt="Svalbard Reconnaissance" class="prebuilt-thumb-img">
-                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 05:18</span>
-                <span class="prebuilt-active-badge">ACTIVE</span>
-              </div>
-              <div class="prebuilt-card-info">
-                <div class="prebuilt-card-title">M02 · Svalbard Arctic Reconnaissance</div>
-                <div class="prebuilt-card-meta">DJI M3E RTK · 1080p 30fps · 113.9 MB</div>
-                <div class="prebuilt-card-terrain"><i class="fa-solid fa-mountain"></i> Polar Glacial / Coastal Outpost</div>
-              </div>
-            </div>
-
-            <!-- PB1 Card -->
-            <div class="prebuilt-video-card" data-mission="pb1" id="prebuilt-card-pb1">
-              <div class="prebuilt-thumb-container">
-                <img src="datasets/frames_pb1/frame_0001.jpg" alt="Komorowice Cadastral" class="prebuilt-thumb-img">
-                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 03:42</span>
-              </div>
-              <div class="prebuilt-card-info">
-                <div class="prebuilt-card-title">M01 · Komorowice Cadastral Survey</div>
-                <div class="prebuilt-card-meta">DJI Mini 3 Pro · 1080p 30fps · 54.4 MB</div>
-                <div class="prebuilt-card-terrain"><i class="fa-solid fa-building"></i> Urban Cadastral / Commercial</div>
-              </div>
-            </div>
-
-            <!-- PB3 Card -->
-            <div class="prebuilt-video-card" data-mission="pb3" id="prebuilt-card-pb3">
-              <div class="prebuilt-thumb-container">
-                <img src="datasets/frames_pb3/frame_0001.jpg" alt="Zermatt Alpine" class="prebuilt-thumb-img">
-                <span class="prebuilt-dur-tag"><i class="fa-solid fa-play"></i> 04:02</span>
-              </div>
-              <div class="prebuilt-card-info">
-                <div class="prebuilt-card-title">M03 · Zermatt Alpine Inspection</div>
-                <div class="prebuilt-card-meta">Autel EVO II Pro · 1080p 30fps · 72.8 MB</div>
-                <div class="prebuilt-card-terrain"><i class="fa-solid fa-mountain-sun"></i> High Alpine / Rock Corridors</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category 3: OPTIONAL INPUTS (IMPROVES ACCURACY) -->
+        <!-- Category 2: OPTIONAL INPUTS (IMPROVES ACCURACY) -->
         <div class="inputs-category-container">
           <div class="category-label-row optional">
             <i class="fa-solid fa-circle-check"></i> OPTIONAL AUXILIARY TELEMETRY (ENHANCES ACCURACY)
@@ -409,7 +502,7 @@
           </div>
         </div>
 
-        <!-- Reconstruction Settings & Start Processing (SCENE TYPE REMOVED AS REQUESTED) -->
+        <!-- Reconstruction Settings & Start Processing (SCENE TYPE REMOVED) -->
         <div class="screen02-bottom-bar">
           <div style="display: flex; gap: 24px; align-items: center;">
             <!-- Reconstruction Mode (Auto) -->

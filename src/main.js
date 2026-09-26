@@ -296,7 +296,7 @@ class AeroSculptApp {
   // 4. Screen 02: Upload & Configuration Events
   // ==========================================================================
   initScreen02Events() {
-    // Reconstruction Mode (Auto) Selection (Scene Type Removed as Requested)
+    // 1. Reconstruction Mode (Auto) Selection
     const modes = ['easy', 'medium', 'hard'];
     modes.forEach(mode => {
       const btn = document.getElementById(`mode-${mode}`);
@@ -306,109 +306,165 @@ class AeroSculptApp {
       });
     });
 
-    // File Input for UAV Video Ingestion
-    const fileInput = document.getElementById('uav-video-file-input');
-    const btnBrowse = document.getElementById('btn-browse-trigger');
-    const dropzone = document.getElementById('uav-upload-zone');
-    const videoPreview = document.getElementById('file-video-preview');
-    const btnReset = document.getElementById('btn-reset-video');
+    // 2. Ingest / Upload Modal Open/Close Controls
+    const modal = document.getElementById('modal-ingest-upload');
+    const btnOpenModal = document.getElementById('btn-open-ingest-modal');
+    const btnChangeVideo = document.getElementById('btn-change-video-trigger');
+    const btnCloseModal = document.getElementById('btn-close-ingest-modal');
+    const btnDoneModal = document.getElementById('btn-done-ingest-modal');
 
-    btnBrowse?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput?.click();
+    const openIngestModal = () => {
+      if (modal) modal.classList.add('active', 'show');
+    };
+
+    const closeIngestModal = () => {
+      if (modal) modal.classList.remove('active', 'show');
+    };
+
+    btnOpenModal?.addEventListener('click', openIngestModal);
+    btnChangeVideo?.addEventListener('click', openIngestModal);
+    btnCloseModal?.addEventListener('click', closeIngestModal);
+    btnDoneModal?.addEventListener('click', closeIngestModal);
+
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeIngestModal();
     });
 
-    const handleVideoFile = (file) => {
+    // 3. Custom UAV Video Upload Inside Modal (Top Section)
+    const modalFileInput = document.getElementById('modal-uav-file-input');
+    const modalBtnBrowse = document.getElementById('modal-btn-browse-trigger');
+    const modalDropzone = document.getElementById('modal-uav-dropzone');
+    const modalEmptyView = document.getElementById('modal-dropzone-empty');
+    const modalSelectedView = document.getElementById('modal-dropzone-selected');
+    const modalVideoPreview = document.getElementById('modal-custom-video-preview');
+    const modalFileName = document.getElementById('modal-custom-file-name');
+    const modalDur = document.getElementById('modal-custom-dur');
+    const modalRes = document.getElementById('modal-custom-res');
+    const modalSize = document.getElementById('modal-custom-size');
+    const modalBtnConfirm = document.getElementById('modal-btn-confirm-upload');
+    const modalBtnChangeCustom = document.getElementById('modal-btn-change-custom');
+
+    let stagedCustomFile = null;
+    let stagedObjectUrl = null;
+
+    modalBtnBrowse?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      modalFileInput?.click();
+    });
+
+    modalDropzone?.addEventListener('click', (e) => {
+      if (e.target.closest('#modal-dropzone-selected')) return;
+      modalFileInput?.click();
+    });
+
+    const handleCustomFile = (file) => {
       if (!file || !file.type.startsWith('video/')) {
-        alert('Please select a valid UAV video file (MP4, MOV, MKV, AVI).');
+        alert('Please select a valid UAV video file (MP4, MOV, MKV).');
         return;
       }
-      const objectUrl = URL.createObjectURL(file);
-      if (videoPreview) {
-        videoPreview.src = objectUrl;
-        videoPreview.load();
-        videoPreview.play().catch(() => {});
+      stagedCustomFile = file;
+      if (stagedObjectUrl) URL.revokeObjectURL(stagedObjectUrl);
+      stagedObjectUrl = URL.createObjectURL(file);
+
+      if (modalVideoPreview) {
+        modalVideoPreview.src = stagedObjectUrl;
+        modalVideoPreview.load();
+        modalVideoPreview.play().catch(() => {});
       }
-      const nameElem = document.getElementById('card-val-video-name');
-      if (nameElem) nameElem.textContent = file.name;
 
-      const sizeElem = document.getElementById('chip-size');
-      if (sizeElem) sizeElem.textContent = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+      if (modalFileName) modalFileName.textContent = file.name;
+      if (modalSize) modalSize.textContent = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
 
-      if (btnReset) btnReset.style.display = 'inline-flex';
+      if (modalEmptyView) modalEmptyView.style.display = 'none';
+      if (modalSelectedView) modalSelectedView.style.display = 'flex';
 
-      // Read metadata once video is loaded
-      videoPreview?.addEventListener('loadedmetadata', () => {
-        const durSec = Math.round(videoPreview.duration) || 300;
+      modalVideoPreview?.addEventListener('loadedmetadata', () => {
+        const durSec = Math.round(modalVideoPreview.duration) || 300;
         const m = Math.floor(durSec / 60);
         const s = durSec % 60;
         const durFormatted = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        
-        const durElem = document.getElementById('chip-dur');
-        if (durElem) durElem.textContent = durFormatted;
-
-        const resElem = document.getElementById('chip-res');
-        if (resElem) resElem.textContent = `${videoPreview.videoWidth}×${videoPreview.videoHeight} FHD`;
-
-        const statDur = document.getElementById('stat-duration');
-        if (statDur) statDur.textContent = `${durFormatted} (${durSec} s)`;
-
-        const statRes = document.getElementById('stat-res');
-        if (statRes) statRes.textContent = `${videoPreview.videoWidth} × ${videoPreview.videoHeight}`;
-
-        // Compute estimated processing time based on user rule:
-        // ~5 min video -> ~5 min process; ~10 min video -> ~15 min process
-        const estSec = durSec <= 360 ? Math.round(durSec * 0.98) : Math.round(durSec * 1.5);
-        const em = Math.floor(estSec / 60);
-        const es = estSec % 60;
-        const estStr = `${String(em).padStart(2, '0')}m ${String(es).padStart(2, '0')}s (GPU Accelerated)`;
-        const statProc = document.getElementById('stat-est-proc');
-        if (statProc) statProc.textContent = estStr;
+        if (modalDur) modalDur.textContent = durFormatted;
+        if (modalRes) modalRes.textContent = `${modalVideoPreview.videoWidth}×${modalVideoPreview.videoHeight}`;
       }, { once: true });
     };
 
-    fileInput?.addEventListener('change', (e) => {
+    modalFileInput?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
-      if (file) handleVideoFile(file);
+      if (file) handleCustomFile(file);
     });
 
-    // Drag and Drop
-    dropzone?.addEventListener('dragover', (e) => {
+    modalDropzone?.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropzone.classList.add('drag-over');
+      modalDropzone.classList.add('drag-over');
     });
-    dropzone?.addEventListener('dragleave', () => {
-      dropzone.classList.remove('drag-over');
+    modalDropzone?.addEventListener('dragleave', () => {
+      modalDropzone.classList.remove('drag-over');
     });
-    dropzone?.addEventListener('drop', (e) => {
+    modalDropzone?.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropzone.classList.remove('drag-over');
+      modalDropzone.classList.remove('drag-over');
       const file = e.dataTransfer?.files?.[0];
-      if (file) handleVideoFile(file);
+      if (file) handleCustomFile(file);
     });
 
-    // Reset button
-    btnReset?.addEventListener('click', (e) => {
+    modalBtnChangeCustom?.addEventListener('click', (e) => {
       e.stopPropagation();
-      const mission = this.store.getMission();
+      if (modalEmptyView) modalEmptyView.style.display = 'flex';
+      if (modalSelectedView) modalSelectedView.style.display = 'none';
+      modalFileInput?.click();
+    });
+
+    modalBtnConfirm?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!stagedCustomFile || !stagedObjectUrl) return;
+
+      const videoPreview = document.getElementById('file-video-preview');
       if (videoPreview) {
-        videoPreview.src = mission.videoUrl;
+        videoPreview.src = stagedObjectUrl;
         videoPreview.load();
         videoPreview.play().catch(() => {});
       }
-      btnReset.style.display = 'none';
-      this.hydrateMissionData(mission);
-    });
 
-    // Pre-built mission cards 1-click instant load
-    ['pb2', 'pb1', 'pb3'].forEach(id => {
-      const card = document.getElementById(`prebuilt-card-${id}`);
-      card?.addEventListener('click', () => {
-        this.switchMission(id);
+      const vName = document.getElementById('card-val-video-name');
+      if (vName) vName.textContent = stagedCustomFile.name;
+
+      const durSec = Math.round(modalVideoPreview?.duration) || 300;
+      const m = Math.floor(durSec / 60);
+      const s = durSec % 60;
+      const durFormatted = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      const resStr = modalVideoPreview ? `${modalVideoPreview.videoWidth}×${modalVideoPreview.videoHeight}` : '1920×1080';
+      const sizeMb = (stagedCustomFile.size / (1024 * 1024)).toFixed(1);
+
+      const vSpecs = document.getElementById('card-val-video-specs');
+      if (vSpecs) vSpecs.textContent = `${durFormatted} | ${resStr} | 30 FPS | ${sizeMb} MB`;
+
+      // Deselect prebuilt cards highlight
+      ['pb2', 'pb1', 'pb3'].forEach(id => {
+        document.getElementById(`modal-pb-card-${id}`)?.classList.remove('active');
       });
+
+      const activeTitle = document.getElementById('modal-active-mission-title');
+      if (activeTitle) activeTitle.textContent = `Custom Upload: ${stagedCustomFile.name}`;
+
+      closeIngestModal();
     });
 
-    // Start Processing CTA -> Transitions to Screen 03 with dynamic animation
+    // 4. Pre-built Mission Cards (Scroll Down Inside Modal)
+    ['pb2', 'pb1', 'pb3'].forEach(id => {
+      const card = document.getElementById(`modal-pb-card-${id}`);
+      const btnLoad = document.getElementById(`btn-load-${id}`);
+
+      const loadAction = (e) => {
+        e.stopPropagation();
+        this.switchMission(id);
+        closeIngestModal();
+      };
+
+      card?.addEventListener('click', loadAction);
+      btnLoad?.addEventListener('click', loadAction);
+    });
+
+    // 5. Start Processing CTA -> Hands-free automated step-by-step pipeline
     document.getElementById('btn-start-processing')?.addEventListener('click', () => {
       this.stopTour();
       this.isAutoAdvancing = true;
@@ -1708,14 +1764,16 @@ class AeroSculptApp {
     const chipSize = document.getElementById('chip-size');
     if (chipSize) chipSize.textContent = mission.rawVideoSize;
 
-    // Highlight active prebuilt video card
+    // Highlight active prebuilt video card in modal
     ['pb2', 'pb1', 'pb3'].forEach(id => {
-      const card = document.getElementById(`prebuilt-card-${id}`);
+      const card = document.getElementById(`modal-pb-card-${id}`);
       if (card) card.classList.toggle('active', id === mission.id);
     });
 
-    const btnReset = document.getElementById('btn-reset-video');
-    if (btnReset) btnReset.style.display = 'none';
+    const modalTitle = document.getElementById('modal-active-mission-title');
+    if (modalTitle) {
+      modalTitle.textContent = `${mission.code} · ${mission.name}`;
+    }
 
     const gpsName = document.getElementById('card-val-gps-name');
     if (gpsName) gpsName.textContent = mission.gpsFile;
