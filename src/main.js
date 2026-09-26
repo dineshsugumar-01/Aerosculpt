@@ -1,6 +1,5 @@
-// AeroSculpt NTRO Main Application Controller v2.0
-// Features: Classic Left Sidebar Navigation, Prebuilt Survey Library,
-// and Hands-Free Automated Step-by-Step Demo Tour Engine.
+// AeroSculpt NTRO Main Application Controller v3.0
+// Landing Page Home + Automated Tab-by-Tab Tour + Authentic NTRO Emblem
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -32,51 +31,121 @@ class AeroSculptApp {
   }
 
   init() {
+    this.bindLandingEvents();
+    this.bindMissionModal();
     this.bindSidebarNav();
-    this.bindStep1Actions();
+    this.bindWorkflowNavigation();
     this.bindTourControls();
-    this.bindStepNavigationButtons();
     this.bind3DViewerControls();
     this.bindExportActions();
     this.bindDocsModal();
 
-    // Subscribe to mission store changes
+    // Subscribe to mission store
     this.store.subscribe((state) => {
       this.hydrateMissionData(state.mission);
     });
 
     // Initial hydration
     this.hydrateMissionData(this.store.getMission());
-    this.goToStep(1, false);
+    this.showLandingPage();
   }
 
   // ==========================================================================
-  // 1. Sidebar Navigation (Evaluator can click ANY item at ANY time)
+  // 1. Landing Page Navigation
   // ==========================================================================
-  bindSidebarNav() {
-    const navButtons = document.querySelectorAll('.sidebar-nav-item[data-step]');
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const stepNum = parseInt(btn.getAttribute('data-step') || '1', 10);
-        this.stopAutomatedTour(); // Stop auto tour if user manually navigates
-        this.goToStep(stepNum);
+  showLandingPage() {
+    this.stopAutomatedTour();
+    document.getElementById('view-landing')?.classList.add('active');
+    document.getElementById('view-workflow')?.classList.remove('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  showWorkflowView(initialStep = 1) {
+    document.getElementById('view-landing')?.classList.remove('active');
+    document.getElementById('view-workflow')?.classList.add('active');
+    this.goToStep(initialStep, false);
+  }
+
+  bindLandingEvents() {
+    const btnHeroDemo = document.getElementById('btn-hero-demo');
+    const btnHeroSelect = document.getElementById('btn-hero-select');
+
+    // Click "Load Demo Mission" -> directly launches automated tour on PB2
+    btnHeroDemo?.addEventListener('click', () => {
+      this.startAutomatedDemoTour('pb2');
+    });
+
+    // Click "Select Mission" -> opens modal to choose PB1, PB2, or PB3
+    btnHeroSelect?.addEventListener('click', () => {
+      this.openMissionModal();
+    });
+
+    // Header Home buttons
+    document.getElementById('btn-header-home')?.addEventListener('click', () => {
+      this.showLandingPage();
+    });
+
+    document.getElementById('sidebar-brand-home')?.addEventListener('click', () => {
+      this.showLandingPage();
+    });
+  }
+
+  // ==========================================================================
+  // 2. Mission Selection Modal
+  // ==========================================================================
+  bindMissionModal() {
+    const modal = document.getElementById('modal-mission-picker');
+    const btnClose = document.getElementById('btn-close-mission-modal');
+    const btnConfirm = document.getElementById('btn-confirm-mission');
+    const cards = document.querySelectorAll('.mission-card[data-mission-id]');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+
+        const missionId = card.getAttribute('data-mission-id');
+        const mission = MISSIONS[missionId];
+        const summary = document.getElementById('modal-summary-mission-name');
+        if (summary && mission) {
+          summary.textContent = `${mission.code} · ${mission.name}`;
+        }
       });
     });
 
-    // Top Brand link returns to Ingest Step 1
-    document.getElementById('sidebar-brand-home')?.addEventListener('click', () => {
-      this.stopAutomatedTour();
-      this.goToStep(1);
+    btnClose?.addEventListener('click', () => modal?.classList.remove('active'));
+
+    btnConfirm?.addEventListener('click', () => {
+      const selected = document.querySelector('.mission-card.selected');
+      const missionId = selected?.getAttribute('data-mission-id') || 'pb2';
+      modal?.classList.remove('active');
+      this.startAutomatedDemoTour(missionId);
     });
 
-    // Sidebar Auto Demo Button
-    document.getElementById('btn-sidebar-auto-demo')?.addEventListener('click', () => {
-      this.startAutomatedDemoTour(this.store.currentMissionId);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
     });
 
-    // Top Header Quick Demo Button
-    document.getElementById('btn-top-quick-demo')?.addEventListener('click', () => {
-      this.startAutomatedDemoTour(this.store.currentMissionId);
+    document.getElementById('btn-sidebar-switch-mission')?.addEventListener('click', () => {
+      this.openMissionModal();
+    });
+  }
+
+  openMissionModal() {
+    document.getElementById('modal-mission-picker')?.classList.add('active');
+  }
+
+  // ==========================================================================
+  // 3. Left Sidebar Navigation (Evaluator can "scroll it back" anytime)
+  // ==========================================================================
+  bindSidebarNav() {
+    const navItems = document.querySelectorAll('.sidebar-nav-item[data-step]');
+    navItems.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const stepNum = parseInt(btn.getAttribute('data-step') || '1', 10);
+        this.stopAutomatedTour(); // Manual click stops auto-tour so user can freely inspect
+        this.goToStep(stepNum);
+      });
     });
   }
 
@@ -88,7 +157,7 @@ class AeroSculptApp {
     this.currentStep = stepNum;
     this.store.setStep(stepNum);
 
-    // Update Sidebar Navigation state
+    // Update Sidebar active state
     document.querySelectorAll('.sidebar-nav-item[data-step]').forEach(btn => {
       btn.classList.remove('active');
       if (parseInt(btn.getAttribute('data-step'), 10) === stepNum) {
@@ -96,7 +165,7 @@ class AeroSculptApp {
       }
     });
 
-    // Update Step Panes visibility
+    // Update Step Panes
     document.querySelectorAll('.step-pane').forEach((pane, idx) => {
       if (idx + 1 === stepNum) {
         pane.classList.add('active');
@@ -108,100 +177,38 @@ class AeroSculptApp {
     // Update Top Breadcrumb
     const breadcrumb = document.getElementById('breadcrumb-current-step');
     const stepTitles = [
-      'Mission Ingest & Configuration',
       'Trajectory Validation & Feasibility',
       'Processing Pipeline & Feature Detection',
-      '3D Studio Viewer & Metric Analysis',
-      'Validation Criteria & Deliverables Export'
+      '3D Model & Studio Inspection',
+      'Validation Criteria & Deliverables'
     ];
     if (breadcrumb) {
-      breadcrumb.textContent = stepTitles[stepNum - 1] || 'Mission Ingest';
+      breadcrumb.textContent = stepTitles[stepNum - 1] || 'Trajectory Validation';
     }
 
-    // Scroll to top of content
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Step-specific trigger
-    if (stepNum === 2) {
+    // Step-specific initializations
+    if (stepNum === 1) {
       setTimeout(() => this.drawGnssFlightPath(), 60);
-    } else if (stepNum === 3) {
+    } else if (stepNum === 2) {
       this.runProcessingPipelineSimulation();
-    } else if (stepNum === 4) {
+    } else if (stepNum === 3) {
       this.initOrUpdate3DViewer();
     }
   }
 
   // ==========================================================================
-  // 2. Step 1 (Ingest / Upload) & Prebuilt Library Actions
-  // ==========================================================================
-  bindStep1Actions() {
-    // Run automated demo from Step 1 header
-    document.getElementById('btn-step1-start-auto')?.addEventListener('click', () => {
-      this.startAutomatedDemoTour(this.store.currentMissionId);
-    });
-
-    // Prebuilt Mission Card selection & "Run Prebuilt Demo" buttons
-    const prebuiltCards = document.querySelectorAll('.prebuilt-mission-card[data-mission-card]');
-    prebuiltCards.forEach(card => {
-      card.addEventListener('click', (e) => {
-        // If clicking the button or card
-        const missionId = card.getAttribute('data-mission-card');
-        this.selectPrebuiltMission(missionId);
-
-        if (e.target.closest('.btn-launch-prebuilt-demo')) {
-          this.startAutomatedDemoTour(missionId);
-        }
-      });
-    });
-
-    // Scene and Mode pills in Step 1
-    document.querySelectorAll('#scene-type-options .setting-btn-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#scene-type-options .setting-btn-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-
-    document.querySelectorAll('#mode-options .setting-btn-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#mode-options .setting-btn-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-
-    // Custom browse buttons simulate file selection
-    document.querySelectorAll('.btn-upload-browse').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        alert('File selected: Custom UAV telemetry stream loaded and validated.');
-      });
-    });
-  }
-
-  selectPrebuiltMission(missionId) {
-    if (!MISSIONS[missionId]) return;
-
-    // Update active card styling
-    document.querySelectorAll('.prebuilt-mission-card').forEach(c => {
-      c.classList.remove('active-selected');
-      if (c.getAttribute('data-mission-card') === missionId) {
-        c.classList.add('active-selected');
-      }
-    });
-
-    this.store.setMission(missionId);
-  }
-
-  // ==========================================================================
-  // 3. Hands-Free Automated Demo Tour Engine
+  // 4. Hands-Free Automated Demo Tour Engine (Step-by-Step Tab Progression)
   // ==========================================================================
   startAutomatedDemoTour(missionId = 'pb2') {
-    this.selectPrebuiltMission(missionId);
+    this.store.setMission(missionId);
+    this.showWorkflowView(1);
+
     this.isTourRunning = true;
     this.tourPaused = false;
     this.tourStep = 1;
 
-    // Show tour banner
     const banner = document.getElementById('auto-tour-banner');
     if (banner) banner.classList.add('active');
 
@@ -219,18 +226,17 @@ class AeroSculptApp {
     this.goToStep(stepNum, false);
 
     const bannerText = document.getElementById('tour-banner-text');
-    const stepDurations = { 1: 3, 2: 3.5, 3: 6.5, 4: 5, 5: 0 }; // in seconds
-    const duration = stepDurations[stepNum] || 4;
+    const stepDurations = { 1: 3.5, 2: 6.0, 3: 5.5, 4: 0 }; // in seconds
+    const duration = stepDurations[stepNum] || 4.5;
 
     const stepNames = [
-      'Step 1/5: Upload & Ingest',
-      'Step 2/5: Trajectory Validation',
-      'Step 3/5: Processing Pipeline (7 Stages)',
-      'Step 4/5: 3D Studio & Model Inspection',
-      'Step 5/5: NTRO Validation & Deliverables'
+      'Step 1/4: Trajectory Validation',
+      'Step 2/4: Processing Pipeline (7 Stages)',
+      'Step 3/4: 3D Model & Studio Viewer',
+      'Step 4/4: Validation & Deliverables'
     ];
 
-    if (stepNum < 5) {
+    if (stepNum < 4) {
       this.tourRemainingSec = duration;
       if (bannerText) {
         bannerText.textContent = `⚡ AUTOMATED DEMO TOUR ACTIVE · ${stepNames[stepNum - 1]} · Auto-advancing in ${this.tourRemainingSec.toFixed(1)}s`;
@@ -248,20 +254,20 @@ class AeroSculptApp {
 
         if (this.tourRemainingSec <= 0) {
           clearInterval(this.tourCountdownTimer);
-          if (this.isTourRunning && this.tourStep < 5) {
+          if (this.isTourRunning && this.tourStep < 4) {
             this.executeTourStep(this.tourStep + 1);
           }
         }
       }, 500);
     } else {
-      // Step 5 - Final Step reached!
+      // Step 4 (Final Deliverables) reached!
       if (this.tourCountdownTimer) clearInterval(this.tourCountdownTimer);
       if (bannerText) {
-        bannerText.textContent = `✓ AUTOMATED DEMO TOUR COMPLETE · Full 3D Model, Accuracy Metrics & Deliverables Ready.`;
+        bannerText.textContent = `✓ AUTOMATED DEMO TOUR COMPLETE · Evaluator may now click any tab in the left sidebar to explore.`;
       }
       setTimeout(() => {
         this.stopAutomatedTour();
-      }, 4000);
+      }, 4500);
     }
   }
 
@@ -284,7 +290,7 @@ class AeroSculptApp {
       btnPause.style.display = 'none';
       if (btnResume) btnResume.style.display = 'inline-flex';
       const bannerText = document.getElementById('tour-banner-text');
-      if (bannerText) bannerText.textContent = `⏸ TOUR PAUSED · Click Resume to continue, or click any sidebar item to explore.`;
+      if (bannerText) bannerText.textContent = `⏸ TOUR PAUSED · Click Resume to continue, or click any sidebar item to explore freely.`;
     });
 
     btnResume?.addEventListener('click', () => {
@@ -295,33 +301,33 @@ class AeroSculptApp {
 
     btnSkip?.addEventListener('click', () => {
       this.stopAutomatedTour();
-      this.goToStep(4);
+      this.goToStep(3); // Jump straight to 3D model
     });
   }
 
   // ==========================================================================
-  // 4. In-Step Navigation Buttons
+  // 5. In-Step Navigation Buttons
   // ==========================================================================
-  bindStepNavigationButtons() {
+  bindWorkflowNavigation() {
+    // Step 1
+    document.getElementById('btn-step1-home')?.addEventListener('click', () => this.showLandingPage());
+    document.getElementById('btn-step1-proceed')?.addEventListener('click', () => this.goToStep(2));
+
     // Step 2
     document.getElementById('btn-step2-back')?.addEventListener('click', () => this.goToStep(1));
     document.getElementById('btn-step2-proceed')?.addEventListener('click', () => this.goToStep(3));
 
     // Step 3
-    document.getElementById('btn-step3-replay')?.addEventListener('click', () => this.runProcessingPipelineSimulation(true));
-    document.getElementById('btn-step3-view-3d')?.addEventListener('click', () => this.goToStep(4));
+    document.getElementById('btn-step3-back')?.addEventListener('click', () => this.goToStep(2));
+    document.getElementById('btn-step3-proceed')?.addEventListener('click', () => this.goToStep(4));
 
     // Step 4
     document.getElementById('btn-step4-back')?.addEventListener('click', () => this.goToStep(3));
-    document.getElementById('btn-step4-export')?.addEventListener('click', () => this.goToStep(5));
-
-    // Step 5
-    document.getElementById('btn-step5-back')?.addEventListener('click', () => this.goToStep(4));
-    document.getElementById('btn-step5-restart')?.addEventListener('click', () => this.goToStep(1));
+    document.getElementById('btn-step4-home')?.addEventListener('click', () => this.showLandingPage());
   }
 
   // ==========================================================================
-  // 5. Dynamic Mission Hydration
+  // 6. Dynamic Mission Hydration
   // ==========================================================================
   hydrateMissionData(mission) {
     if (!mission) return;
@@ -332,23 +338,23 @@ class AeroSculptApp {
     if (sideName) sideName.textContent = `${mission.code} · ${mission.name}`;
     if (sideDatum) sideDatum.textContent = mission.crsDatum.split(' ')[0];
 
-    // Step 2 - Validation Details
-    const s2Dur = document.getElementById('step2-duration');
-    const s2Gps = document.getElementById('step2-gps-count');
-    const s2Gsd = document.getElementById('step2-gsd');
-    const s2Comp = document.getElementById('step2-compute-time');
-    const s2Crs = document.getElementById('step2-crs-name');
-    if (s2Dur) s2Dur.textContent = `${mission.videoDuration} (${mission.videoDurationSec} s)`;
-    if (s2Gps) s2Gps.textContent = mission.gpsRecords;
-    if (s2Gsd) s2Gsd.textContent = mission.gsd;
-    if (s2Comp) s2Comp.textContent = mission.reconstructionTime;
-    if (s2Crs) s2Crs.textContent = mission.crsDatum;
+    // Step 1 - Trajectory Details
+    const s1Dur = document.getElementById('step1-duration');
+    const s1Gps = document.getElementById('step1-gps-count');
+    const s1Gsd = document.getElementById('step1-gsd');
+    const s1Comp = document.getElementById('step1-compute-time');
+    const s1Crs = document.getElementById('step1-crs-name');
+    if (s1Dur) s1Dur.textContent = `${mission.videoDuration} (${mission.videoDurationSec} s)`;
+    if (s1Gps) s1Gps.textContent = mission.gpsRecords;
+    if (s1Gsd) s1Gsd.textContent = mission.gsd;
+    if (s1Comp) s1Comp.textContent = mission.reconstructionTime;
+    if (s1Crs) s1Crs.textContent = mission.crsDatum;
 
-    // Step 3 - Keyframe stream & semantic masks
+    // Step 2 - Keyframes & SAM Masks
     this.renderKeyframeStrip(mission);
     this.renderSemanticPreviews(mission);
 
-    // Step 5 - Validation Table & Metrics
+    // Step 4 - Validation Table & Metrics
     const valReproj = document.getElementById('val-reproj');
     const valSpatial = document.getElementById('val-spatial');
     const valCoverage = document.getElementById('val-coverage');
@@ -358,21 +364,21 @@ class AeroSculptApp {
     if (valCoverage) valCoverage.textContent = mission.coverage;
     if (valTime) valTime.textContent = mission.reconstructionTime;
 
-    // Step 5 - Donut Chart
+    // Step 4 - Donut Chart
     this.updateDonutChart(mission.evidence);
 
-    // Step 5 - Deliverable card filename
+    // Step 4 - Deliverable card filename
     const meshMeta = document.getElementById('dl-mesh-meta');
     if (meshMeta) meshMeta.textContent = `${mission.id}_model.glb · ${mission.outputSize.split(' ')[0]} MB`;
 
-    // Redraw flight path if on step 2
-    if (this.currentStep === 2) {
+    // Redraw flight path if on step 1
+    if (this.currentStep === 1) {
       this.drawGnssFlightPath();
     }
   }
 
   // ==========================================================================
-  // 6. 2D GNSS Flight Trajectory Canvas (Step 2)
+  // 7. 2D GNSS Flight Trajectory Canvas (Step 1)
   // ==========================================================================
   drawGnssFlightPath() {
     const canvas = document.getElementById('flight-path-canvas');
@@ -460,7 +466,7 @@ class AeroSculptApp {
   }
 
   // ==========================================================================
-  // 7. Processing Pipeline Simulation (Step 3)
+  // 8. Processing Pipeline Simulation (Step 2)
   // ==========================================================================
   runProcessingPipelineSimulation(forceReplay = false) {
     if (this.store.isProcessing && !forceReplay) return;
@@ -511,7 +517,7 @@ class AeroSculptApp {
           statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--as-green);"></i> PROCESSING COMPLETE · 3D WORLD READY FOR EVALUATION`;
         }
       }
-    }, 750); // ~5.2 seconds total
+    }, 700);
   }
 
   renderKeyframeStrip(mission) {
@@ -568,7 +574,7 @@ class AeroSculptApp {
   }
 
   // ==========================================================================
-  // 8. Three.js 3D Studio & Viewer Engine (Step 4)
+  // 9. Three.js 3D Studio & Viewer Engine (Step 3)
   // ==========================================================================
   initOrUpdate3DViewer() {
     const container = document.getElementById('viewer3d-canvas-container');
@@ -648,7 +654,6 @@ class AeroSculptApp {
 
     scene.add(this.viewer.modelContainer);
 
-    // Raycasting & Coordinate readout
     renderer.domElement.addEventListener('mousemove', (e) => {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -662,7 +667,6 @@ class AeroSculptApp {
       }
     });
 
-    // Distance Measurement click handler
     renderer.domElement.addEventListener('click', (e) => {
       if (!this.measureActive) return;
 
@@ -678,7 +682,6 @@ class AeroSculptApp {
       }
     });
 
-    // Window resize handler
     window.addEventListener('resize', () => {
       if (!this.viewer) return;
       const w = container.clientWidth || 800;
@@ -688,7 +691,6 @@ class AeroSculptApp {
       renderer.setSize(w, h);
     });
 
-    // Render loop
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
@@ -719,7 +721,6 @@ class AeroSculptApp {
       (gltf) => {
         const rawModel = gltf.scene;
 
-        // Auto-fit algorithm
         const bbox = new THREE.Box3().setFromObject(rawModel);
         const rawSize = bbox.getSize(new THREE.Vector3());
 
@@ -741,13 +742,11 @@ class AeroSculptApp {
         this.viewer.modelContainer.add(rawModel);
         this.viewer.currentMesh = rawModel;
 
-        // Sit flat on datum grid (Y = 0)
         const worldBox = new THREE.Box3().setFromObject(this.viewer.modelContainer);
         const worldCenter = worldBox.getCenter(new THREE.Vector3());
         this.viewer.modelContainer.position.set(-worldCenter.x, -worldBox.min.y, -worldCenter.z);
         this.viewer.modelContainer.updateMatrixWorld(true);
 
-        // ROI Bounding Box
         const finalBox = new THREE.Box3().setFromObject(this.viewer.modelContainer);
         const finalSize = finalBox.getSize(new THREE.Vector3());
         const finalCenter = finalBox.getCenter(new THREE.Vector3());
@@ -759,10 +758,8 @@ class AeroSculptApp {
         this.viewer.roiBox.position.copy(finalCenter);
         this.viewer.scene.add(this.viewer.roiBox);
 
-        // Drone Camera Frustums
         this.createDroneFrustums(finalSize);
 
-        // Set Camera & Controls
         this.viewer.camera.position.set(
           mission.viewerSettings?.cameraPos?.[0] || -28,
           mission.viewerSettings?.cameraPos?.[1] || 22,
@@ -771,7 +768,7 @@ class AeroSculptApp {
         this.viewer.controls.target.set(0, finalSize.y * 0.45, 0);
         this.viewer.controls.update();
 
-        // Enable auto-rotation during automated demo tour
+        // Auto-rotation during automated demo tour
         if (this.isTourRunning) {
           this.viewer.controls.autoRotate = true;
           setTimeout(() => {
@@ -991,7 +988,7 @@ class AeroSculptApp {
   }
 
   // ==========================================================================
-  // 9. Step 5 (Validation & Export) Actions
+  // 10. Step 4 (Validation & Export) Actions
   // ==========================================================================
   updateDonutChart(evidence) {
     if (!evidence) return;
@@ -1071,7 +1068,7 @@ class AeroSculptApp {
   }
 
   // ==========================================================================
-  // 10. NTRO Documentation Modal
+  // 11. NTRO Documentation Modal
   // ==========================================================================
   bindDocsModal() {
     const modal = document.getElementById('modal-docs');

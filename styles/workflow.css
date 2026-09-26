@@ -1,7 +1,6 @@
 /* ==========================================================================
-   AeroSculpt NTRO Workflow Stylesheet v2.0
-   Classic Left Sidebar Layout + Auto-Demo Playthrough Engine
-   Tactical Dark Aerospace Aesthetic · Micro-animations · Glassmorphism
+   AeroSculpt NTRO Workflow Stylesheet v3.0
+   Landing Page Home + Automated Tab Progression + Official NTRO Emblem
    ========================================================================== */
 
 :root {
@@ -54,8 +53,284 @@ html, body {
 }
 
 /* ==========================================================================
-   Classic Full-Height Left Navigation Sidebar
+   Screen 01: Landing Page (Home)
    ========================================================================== */
+#view-landing {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.hero-background-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/hero_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  filter: brightness(0.6) contrast(1.15);
+}
+
+.hero-overlay-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(11, 15, 25, 0.4) 0%, rgba(7, 9, 14, 0.92) 80%),
+              linear-gradient(to bottom, rgba(11, 15, 25, 0.6) 0%, rgba(7, 9, 14, 0.98) 100%);
+  z-index: 1;
+}
+
+.hero-tactical-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Landing Top Navigation Bar */
+.landing-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+  background: linear-gradient(to bottom, rgba(7, 9, 14, 0.8), transparent);
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-logo-img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
+}
+
+.landing-brand-text {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-brand-sub {
+  font-size: 0.7rem;
+  color: var(--as-text-muted);
+  font-family: var(--as-font-mono);
+}
+
+.landing-ntro-emblem-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 24px;
+  background: rgba(22, 32, 50, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.ntro-official-emblem-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+}
+
+.ntro-emblem-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.ntro-emblem-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+
+.ntro-emblem-sub {
+  font-size: 0.65rem;
+  color: var(--as-cyan);
+  font-weight: 700;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 960px;
+  padding: 80px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-pre-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--as-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+
+.hero-title {
+  font-size: 3.8rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #ffffff;
+  margin-bottom: 14px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff 40%, var(--as-cyan) 80%, var(--as-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 18px;
+}
+
+.hero-description {
+  font-size: 1.05rem;
+  color: var(--as-text-secondary);
+  line-height: 1.6;
+  max-width: 720px;
+  margin-bottom: 30px;
+}
+
+.hero-feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.feature-chip {
+  padding: 8px 16px;
+  background: rgba(22, 32, 50, 0.7);
+  border: 1px solid var(--as-border-subtle);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-chip i {
+  color: var(--as-cyan);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 40px;
+}
+
+.btn-hero-primary {
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #00f0ff);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px var(--as-blue-glow);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px var(--as-cyan-glow);
+}
+
+.btn-hero-secondary {
+  padding: 16px 30px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--as-border-medium);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Screen 02: 4-Step Operational Workflow Layout (#view-workflow)
+   ========================================================================== */
+#view-workflow {
+  display: none;
+  min-height: 100vh;
+}
+
+#view-workflow.active {
+  display: block;
+}
+
+/* Full-Height Left Navigation Sidebar */
 #app-sidebar {
   position: fixed;
   top: 0;
@@ -72,7 +347,7 @@ html, body {
 }
 
 .sidebar-brand-header {
-  padding: 18px 20px;
+  padding: 16px 18px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -82,10 +357,9 @@ html, body {
 }
 
 .sidebar-logo-img {
-  height: 36px;
+  height: 34px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));
 }
 
 .sidebar-title-wrap {
@@ -94,9 +368,8 @@ html, body {
 }
 
 .sidebar-brand-title {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 900;
-  letter-spacing: -0.02em;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -104,23 +377,15 @@ html, body {
 }
 
 .sidebar-version-badge {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
   background: rgba(59, 130, 246, 0.15);
   color: var(--as-cyan);
   border: 1px solid rgba(0, 240, 255, 0.3);
-  font-family: var(--as-font-mono);
 }
 
-.sidebar-brand-sub {
-  font-size: 0.68rem;
-  color: var(--as-text-muted);
-  font-family: var(--as-font-mono);
-}
-
-/* Sidebar Navigation Items */
 .sidebar-nav-list {
   list-style: none;
   padding: 16px 12px;
@@ -134,7 +399,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   border-radius: 8px;
   background: transparent;
   border: 1px solid transparent;
@@ -143,7 +408,8 @@ html, body {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
-  text-decoration: none;
+  width: 100%;
+  text-align: left;
 }
 
 .sidebar-nav-item i {
@@ -151,7 +417,6 @@ html, body {
   width: 20px;
   text-align: center;
   color: var(--as-text-muted);
-  transition: color 0.15s ease;
 }
 
 .sidebar-nav-item:hover {
@@ -167,7 +432,6 @@ html, body {
   background: rgba(59, 130, 246, 0.15);
   border-color: rgba(59, 130, 246, 0.35);
   color: #ffffff;
-  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
 }
 
 .sidebar-nav-item.active i {
@@ -189,65 +453,50 @@ html, body {
   color: #ffffff;
 }
 
-/* Sidebar Auto-Demo Controller Card */
-.sidebar-demo-card {
+/* Sidebar Active Mission Card */
+.sidebar-mission-card {
   margin: 12px;
   padding: 14px;
   background: rgba(22, 32, 50, 0.6);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  border: 1px solid var(--as-border-subtle);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
-.demo-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.demo-card-label {
+.sidebar-mission-label {
   font-size: 0.65rem;
   font-weight: 800;
-  color: var(--as-cyan);
+  color: var(--as-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
-.btn-sidebar-play-demo {
-  width: 100%;
-  padding: 9px 12px;
-  font-size: 0.8rem;
+.sidebar-mission-name {
+  font-size: 0.82rem;
   font-weight: 800;
   color: #ffffff;
-  background: linear-gradient(135deg, #2563eb, #00f0ff);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px var(--as-blue-glow);
-  transition: all 0.2s ease;
-}
-
-.btn-sidebar-play-demo:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px var(--as-cyan-glow);
-}
-
-.sidebar-mission-active-info {
-  font-size: 0.75rem;
-  color: #e2e8f0;
-  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Sidebar Footer Hardware & Datum */
+.btn-sidebar-switch-mission {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--as-blue);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 0 0;
+}
+
+.btn-sidebar-switch-mission:hover {
+  text-decoration: underline;
+  color: var(--as-cyan);
+}
+
 .sidebar-footer {
   padding: 14px 16px;
   border-top: 1px solid var(--as-border-subtle);
@@ -260,9 +509,7 @@ html, body {
   gap: 4px;
 }
 
-/* ==========================================================================
-   Top Header Bar (To the right of sidebar)
-   ========================================================================== */
+/* Top Header Bar */
 #top-header-bar {
   position: fixed;
   top: 0;
@@ -299,52 +546,37 @@ html, body {
   gap: 16px;
 }
 
-.btn-quick-run-demo {
-  padding: 8px 16px;
-  font-size: 0.8rem;
+.ntro-official-header-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 8px;
+  border-radius: 20px;
+  background: rgba(22, 32, 50, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ntro-header-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ntro-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ntro-header-title {
+  font-size: 0.72rem;
   font-weight: 800;
   color: #ffffff;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 10px var(--as-green-glow);
-  transition: all 0.15s ease;
 }
 
-.btn-quick-run-demo:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, #059669, #047857);
-}
-
-.ntro-pill-tag {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  font-size: 0.74rem;
+.ntro-header-sub {
+  font-size: 0.62rem;
   font-weight: 700;
-  color: #34d399;
-}
-
-.ntro-dot-pulse {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--as-green);
-  box-shadow: 0 0 8px var(--as-green);
-  animation: pulse-dot 2s infinite ease-in-out;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  color: var(--as-green);
 }
 
 .evaluator-profile-tag {
@@ -373,9 +605,7 @@ html, body {
   color: #ffffff;
 }
 
-/* ==========================================================================
-   Main App Content Area (To the right of sidebar, below topbar)
-   ========================================================================== */
+/* Main Content Area */
 #main-app-content {
   margin-left: var(--sidebar-width);
   margin-top: var(--topbar-height);
@@ -429,7 +659,7 @@ html, body {
   background: rgba(0, 0, 0, 0.45);
 }
 
-/* Step Views */
+/* Step Panes */
 .step-pane {
   display: none;
   padding: 28px 36px;
@@ -441,7 +671,6 @@ html, body {
   display: flex;
 }
 
-/* Shared Step Top Row */
 .step-header-row {
   display: flex;
   justify-content: space-between;
@@ -505,267 +734,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Page 1: Ingest & Upload (Top: Custom Dropzone / Bottom: Prebuilt Missions)
-   ========================================================================== */
-.section-subtitle-badge {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--as-cyan);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Top Section: Custom Dropzone */
-.custom-upload-zone {
-  background: var(--as-bg-surface-elevated);
-  border: 2px dashed rgba(59, 130, 246, 0.35);
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  transition: all 0.2s ease;
-}
-
-.custom-upload-zone:hover {
-  border-color: var(--as-cyan);
-  background: rgba(22, 32, 50, 0.85);
-}
-
-.dropzone-inner-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.upload-input-box {
-  background: rgba(11, 15, 25, 0.6);
-  border: 1px solid var(--as-border-subtle);
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.upload-input-box:hover {
-  border-color: var(--as-blue);
-  background: rgba(11, 15, 25, 0.9);
-}
-
-.upload-box-icon {
-  font-size: 1.8rem;
-  color: var(--as-cyan);
-}
-
-.upload-box-title {
-  font-size: 0.84rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.upload-box-desc {
-  font-size: 0.72rem;
-  color: var(--as-text-muted);
-}
-
-.btn-upload-browse {
-  padding: 6px 14px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 6px;
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  color: #ffffff;
-  cursor: pointer;
-}
-
-/* Reconstruction Settings in Step 1 */
-.reconstruction-settings-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  background: rgba(11, 15, 25, 0.5);
-  border: 1px solid var(--as-border-subtle);
-  border-radius: 10px;
-  padding: 14px 18px;
-}
-
-.setting-options-wrap {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-.setting-btn-pill {
-  padding: 6px 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--as-border-subtle);
-  color: var(--as-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.setting-btn-pill.active {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: var(--as-blue);
-  color: #ffffff;
-}
-
-/* Bottom Section: Prebuilt Mission Library */
-.prebuilt-library-container {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.prebuilt-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.prebuilt-mission-card {
-  background: var(--as-bg-surface-elevated);
-  border: 2px solid var(--as-border-subtle);
-  border-radius: 14px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.prebuilt-mission-card:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-}
-
-.prebuilt-mission-card.active-selected {
-  border-color: var(--as-cyan);
-  background: rgba(22, 32, 50, 0.95);
-  box-shadow: 0 0 0 1px var(--as-cyan), 0 8px 24px var(--as-cyan-glow);
-}
-
-.prebuilt-badge-tag {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 12px;
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--as-green);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.prebuilt-badge-tag.rec {
-  background: rgba(0, 240, 255, 0.15);
-  color: var(--as-cyan);
-  border-color: rgba(0, 240, 255, 0.4);
-}
-
-.prebuilt-mission-num {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--as-blue);
-  font-family: var(--as-font-mono);
-  margin-bottom: 4px;
-}
-
-.prebuilt-mission-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #ffffff;
-  margin-bottom: 4px;
-}
-
-.prebuilt-scene-desc {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--as-cyan);
-  margin-bottom: 12px;
-}
-
-.prebuilt-video-preview-box {
-  width: 100%;
-  height: 120px;
-  background: rgba(11, 15, 25, 0.7);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  position: relative;
-}
-
-.prebuilt-video-elem {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.prebuilt-specs-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 0.74rem;
-  font-family: var(--as-font-mono);
-  padding: 10px 0;
-  border-top: 1px solid var(--as-border-subtle);
-  border-bottom: 1px solid var(--as-border-subtle);
-  margin-bottom: 14px;
-}
-
-.prebuilt-spec-row {
-  display: flex;
-  justify-content: space-between;
-  color: var(--as-text-muted);
-}
-
-.prebuilt-spec-row strong {
-  color: #e2e8f0;
-}
-
-.btn-launch-prebuilt-demo {
-  width: 100%;
-  padding: 11px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #ffffff;
-  background: linear-gradient(135deg, #2563eb, #00f0ff);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 14px var(--as-blue-glow);
-  transition: all 0.2s ease;
-}
-
-.btn-launch-prebuilt-demo:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--as-cyan-glow);
-}
-
-/* ==========================================================================
-   Page 2: Trajectory Validation & Feasibility
+   Tab 1: Trajectory Validation & Feasibility
    ========================================================================== */
 .validation-grid-layout {
   display: grid;
@@ -908,7 +877,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Page 3: Processing Pipeline (Dynamic Experience)
+   Tab 2: Processing Pipeline
    ========================================================================== */
 .pipeline-progress-container {
   background: var(--as-bg-surface-elevated);
@@ -1005,7 +974,6 @@ html, body {
   line-height: 1.2;
 }
 
-/* Keyframe Gallery */
 .keyframe-gallery-box {
   background: var(--as-bg-surface-elevated);
   border: 1px solid var(--as-border-subtle);
@@ -1059,7 +1027,6 @@ html, body {
   justify-content: space-between;
 }
 
-/* AI Semantic Masking Panel */
 .semantic-segmentation-box {
   background: var(--as-bg-surface-elevated);
   border: 1px solid var(--as-border-subtle);
@@ -1135,7 +1102,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Page 4: 3D Studio & Viewer
+   Tab 3: 3D Model & Studio Viewer
    ========================================================================== */
 .viewer-workspace-container {
   display: flex;
@@ -1390,7 +1357,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Page 5: Validation & Export
+   Tab 4: Validation & Deliverables
    ========================================================================== */
 .export-three-col-grid {
   display: grid;
@@ -1617,7 +1584,7 @@ html, body {
 
 .as-modal-window {
   width: 100%;
-  max-width: 820px;
+  max-width: 960px;
   background: var(--as-bg-surface);
   border: 1px solid var(--as-border-medium);
   border-radius: 18px;
@@ -1667,13 +1634,115 @@ html, body {
   overflow-y: auto;
 }
 
+.mission-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.mission-card {
+  background: var(--as-bg-surface-elevated);
+  border: 2px solid var(--as-border-subtle);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mission-card:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.mission-card.selected {
+  border-color: var(--as-cyan);
+  background: rgba(22, 32, 50, 0.95);
+  box-shadow: 0 0 0 1px var(--as-cyan), 0 10px 30px var(--as-cyan-glow);
+}
+
+.mission-card-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--as-green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mission-card.recommended .mission-card-badge {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--as-cyan);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.mission-number {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--as-blue);
+  font-family: var(--as-font-mono);
+  margin-bottom: 6px;
+}
+
+.mission-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.mission-scene-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--as-cyan);
+  margin-bottom: 12px;
+}
+
+.mission-desc {
+  font-size: 0.8rem;
+  color: var(--as-text-secondary);
+  line-height: 1.4;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.mission-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.75rem;
+  padding-top: 12px;
+  border-top: 1px solid var(--as-border-subtle);
+  font-family: var(--as-font-mono);
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--as-text-muted);
+}
+
+.spec-val {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
 .modal-footer {
   padding: 18px 28px;
   background: var(--as-bg-surface-elevated);
   border-top: 1px solid var(--as-border-subtle);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .docs-table {
@@ -1694,7 +1763,7 @@ html, body {
 }
 
 @media (max-width: 1100px) {
-  .prebuilt-cards-grid, .dropzone-inner-grid, .export-three-col-grid, .validation-grid-layout {
+  .mission-cards-grid, .export-three-col-grid, .validation-grid-layout {
     grid-template-columns: 1fr;
   }
 }
